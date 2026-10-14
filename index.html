@@ -63,7 +63,6 @@
                 TAP TO START 🎙️
             </button>
             
-            <!-- Presentation -->
             <div class="absolute bottom-6 flex flex-col items-center opacity-90 z-20 pointer-events-none">
                 <div class="text-slate-500 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-center leading-tight">
                     Presented by <br/> <span class="text-slate-400">Black Eagle Cricket Club</span>
@@ -87,7 +86,6 @@
                 <button @click="copyOverlayUrl" class="w-full py-3 bg-slate-800 border border-slate-600 rounded-xl font-bold text-sm text-slate-300 mt-4 hover:bg-slate-700">📺 Copy Overlay URL</button>
             </div>
 
-            <!-- Presentation -->
             <div class="absolute bottom-6 flex flex-col items-center opacity-90 z-20 pointer-events-none">
                 <div class="text-slate-500 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-center leading-tight">
                     Presented by <br/> <span class="text-slate-400">Black Eagle Cricket Club</span>
@@ -194,13 +192,10 @@
                 <h2 class="text-3xl font-black font-oswald text-center mb-6 text-white tracking-widest">MATCH SETUP</h2>
                 
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <!-- Home Team Setup (with Native Datalist) -->
                     <div>
                         <label class="text-xs text-blue-400 font-black uppercase tracking-widest mb-1 block">HOME TEAM</label>
                         <input type="text" list="team-list" v-model="setupData.home" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-blue-500 outline-none shadow-inner" placeholder="E.g. IND">
                     </div>
-                    
-                    <!-- Away Team Setup (with Native Datalist) -->
                     <div>
                         <label class="text-xs text-red-400 font-black uppercase tracking-widest mb-1 block">AWAY TEAM</label>
                         <input type="text" list="team-list" v-model="setupData.away" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-red-500 outline-none shadow-inner" placeholder="E.g. AUS">
@@ -325,44 +320,76 @@
                 </div>
 
                 <!-- Players Dashboard -->
-                <div class="bg-slate-800 rounded-xl border border-slate-700 p-3 space-y-3 shadow-lg">
-                    <!-- Striker -->
-                    <div class="flex items-center gap-1.5">
-                        <span class="text-yellow-400 text-sm w-4 font-black animate-pulse">▶</span>
-                        <input type="text" v-model="match.striker.name" @change="updatePlayerStat(match.striker.name, 'batting')" class="flex-1 bg-slate-900 border border-slate-600 rounded px-2 py-2 text-sm font-black text-white uppercase outline-none focus:border-yellow-500 shadow-inner min-w-0">
-                        <div class="flex flex-col items-center bg-slate-900 border border-slate-600 rounded px-1.5 py-0.5 text-[10px] text-gray-400 shrink-0">
-                            <span class="text-blue-400 font-bold leading-none">{{ match.striker.fours }}<span class="text-[8px] text-slate-500">x4</span></span>
-                            <span class="text-indigo-400 font-bold leading-none mt-0.5">{{ match.striker.sixes }}<span class="text-[8px] text-slate-500">x6</span></span>
-                        </div>
-                        <div class="w-10 bg-black border border-slate-600 rounded px-1 py-2 text-sm font-black text-center text-white shadow-inner shrink-0">{{ match.striker.runs }}</div>
-                        <div class="w-10 bg-black border border-slate-600 rounded px-1 py-2 text-sm font-black text-center text-slate-400 shadow-inner shrink-0">({{ match.striker.balls }})</div>
+                <div class="bg-slate-800 rounded-xl border border-slate-700 p-2 space-y-2 shadow-lg overflow-hidden">
+                    
+                    <!-- BATTING HEADER -->
+                    <div class="flex text-[10px] text-slate-400 font-black tracking-widest uppercase mb-1 px-1">
+                        <div class="flex-1 pl-5">BATTING</div>
+                        <div class="w-9 text-center">R</div>
+                        <div class="w-9 text-center">B</div>
+                        <div class="w-7 text-center">4s</div>
+                        <div class="w-7 text-center">6s</div>
+                        <div class="w-10 text-center">SR</div>
                     </div>
+
+                    <!-- Striker -->
+                    <div class="flex items-center gap-1 mb-1.5">
+                        <span class="text-yellow-400 text-sm w-4 font-black animate-pulse text-center shrink-0">▶</span>
+                        <input type="text" v-model="match.striker.name" @change="updatePlayerStat(match.striker.name, 'batting')" class="flex-1 bg-slate-900 border border-slate-600 rounded px-1.5 py-1.5 text-sm font-black text-white uppercase outline-none focus:border-yellow-500 shadow-inner min-w-0" placeholder="Striker">
+                        <div class="w-9 bg-black border border-slate-600 rounded py-1.5 text-sm font-black text-center text-white shadow-inner shrink-0">{{ match.striker.runs }}</div>
+                        <div class="w-9 bg-black border border-slate-600 rounded py-1.5 text-sm font-black text-center text-slate-400 shadow-inner shrink-0">{{ match.striker.balls }}</div>
+                        <div class="w-7 bg-slate-900 border border-slate-600 rounded py-1.5 text-xs font-bold text-center text-blue-400 shadow-inner shrink-0">{{ match.striker.fours }}</div>
+                        <div class="w-7 bg-slate-900 border border-slate-600 rounded py-1.5 text-xs font-bold text-center text-indigo-400 shadow-inner shrink-0">{{ match.striker.sixes }}</div>
+                        <div class="w-10 bg-slate-900 border border-slate-600 rounded py-1.5 text-[11px] font-bold text-center text-yellow-500 shadow-inner shrink-0">{{ match.striker.balls > 0 ? ((match.striker.runs / match.striker.balls) * 100).toFixed(1) : '0.0' }}</div>
+                    </div>
+
                     <!-- Non Striker -->
-                    <div class="flex items-center gap-1.5 pl-6">
-                        <input type="text" v-model="match.nonStriker.name" @change="updatePlayerStat(match.nonStriker.name, 'batting')" class="flex-1 bg-slate-900 border border-slate-600 rounded px-2 py-2 text-sm font-bold text-slate-300 uppercase outline-none shadow-inner min-w-0">
-                        <div class="flex flex-col items-center bg-slate-900 border border-slate-600 rounded px-1.5 py-0.5 text-[10px] text-gray-500 shrink-0">
-                            <span class="text-blue-400/50 font-bold leading-none">{{ match.nonStriker.fours }}<span class="text-[8px] text-slate-600">x4</span></span>
-                            <span class="text-indigo-400/50 font-bold leading-none mt-0.5">{{ match.nonStriker.sixes }}<span class="text-[8px] text-slate-600">x6</span></span>
-                        </div>
-                        <div class="w-10 bg-black border border-slate-600 rounded px-1 py-2 text-sm font-bold text-center text-slate-300 shadow-inner shrink-0">{{ match.nonStriker.runs }}</div>
-                        <div class="w-10 bg-black border border-slate-600 rounded px-1 py-2 text-sm font-bold text-center text-slate-500 shadow-inner shrink-0">({{ match.nonStriker.balls }})</div>
+                    <div class="flex items-center gap-1 mb-2">
+                        <span class="text-transparent text-sm w-4 shrink-0">▶</span>
+                        <input type="text" v-model="match.nonStriker.name" @change="updatePlayerStat(match.nonStriker.name, 'batting')" class="flex-1 bg-slate-900 border border-slate-600 rounded px-1.5 py-1.5 text-sm font-bold text-slate-300 uppercase outline-none shadow-inner min-w-0" placeholder="Non-Striker">
+                        <div class="w-9 bg-black border border-slate-600 rounded py-1.5 text-sm font-bold text-center text-slate-300 shadow-inner shrink-0">{{ match.nonStriker.runs }}</div>
+                        <div class="w-9 bg-black border border-slate-600 rounded py-1.5 text-sm font-bold text-center text-slate-500 shadow-inner shrink-0">{{ match.nonStriker.balls }}</div>
+                        <div class="w-7 bg-slate-900 border border-slate-600 rounded py-1.5 text-xs font-bold text-center text-blue-400/70 shadow-inner shrink-0">{{ match.nonStriker.fours }}</div>
+                        <div class="w-7 bg-slate-900 border border-slate-600 rounded py-1.5 text-xs font-bold text-center text-indigo-400/70 shadow-inner shrink-0">{{ match.nonStriker.sixes }}</div>
+                        <div class="w-10 bg-slate-900 border border-slate-600 rounded py-1.5 text-[11px] font-bold text-center text-slate-500 shadow-inner shrink-0">{{ match.nonStriker.balls > 0 ? ((match.nonStriker.runs / match.nonStriker.balls) * 100).toFixed(1) : '0.0' }}</div>
                     </div>
                     
-                    <button @click="rotateStrike" class="w-full py-2 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold border border-slate-600 shadow flex justify-center items-center gap-1 text-white transition-colors">🔃 Rotate Strike</button>
+                    <button @click="rotateStrike" class="w-full py-2 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold border border-slate-600 shadow flex justify-center items-center gap-1 text-white transition-colors mb-2">🔃 Rotate Strike</button>
 
-                    <!-- Bowler -->
-                    <div class="flex items-center gap-1.5 pt-2 border-t border-slate-700 pl-6 relative">
-                        <span class="absolute left-1 top-4 text-blue-400 text-[10px] font-black -rotate-90 origin-left">BOWL</span>
-                        <input type="text" v-model="match.bowler.name" @change="updatePlayerStat(match.bowler.name, 'bowling')" class="flex-1 bg-slate-900 border-2 border-blue-900/50 rounded px-2 py-2 text-sm font-black text-blue-300 uppercase outline-none focus:border-blue-500 shadow-inner min-w-0">
-                        <div class="flex flex-col items-center bg-slate-900 border border-slate-600 rounded px-1.5 py-0.5 text-[10px] text-orange-400 font-bold shrink-0">
-                            <span class="leading-none">W:{{ match.bowler.wd }}</span>
-                            <span class="leading-none mt-0.5">N:{{ match.bowler.nb }}</span>
+                    <!-- BOWLING HEADER -->
+                    <div class="flex text-[10px] text-slate-400 font-black tracking-widest uppercase mb-1 px-1 mt-3 pt-3 border-t border-slate-700">
+                        <div class="flex-1 pl-5">BOWLING</div>
+                        <div class="w-11 text-center">O</div>
+                        <div class="w-7 text-center">M</div>
+                        <div class="w-9 text-center">R</div>
+                        <div class="w-8 text-center text-red-400">W</div>
+                        <div class="w-10 text-center">ECO</div>
+                    </div>
+
+                    <!-- Current Bowler -->
+                    <div class="flex items-center gap-1 mb-1.5 relative">
+                        <span class="text-blue-400 text-sm w-4 font-black animate-pulse text-center shrink-0">▶</span>
+                        <input type="text" v-model="match.bowler.name" @change="updatePlayerStat(match.bowler.name, 'bowling')" class="flex-1 bg-slate-900 border-2 border-blue-900/50 rounded px-1.5 py-1.5 text-sm font-black text-blue-300 uppercase outline-none focus:border-blue-500 shadow-inner min-w-0" placeholder="Bowler">
+                        <div class="w-11 flex justify-center items-center bg-black border border-slate-600 rounded py-1 text-white shadow-inner shrink-0">
+                            <span class="text-sm font-black">{{ match.bowler.overs }}</span><span class="text-slate-500 font-black mx-0.5">.</span><span class="text-sm font-black">{{ match.bowler.balls }}</span>
                         </div>
-                        <div class="flex gap-0.5 items-center bg-black border border-slate-600 rounded px-1 text-white shadow-inner shrink-0">
-                            <div class="w-5 text-center text-sm font-black py-2">{{ match.bowler.overs }}</div><span class="text-slate-500 font-black">.</span><div class="w-5 text-center text-sm font-black py-2">{{ match.bowler.balls }}</div>
+                        <div class="w-7 bg-slate-900 border border-slate-600 rounded py-1.5 text-xs font-bold text-center text-slate-400 shadow-inner shrink-0">{{ match.bowler.maidens }}</div>
+                        <div class="w-9 bg-black border border-slate-600 rounded py-1.5 text-sm font-black text-center text-white shadow-inner shrink-0">{{ match.bowler.runs }}</div>
+                        <div class="w-8 bg-black border border-red-900/50 rounded py-1.5 text-sm font-black text-center text-red-400 shadow-inner shrink-0">{{ match.bowler.wickets }}</div>
+                        <div class="w-10 bg-slate-900 border border-slate-600 rounded py-1.5 text-[11px] font-bold text-center text-yellow-500 shadow-inner shrink-0">{{ calculateEconomy(match.bowler.runs, match.bowler.overs, match.bowler.balls) }}</div>
+                    </div>
+
+                    <!-- Previous Bowler -->
+                    <div v-if="match.prevBowlerName && match.bowlingStats[match.prevBowlerName]" class="flex items-center gap-1 cursor-pointer hover:bg-slate-700/50 rounded transition-colors" @click="tempSetup.bowler = match.prevBowlerName; activeModal = 'newBowler'" title="Select for next over">
+                        <span class="w-4 shrink-0"></span>
+                        <div class="flex-1 bg-slate-900/50 border border-slate-700 rounded px-1.5 py-1.5 text-xs font-bold text-slate-400 uppercase truncate min-w-0 shadow-inner">
+                            {{ match.prevBowlerName }}
                         </div>
-                        <div class="w-9 bg-black border border-slate-600 rounded text-center py-2 text-sm font-black text-white shadow-inner shrink-0">{{ match.bowler.runs }}</div>
-                        <div class="w-9 bg-black border border-red-900/50 rounded text-center py-2 text-sm font-black text-red-400 shadow-inner shrink-0">{{ match.bowler.wickets }}</div>
+                        <div class="w-11 bg-black/50 border border-slate-700 rounded py-1.5 text-xs font-bold text-center text-slate-500 shadow-inner shrink-0">{{ match.bowlingStats[match.prevBowlerName].overs }}.{{ match.bowlingStats[match.prevBowlerName].balls }}</div>
+                        <div class="w-7 bg-slate-900/50 border border-slate-700 rounded py-1.5 text-xs font-bold text-center text-slate-500 shadow-inner shrink-0">{{ match.bowlingStats[match.prevBowlerName].maidens }}</div>
+                        <div class="w-9 bg-black/50 border border-slate-700 rounded py-1.5 text-xs font-bold text-center text-slate-500 shadow-inner shrink-0">{{ match.bowlingStats[match.prevBowlerName].runs }}</div>
+                        <div class="w-8 bg-black/50 border border-slate-700 rounded py-1.5 text-xs font-bold text-center text-slate-500 shadow-inner shrink-0">{{ match.bowlingStats[match.prevBowlerName].wickets }}</div>
+                        <div class="w-10 bg-slate-900/50 border border-slate-700 rounded py-1.5 text-[10px] font-bold text-center text-slate-500 shadow-inner shrink-0">{{ calculateEconomy(match.bowlingStats[match.prevBowlerName].runs, match.bowlingStats[match.prevBowlerName].overs, match.bowlingStats[match.prevBowlerName].balls) }}</div>
                     </div>
 
                     <!-- THIS OVER DISPLAY -->
@@ -415,12 +442,12 @@
                 <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.3)] animate-pop">
                     <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">WICKET!</h2>
                     <div class="grid grid-cols-2 gap-3 mb-4">
-                        <button @click="handleWicket('Bowled')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Bowled</button>
-                        <button @click="handleWicket('Caught')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Caught</button>
-                        <button @click="handleWicket('LBW')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">LBW</button>
-                        <button @click="handleWicket('Run Out')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Run Out</button>
-                        <button @click="handleWicket('Stumped')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Stumped</button>
-                        <button @click="handleWicket('Hit Wicket')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Hit Wicket</button>
+                        <button @click="handleWicket('b')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Bowled</button>
+                        <button @click="handleWicket('c')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Caught</button>
+                        <button @click="handleWicket('lbw')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">LBW</button>
+                        <button @click="handleWicket('run out')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Run Out</button>
+                        <button @click="handleWicket('st')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Stumped</button>
+                        <button @click="handleWicket('hit wicket')" class="py-4 bg-slate-800 active:bg-slate-700 rounded-xl font-bold text-sm border border-slate-600 text-white shadow">Hit Wicket</button>
                     </div>
                     <button @click="closeModal" class="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black text-lg shadow border border-slate-600 mt-2">⬅ BACK / CANCEL</button>
                 </div>
@@ -430,7 +457,7 @@
             <div v-if="activeModal === 'fielderSelect'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
                 <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 shadow-[0_0_30px_rgba(220,38,38,0.3)] animate-pop">
                     <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">{{ tempSetup.wType }}!</h2>
-                    <p class="text-xs text-center text-yellow-400 font-bold mb-3 bg-yellow-900/30 py-1.5 rounded border border-yellow-900/50">Who took the catch / affected run out?</p>
+                    <p class="text-xs text-center text-yellow-400 font-bold mb-3 bg-yellow-900/30 py-1.5 rounded border border-yellow-900/50">Who took the catch / affected run out / stumping?</p>
                     <input type="text" list="fielding-squad-list" v-model="tempSetup.fielder" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 text-center outline-none focus:border-red-500 shadow-inner" placeholder="Fielder Name...">
                     <div class="flex gap-3">
                         <button @click="activeModal = 'out'" class="flex-1 py-4 bg-slate-700 text-white rounded-xl font-black text-lg shadow border border-slate-600">⬅ BACK</button>
@@ -581,7 +608,10 @@
                         <table class="w-full text-left border-collapse">
                             <tr class="bg-slate-900/80 text-slate-400 text-[10px] uppercase tracking-wider"><th class="py-2.5 pl-3">Batter</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center text-blue-300">4s</th><th class="text-center text-indigo-300">6s</th><th class="text-center pr-3">SR</th></tr>
                             <tr v-for="(stat, bName) in getScorecardData().battingStats" :key="bName" class="border-b border-slate-700/50 text-slate-200">
-                                <td class="py-2.5 pl-3 font-bold flex items-center min-w-0"><span class="truncate max-w-[80px]">{{bName}}</span><span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span><span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span></td>
+                                <td class="py-2 pl-3 min-w-0">
+                                    <div class="font-bold flex items-center"><span class="truncate max-w-[80px]">{{bName}}</span><span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span><span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span></div>
+                                    <div v-if="stat.out && stat.dismissal" class="text-[8px] text-slate-400 mt-0.5 truncate">{{stat.dismissal}}</div>
+                                </td>
                                 <td class="text-center font-black">{{stat.runs}}</td><td class="text-center text-slate-400 font-bold">{{stat.balls}}</td><td class="text-center text-blue-300 font-bold">{{stat.fours}}</td><td class="text-center text-indigo-300 font-bold">{{stat.sixes}}</td><td class="text-center pr-3 font-bold">{{ stat.balls > 0 ? ((stat.runs/stat.balls)*100).toFixed(1) : '0.0' }}</td>
                             </tr>
                         </table>
@@ -721,7 +751,10 @@
                         <table class="w-full text-left border-collapse">
                             <tr class="bg-slate-900/80 text-slate-400 text-[10px] uppercase tracking-wider"><th class="py-2.5 pl-3">Batter</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center text-blue-300">4s</th><th class="text-center text-indigo-300">6s</th><th class="text-center pr-3">SR</th></tr>
                             <tr v-for="(stat, bName) in getHistoryScorecardData().bat" :key="bName" class="border-b border-slate-700/50 text-slate-200">
-                                <td class="py-2.5 pl-3 font-bold min-w-0"><div class="flex items-center"><span class="truncate max-w-[80px]">{{bName}}</span><span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span><span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span></div></td>
+                                <td class="py-2 pl-3 min-w-0">
+                                    <div class="font-bold flex items-center"><span class="truncate max-w-[80px]">{{bName}}</span><span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span><span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span></div>
+                                    <div v-if="stat.out && stat.dismissal" class="text-[8px] text-slate-400 mt-0.5 truncate">{{stat.dismissal}}</div>
+                                </td>
                                 <td class="text-center font-black">{{stat.runs}}</td><td class="text-center text-slate-400 font-bold">{{stat.balls}}</td><td class="text-center text-blue-300 font-bold">{{stat.fours}}</td><td class="text-center text-indigo-300 font-bold">{{stat.sixes}}</td><td class="text-center pr-3 font-bold">{{ stat.balls > 0 ? ((stat.runs/stat.balls)*100).toFixed(1) : '0.0' }}</td>
                             </tr>
                         </table>
@@ -915,7 +948,10 @@
                             <table class="w-full text-left border-collapse text-xl">
                                 <tr class="bg-slate-800/80 text-slate-300 text-lg uppercase tracking-wider"><th class="py-3 pl-4">Batter</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center text-blue-300">4s</th><th class="text-center text-indigo-300">6s</th><th class="text-center pr-4">SR</th></tr>
                                 <tr v-for="(stat, bName) in getOverlayScorecardData().battingStats" :key="bName" class="border-b border-slate-700/50 text-white">
-                                    <td class="py-3 pl-4 font-bold">{{bName}}<span v-if="stat.out" class="text-red-400 text-sm ml-2 uppercase bg-red-900/30 px-2 py-0.5 rounded border border-red-900">Out</span><span v-else class="text-yellow-400 text-xl ml-2">*</span></td>
+                                    <td class="py-3 pl-4">
+                                        <div class="font-bold flex items-center">{{bName}}<span v-if="stat.out" class="text-red-400 text-sm ml-2 uppercase bg-red-900/30 px-2 py-0.5 rounded border border-red-900">Out</span><span v-else class="text-yellow-400 text-xl ml-2">*</span></div>
+                                        <div v-if="stat.out && stat.dismissal" class="text-sm text-slate-400 mt-1">{{stat.dismissal}}</div>
+                                    </td>
                                     <td class="text-center font-black text-2xl">{{stat.runs}}</td><td class="text-center text-slate-400 font-bold">{{stat.balls}}</td><td class="text-center text-blue-300 font-bold">{{stat.fours}}</td><td class="text-center text-indigo-300 font-bold">{{stat.sixes}}</td><td class="text-center pr-4 text-yellow-400 font-bold">{{ stat.balls > 0 ? ((stat.runs/stat.balls)*100).toFixed(1) : '0.0' }}</td>
                                 </tr>
                             </table>
@@ -1000,21 +1036,11 @@
                     </div>
                 </div>
 
-                <div class="mt-10 flex gap-8 w-full max-w-[1600px]">
-                    <div class="flex-1 bg-gradient-to-r from-yellow-900 to-black border-4 border-yellow-500 rounded-3xl p-8 text-center shadow-[0_0_50px_rgba(234,179,8,0.4)]">
-                        <div class="text-2xl text-yellow-500 font-black uppercase tracking-widest mb-4">MAN OF THE MATCH 🏆</div>
-                        <div class="text-5xl font-black text-white uppercase mb-4">{{ getSummaryAwards().mom.name }}</div>
-                        <div class="text-2xl text-yellow-200 font-bold">{{ getSummaryAwards().mom.desc }}</div>
-                    </div>
-                    <div class="flex-1 bg-slate-800 border-2 border-blue-500 rounded-3xl p-8 text-center shadow-lg">
-                        <div class="text-xl text-blue-400 font-black uppercase tracking-widest mb-4">BEST BATSMAN 🏏</div>
-                        <div class="text-4xl font-black text-white uppercase mb-4">{{ getSummaryAwards().bestBat.name }}</div>
-                        <div class="text-xl text-blue-200 font-bold">{{ getSummaryAwards().bestBat.desc }}</div>
-                    </div>
-                    <div class="flex-1 bg-slate-800 border-2 border-red-500 rounded-3xl p-8 text-center shadow-lg">
-                        <div class="text-xl text-red-400 font-black uppercase tracking-widest mb-4">BEST BOWLER 🎳</div>
-                        <div class="text-4xl font-black text-white uppercase mb-4">{{ getSummaryAwards().bestBowl.name }}</div>
-                        <div class="text-xl text-red-200 font-bold">{{ getSummaryAwards().bestBowl.desc }}</div>
+                <div class="mt-10 flex justify-center w-full max-w-[1600px]">
+                    <div class="bg-gradient-to-r from-yellow-900 to-black border-4 border-yellow-500 rounded-3xl p-8 px-20 text-center shadow-[0_0_50px_rgba(234,179,8,0.4)]">
+                        <div class="text-3xl text-yellow-500 font-black uppercase tracking-widest mb-4">MAN OF THE MATCH 🏆</div>
+                        <div class="text-6xl font-black text-white uppercase mb-4">{{ getSummaryAwards().mom.name }}</div>
+                        <div class="text-3xl text-yellow-200 font-bold">{{ getSummaryAwards().mom.desc }}</div>
                     </div>
                 </div>
             </div>
@@ -1031,25 +1057,25 @@
                 
                 <!-- Scores -->
                 <div class="grid grid-cols-2 p-4 md:p-6 gap-4 md:gap-6 border-b border-slate-800 bg-black/40 shrink-0">
-                    <div class="text-center bg-slate-900/80 p-4 rounded-2xl border border-slate-700 shadow-lg overflow-hidden flex flex-col items-center w-full">
-                        <h3 class="text-blue-400 font-black text-xl md:text-2xl uppercase mb-2 tracking-widest drop-shadow break-words w-full px-1">{{ summaryData.team1Name }}</h3>
-                        <div class="text-4xl md:text-5xl font-black font-oswald text-white drop-shadow-lg">{{ summaryData.team1Runs }}-{{ summaryData.team1Wickets }}</div>
+                    <div class="text-center bg-slate-900/80 p-4 rounded-2xl border border-slate-700 shadow-lg flex flex-col items-center w-full min-w-0">
+                        <h3 class="text-blue-400 font-black text-xl md:text-2xl uppercase mb-2 tracking-widest drop-shadow break-words w-full">{{ summaryData.team1Name }}</h3>
+                        <div class="text-4xl md:text-5xl font-black font-oswald text-white drop-shadow-lg leading-none">{{ summaryData.team1Runs }}-{{ summaryData.team1Wickets }}</div>
                         <div class="text-slate-400 text-xs md:text-sm font-bold mt-2 uppercase tracking-widest">Overs: {{ summaryData.team1Overs }}</div>
                     </div>
-                    <div class="text-center bg-slate-900/80 p-4 rounded-2xl border border-slate-700 shadow-lg overflow-hidden flex flex-col items-center w-full">
-                        <h3 class="text-red-400 font-black text-xl md:text-2xl uppercase mb-2 tracking-widest drop-shadow break-words w-full px-1">{{ summaryData.team2Name || 'TBA' }}</h3>
-                        <div class="text-4xl md:text-5xl font-black font-oswald text-white drop-shadow-lg">{{ summaryData.team2Runs }}-{{ summaryData.team2Wickets }}</div>
+                    <div class="text-center bg-slate-900/80 p-4 rounded-2xl border border-slate-700 shadow-lg flex flex-col items-center w-full min-w-0">
+                        <h3 class="text-red-400 font-black text-xl md:text-2xl uppercase mb-2 tracking-widest drop-shadow break-words w-full">{{ summaryData.team2Name || 'TBA' }}</h3>
+                        <div class="text-4xl md:text-5xl font-black font-oswald text-white drop-shadow-lg leading-none">{{ summaryData.team2Runs }}-{{ summaryData.team2Wickets }}</div>
                         <div class="text-slate-400 text-xs md:text-sm font-bold mt-2 uppercase tracking-widest">Overs: {{ summaryData.team2Overs }}</div>
                     </div>
                 </div>
 
-                <!-- Mega Award (Man of the Match only on this screen) -->
+                <!-- Mega Award -->
                 <div class="flex justify-center p-4 md:p-6 bg-black/60 shrink-0">
-                    <div class="bg-gradient-to-br from-yellow-900/60 to-black p-4 md:p-6 rounded-2xl border-2 border-yellow-500 relative overflow-hidden flex flex-col items-center text-center shadow-[0_0_30px_rgba(234,179,8,0.3)] w-full max-w-md">
+                    <div class="bg-gradient-to-br from-yellow-900/60 to-black p-4 md:p-6 rounded-2xl border-2 border-yellow-500 relative overflow-hidden flex flex-col items-center text-center shadow-[0_0_30px_rgba(234,179,8,0.3)] w-full max-w-md min-w-0">
                         <div class="text-4xl md:text-5xl drop-shadow-2xl z-10 mb-2">🏆</div>
-                        <div class="z-10 w-full flex flex-col items-center">
+                        <div class="z-10 w-full flex flex-col items-center min-w-0">
                             <h3 class="text-yellow-500 font-black text-xs md:text-sm uppercase tracking-widest mb-1 animate-pulse">Man of the Match</h3>
-                            <div class="text-2xl md:text-3xl font-black text-white uppercase font-oswald drop-shadow truncate px-2 w-full">{{ summaryData.mom.name }}</div>
+                            <div class="text-2xl md:text-3xl font-black text-white uppercase font-oswald drop-shadow break-words w-full px-2">{{ summaryData.mom.name }}</div>
                             <div class="text-yellow-200 text-xs sm:text-sm mt-1.5 font-bold bg-yellow-900/50 px-3 py-1.5 rounded border border-yellow-700 max-w-full break-words leading-tight">{{ summaryData.mom.desc }}</div>
                         </div>
                     </div>
@@ -1088,6 +1114,7 @@
             striker: { name: '', runs: 0, balls: 0, fours: 0, sixes: 0 },
             nonStriker: { name: '', runs: 0, balls: 0, fours: 0, sixes: 0 },
             bowler: { name: '', runs: 0, wickets: 0, overs: 0, balls: 0, maidens: 0, wd: 0, nb: 0 },
+            prevBowlerName: '',
             thisOverHistory: [],
             battingStats: {}, bowlingStats: {},
             historyRecords: [], 
@@ -1239,9 +1266,9 @@
                     
                     const existingIdx = db.findIndex(m => m.id === match.id);
                     if(existingIdx >= 0) {
-                        db[existingIdx] = matchRecord; // Overwrite existing history to avoid duplicate resumes
+                        db[existingIdx] = matchRecord;
                     } else {
-                        db.unshift(matchRecord); // Insert new match
+                        db.unshift(matchRecord);
                     }
                     
                     localStorage.setItem('cricketDatabase', JSON.stringify(db));
@@ -1803,7 +1830,7 @@
                 const saveStateForUndo = () => {
                     match.historyRecords.push(JSON.parse(JSON.stringify({
                         runs: match.runs, wickets: match.wickets, overs: match.overs, balls: match.balls,
-                        striker: match.striker, nonStriker: match.nonStriker, bowler: match.bowler,
+                        striker: match.striker, nonStriker: match.nonStriker, bowler: match.bowler, prevBowlerName: match.prevBowlerName,
                         thisOverHistory: match.thisOverHistory, battingStats: match.battingStats, bowlingStats: match.bowlingStats,
                         commentaryLog: match.commentaryLog, overLog: match.overLog
                     })));
@@ -1822,7 +1849,7 @@
                 const updatePlayerStat = (name, type) => {
                     if(!name) return;
                     if(type === 'batting') {
-                        if(!match.battingStats[name]) match.battingStats[name] = { runs:0, balls:0, fours:0, sixes:0, out:false };
+                        if(!match.battingStats[name]) match.battingStats[name] = { runs:0, balls:0, fours:0, sixes:0, out:false, dismissal:'' };
                         match.battingStats[name].runs = match.striker.runs;
                         match.battingStats[name].balls = match.striker.balls;
                         match.battingStats[name].fours = match.striker.fours;
@@ -1909,9 +1936,10 @@
                 const startNewOver = () => {
                     const nextB = tempSetup.bowler.toUpperCase();
                     if(!nextB) return showAlert("Please select a bowler!");
-                    // Ensure name casing is matched correctly for the consecutive over check
                     if(match.bowler.name && nextB === match.bowler.name.toUpperCase()) return showAlert("Consecutive overs by same bowler not allowed!");
                     if(!availableBowlersXI.value.includes(nextB)) return showAlert("Bowler must be from Bowling Squad!");
+                    
+                    if(match.bowler.name) match.prevBowlerName = match.bowler.name;
                     
                     const prevStats = match.bowlingStats[nextB] || { runs:0, wickets:0, overs:0, balls:0, maidens:0, wd:0, nb:0 };
                     
@@ -1963,7 +1991,10 @@
                 };
 
                 const openExtraModal = (type) => { 
-                    if(type === 'out') activeModal.value = 'out';
+                    if(type === 'out') {
+                        tempSetup.wType = '';
+                        activeModal.value = 'out';
+                    }
                     else { extraType.value = type; activeModal.value = 'extras'; }
                 };
                 const closeModal = () => { activeModal.value = ''; };
@@ -2004,7 +2035,7 @@
 
                 const handleWicket = (wType) => {
                     if (match.balls >= 6) return;
-                    if (wType === 'Caught' || wType === 'Run Out') {
+                    if (wType === 'c' || wType === 'run out' || wType === 'st') {
                         tempSetup.wType = wType;
                         tempSetup.fielder = '';
                         activeModal.value = 'fielderSelect';
@@ -2035,9 +2066,20 @@
 
                     match.wickets += 1; match.balls += 1;
                     match.striker.balls += 1; match.bowler.balls += 1;
-                    if (wType !== 'Run Out') match.bowler.wickets += 1;
+                    if (wType !== 'run out') match.bowler.wickets += 1;
                     
+                    let dismissalString = '';
+                    if(wType === 'b') dismissalString = `b ${match.bowler.name}`;
+                    else if(wType === 'lbw') dismissalString = `lbw b ${match.bowler.name}`;
+                    else if(wType === 'c') dismissalString = `c ${fielder} b ${match.bowler.name}`;
+                    else if(wType === 'st') dismissalString = `st ${fielder} b ${match.bowler.name}`;
+                    else if(wType === 'run out') dismissalString = `run out (${fielder})`;
+                    else dismissalString = `${wType} b ${match.bowler.name}`;
+                    
+                    if(!match.battingStats[match.striker.name]) updatePlayerStat(match.striker.name, 'batting');
                     match.battingStats[match.striker.name].out = true;
+                    match.battingStats[match.striker.name].dismissal = dismissalString;
+                    
                     updatePlayerStat(match.striker.name, 'batting');
                     updatePlayerStat(match.bowler.name, 'bowling');
                     match.thisOverHistory.push('W');
@@ -2053,7 +2095,7 @@
                     addCommentary(wText);
                     
                     if(match.striker.runs === 0 && match.striker.balls > 0) { showTVPopup('DUCK', match.striker.name); speak(aiSettings.lang==='bn' ? "ডাক মেরে আউট হলেন তিনি!" : "He is gone for a duck!", true); }
-                    else if(wType !== 'Run Out' && match.thisOverHistory.slice(-3).filter(b=>b==='W').length === 3) { showTVPopup('HAT-TRICK'); speak(aiSettings.lang==='bn' ? "হ্যাটট্রিক! অবিশ্বাস্য বোলিং!" : "Hat-trick! Unbelievable bowling!", true); }
+                    else if(wType !== 'run out' && match.thisOverHistory.slice(-3).filter(b=>b==='W').length === 3) { showTVPopup('HAT-TRICK'); speak(aiSettings.lang==='bn' ? "হ্যাটট্রিক! অবিশ্বাস্য বোলিং!" : "Hat-trick! Unbelievable bowling!", true); }
                     else { showTVPopup('W'); }
 
                     setTimeout(() => {
@@ -2105,16 +2147,15 @@
                 const checkInningsEnd = () => {
                     const isAllOut = match.wickets >= 10;
                     const targetChased = match.innings === 2 && match.runs >= match.target;
-                    const isOversFinished = match.overs >= match.totalOvers;
+                    const isOversDone = match.overs >= match.totalOvers;
 
                     if (targetChased) { calculateMatchResult(match.battingTeam, 'chase'); return true; }
 
-                    if (isAllOut || isOversFinished) {
+                    if (isAllOut || isOversDone) {
                         if (match.innings === 1) {
                             addCommentary(aiSettings.lang === 'bn' ? "প্রথম ইনিংসের সমাপ্তি।" : "That's the end of the first innings.");
                             showAlert("INNINGS BREAK! Target is " + (match.runs + 1));
                             
-                            // Deep copy to perfectly isolate 1st innings data
                             innings1Data.value = { 
                                 team: match.battingTeam, 
                                 runs: match.runs, 
@@ -2131,10 +2172,9 @@
                             match.battingTeam = setupData.decision === 'BOWL' ? setupData.tossWinner : (setupData.tossWinner === setupData.home ? setupData.away : setupData.home);
                             match.bowlingTeam = setupData.decision === 'BAT' ? setupData.tossWinner : (setupData.tossWinner === setupData.home ? setupData.away : setupData.home);
                             
-                            // Reset everything cleanly for 2nd innings
                             match.runs = 0; match.wickets = 0; match.overs = 0; match.balls = 0;
                             match.battingStats = {}; match.bowlingStats = {}; match.thisOverHistory = [];
-                            match.historyRecords = []; match.commentaryLog = []; match.overLog = [];
+                            match.historyRecords = []; match.commentaryLog = []; match.overLog = []; match.prevBowlerName = '';
                             
                             tempSetup.striker = ''; tempSetup.nonStriker = ''; tempSetup.bowler = '';
                             appState.value = 'opening';
@@ -2332,7 +2372,6 @@
                     
                     if (selectedVoice) u.voice = selectedVoice;
                     
-                    // Force lang tag for proper OS Engine selection
                     u.lang = aiSettings.lang === 'bn' ? 'bn-BD' : 'en-US';
                     u.rate = excited ? 1.2 : 1.0; 
                     u.pitch = excited ? 1.2 : 0.9; 
