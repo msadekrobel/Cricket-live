@@ -62,7 +62,6 @@
             <button @click="unlockAudio" class="px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full font-black text-2xl shadow-[0_0_40px_rgba(59,130,246,0.6)] hover:scale-105 transition-transform animate-pulse text-white">
                 TAP TO START 🎙️
             </button>
-            
             <div class="absolute bottom-6 flex flex-col items-center opacity-90 z-20 pointer-events-none">
                 <div class="text-slate-500 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-center leading-tight">
                     Presented by <br/> <span class="text-slate-400">Black Eagle Cricket Club</span>
@@ -83,7 +82,6 @@
                 <button @click="viewHistory" class="w-full py-4 bg-slate-700 hover:bg-slate-600 rounded-xl font-black text-xl shadow-lg transition-colors text-white">📋 PREVIOUS MATCHES</button>
                 <button @click="viewPlayerProfiles" class="w-full py-4 bg-indigo-700 hover:bg-indigo-600 rounded-xl font-black text-xl shadow-lg transition-colors text-white">👤 PLAYER PROFILES</button>
             </div>
-
             <div class="absolute bottom-6 flex flex-col items-center opacity-90 z-20 pointer-events-none">
                 <div class="text-slate-500 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-center leading-tight">
                     Presented by <br/> <span class="text-slate-400">Black Eagle Cricket Club</span>
@@ -292,9 +290,7 @@
                     <span class="font-black text-sm text-slate-300 font-oswald tracking-widest ml-2">ADMIN</span>
                 </div>
                 <div class="flex gap-2">
-                    <!-- OVERLAY COPY LINK BUTTON -->
-                    <button @click="copyOverlayUrl" class="px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded font-bold text-[10px] shadow border border-green-700 flex items-center gap-1">📺 COPY LINK</button>
-                    
+                    <button @click="copyOverlayUrl" class="px-3 py-1.5 bg-green-600 text-white hover:bg-green-500 rounded font-bold text-xs shadow border border-green-700 flex items-center gap-1">📺 COPY LINK</button>
                     <button @click="aiSettings.lang = aiSettings.lang === 'en' ? 'bn' : 'en'" class="px-2 py-1.5 rounded bg-slate-800 text-[10px] font-black text-blue-400 shadow border border-slate-700">{{ aiSettings.lang === 'en' ? '🇬🇧 ENG' : '🇧🇩 BNG' }}</button>
                     <button @click="toggleVoice" class="px-2 py-1.5 rounded bg-slate-800 text-xs font-bold text-white shadow border border-slate-700">{{ aiSettings.voiceEnabled ? '🎙️ ON' : '🎙️ OFF' }}</button>
                     <button @click="exitMatch" class="px-4 py-1.5 bg-red-800 text-white rounded-lg font-bold text-xs shadow hover:bg-red-700 border border-red-900 tracking-widest">🚪 EXIT</button>
@@ -320,7 +316,7 @@
                     </div>
                 </div>
 
-                <!-- Players Dashboard -->
+                <!-- Players Dashboard (PRO Matrix) -->
                 <div class="bg-slate-800 rounded-xl border border-slate-700 p-2 space-y-2 shadow-lg overflow-hidden">
                     
                     <!-- BATTING HEADER -->
@@ -527,14 +523,14 @@
                         <div class="flex">
                             <div class="flex-1 p-2 border-r border-slate-700">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BATSMEN</div>
-                                <div v-for="bat in getTopPerformers(1).batsmen" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bat in getTopPerformers(1).batsmen" :key="bat.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bat.name}}</span><span class="shrink-0 font-bold text-yellow-400">{{bat.runs}} <span class="text-slate-400 font-normal">({{bat.balls}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(1).batsmen.length===0" class="text-[10px] text-slate-500">No data</div>
                             </div>
                             <div class="flex-1 p-2">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BOWLERS</div>
-                                <div v-for="bowl in getTopPerformers(1).bowlers" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bowl in getTopPerformers(1).bowlers" :key="bowl.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bowl.name}}</span><span class="shrink-0 font-bold text-red-400">{{bowl.wickets}}-{{bowl.runs}} <span class="text-slate-400 font-normal">({{bowl.overs}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(1).bowlers.length===0" class="text-[10px] text-slate-500">No data</div>
@@ -548,14 +544,14 @@
                         <div class="flex">
                             <div class="flex-1 p-2 border-r border-slate-700">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BATSMEN</div>
-                                <div v-for="bat in getTopPerformers(2).batsmen" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bat in getTopPerformers(2).batsmen" :key="bat.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bat.name}}</span><span class="shrink-0 font-bold text-yellow-400">{{bat.runs}} <span class="text-slate-400 font-normal">({{bat.balls}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(2).batsmen.length===0" class="text-[10px] text-slate-500">No data</div>
                             </div>
                             <div class="flex-1 p-2">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BOWLERS</div>
-                                <div v-for="bowl in getTopPerformers(2).bowlers" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bowl in getTopPerformers(2).bowlers" :key="bowl.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bowl.name}}</span><span class="shrink-0 font-bold text-red-400">{{bowl.wickets}}-{{bowl.runs}} <span class="text-slate-400 font-normal">({{bowl.overs}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(2).bowlers.length===0" class="text-[10px] text-slate-500">No data</div>
@@ -595,7 +591,7 @@
                                 <div class="text-[10px] text-yellow-500 font-black uppercase tracking-widest animate-pulse">Man of the Match 🏆</div>
                                 <div class="font-black text-white text-lg font-oswald uppercase drop-shadow truncate w-[130px]">{{ getSummaryAwards().mom.name }}</div>
                             </div>
-                            <div class="text-right shrink-0">
+                            <div class="text-right shrink-0 flex items-center justify-end">
                                 <div class="text-[10px] font-bold text-white bg-yellow-900/80 px-2 py-1 rounded border border-yellow-700 max-w-[150px] leading-tight break-words">{{ getSummaryAwards().mom.desc }}</div>
                             </div>
                         </div>
@@ -609,7 +605,12 @@
                         <table class="w-full text-left border-collapse">
                             <tr class="bg-slate-900/80 text-slate-400 text-[10px] uppercase tracking-wider"><th class="py-2.5 pl-3">Batter</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center text-blue-300">4s</th><th class="text-center text-indigo-300">6s</th><th class="text-center pr-3">SR</th></tr>
                             <tr v-for="(stat, bName) in getScorecardData().battingStats" :key="bName" class="border-b border-slate-700/50 text-slate-200">
-                                <td class="py-2.5 pl-3 font-bold flex items-center min-w-0"><span class="truncate max-w-[80px]">{{bName}}</span><span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span><span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span></td>
+                                <td class="py-2.5 pl-3 font-bold flex items-center min-w-0">
+                                    <div class="truncate max-w-[80px]">{{bName}}</div>
+                                    <span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span>
+                                    <span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span>
+                                    <div v-if="stat.out && stat.dismissal" class="text-[8px] text-slate-400 ml-1 truncate absolute mt-6 max-w-[120px]">{{stat.dismissal}}</div>
+                                </td>
                                 <td class="text-center font-black">{{stat.runs}}</td><td class="text-center text-slate-400 font-bold">{{stat.balls}}</td><td class="text-center text-blue-300 font-bold">{{stat.fours}}</td><td class="text-center text-indigo-300 font-bold">{{stat.sixes}}</td><td class="text-center pr-3 font-bold">{{ stat.balls > 0 ? ((stat.runs/stat.balls)*100).toFixed(1) : '0.0' }}</td>
                             </tr>
                         </table>
@@ -667,14 +668,14 @@
                         <div class="flex">
                             <div class="flex-1 p-2 border-r border-slate-700">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BATSMEN</div>
-                                <div v-for="bat in getTopPerformers(1).batsmen" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bat in getTopPerformers(1).batsmen" :key="bat.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bat.name}}</span><span class="shrink-0 font-bold text-yellow-400">{{bat.runs}} <span class="text-slate-400 font-normal">({{bat.balls}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(1).batsmen.length===0" class="text-[10px] text-slate-500">No data</div>
                             </div>
                             <div class="flex-1 p-2">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BOWLERS</div>
-                                <div v-for="bowl in getTopPerformers(1).bowlers" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bowl in getTopPerformers(1).bowlers" :key="bowl.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bowl.name}}</span><span class="shrink-0 font-bold text-red-400">{{bowl.wickets}}-{{bowl.runs}} <span class="text-slate-400 font-normal">({{bowl.overs}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(1).bowlers.length===0" class="text-[10px] text-slate-500">No data</div>
@@ -688,14 +689,14 @@
                         <div class="flex">
                             <div class="flex-1 p-2 border-r border-slate-700">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BATSMEN</div>
-                                <div v-for="bat in getTopPerformers(2).batsmen" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bat in getTopPerformers(2).batsmen" :key="bat.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bat.name}}</span><span class="shrink-0 font-bold text-yellow-400">{{bat.runs}} <span class="text-slate-400 font-normal">({{bat.balls}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(2).batsmen.length===0" class="text-[10px] text-slate-500">No data</div>
                             </div>
                             <div class="flex-1 p-2">
                                 <div class="text-[9px] text-slate-400 font-bold mb-1 border-b border-slate-700 pb-0.5">TOP BOWLERS</div>
-                                <div v-for="bowl in getTopPerformers(2).bowlers" class="flex justify-between text-[10px] text-white py-0.5">
+                                <div v-for="bowl in getTopPerformers(2).bowlers" :key="bowl.name" class="flex justify-between text-[10px] text-white py-0.5">
                                     <span class="truncate pr-1">{{bowl.name}}</span><span class="shrink-0 font-bold text-red-400">{{bowl.wickets}}-{{bowl.runs}} <span class="text-slate-400 font-normal">({{bowl.overs}})</span></span>
                                 </div>
                                 <div v-if="getTopPerformers(2).bowlers.length===0" class="text-[10px] text-slate-500">No data</div>
@@ -749,7 +750,10 @@
                         <table class="w-full text-left border-collapse">
                             <tr class="bg-slate-900/80 text-slate-400 text-[10px] uppercase tracking-wider"><th class="py-2.5 pl-3">Batter</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center text-blue-300">4s</th><th class="text-center text-indigo-300">6s</th><th class="text-center pr-3">SR</th></tr>
                             <tr v-for="(stat, bName) in getHistoryScorecardData().bat" :key="bName" class="border-b border-slate-700/50 text-slate-200">
-                                <td class="py-2.5 pl-3 font-bold min-w-0"><div class="flex items-center"><span class="truncate max-w-[80px]">{{bName}}</span><span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span><span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span></div></td>
+                                <td class="py-2.5 pl-3 font-bold min-w-0">
+                                    <div class="flex items-center"><span class="truncate max-w-[80px]">{{bName}}</span><span v-if="stat.out" class="text-red-400 text-[9px] ml-1 uppercase bg-red-900/30 px-1 rounded border border-red-900 shrink-0">Out</span><span v-else class="text-yellow-400 text-[12px] ml-1 shrink-0">*</span></div>
+                                    <div v-if="stat.out && stat.dismissal" class="text-[8px] text-slate-400 mt-0.5 truncate max-w-[120px]">{{stat.dismissal}}</div>
+                                </td>
                                 <td class="text-center font-black">{{stat.runs}}</td><td class="text-center text-slate-400 font-bold">{{stat.balls}}</td><td class="text-center text-blue-300 font-bold">{{stat.fours}}</td><td class="text-center text-indigo-300 font-bold">{{stat.sixes}}</td><td class="text-center pr-3 font-bold">{{ stat.balls > 0 ? ((stat.runs/stat.balls)*100).toFixed(1) : '0.0' }}</td>
                             </tr>
                         </table>
@@ -899,7 +903,7 @@
                 </div>
             </div>
 
-            <!-- Career Stats Popup (Bottom Left) -->
+            <!-- Career Stats Popup (Bottom Left) - 8 Seconds -->
             <div v-if="careerPopup.show" class="absolute bottom-[20%] left-10 z-[90] bg-gradient-to-r from-[#020617] to-[#0f172a] border-l-4 border-blue-500 p-5 rounded-r-xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] animate-pop w-[350px]">
                 <div class="text-[#ffcc00] font-black text-xs tracking-widest uppercase mb-1.5 border-b border-slate-700 pb-1">CAREER STATS</div>
                 <div class="text-white font-black text-3xl uppercase font-oswald truncate drop-shadow">{{ careerPopup.name }}</div>
@@ -912,7 +916,7 @@
                 </div>
             </div>
             
-            <!-- Out Summary Popup (Bottom Right) -->
+            <!-- Out Summary Popup (Bottom Right) - 8 Seconds -->
             <div v-if="outSummaryPopup.show" class="absolute bottom-[20%] right-10 z-[90] bg-gradient-to-l from-[#450a0a] to-[#7f1d1d] border-r-4 border-yellow-500 p-5 rounded-l-xl shadow-[0_20px_50px_rgba(0,0,0,0.9)] animate-pop w-[380px]">
                 <div class="text-yellow-400 font-black text-xs tracking-widest uppercase mb-1.5 border-b border-red-900/50 pb-1">BATSMAN DISMISSED</div>
                 <div class="text-white font-black text-3xl uppercase font-oswald truncate drop-shadow">{{ outSummaryPopup.name }}</div>
@@ -943,7 +947,10 @@
                             <table class="w-full text-left border-collapse text-xl">
                                 <tr class="bg-slate-800/80 text-slate-300 text-lg uppercase tracking-wider"><th class="py-3 pl-4">Batter</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center text-blue-300">4s</th><th class="text-center text-indigo-300">6s</th><th class="text-center pr-4">SR</th></tr>
                                 <tr v-for="(stat, bName) in getOverlayScorecardData().battingStats" :key="bName" class="border-b border-slate-700/50 text-white">
-                                    <td class="py-3 pl-4 font-bold">{{bName}}<span v-if="stat.out" class="text-red-400 text-sm ml-2 uppercase bg-red-900/30 px-2 py-0.5 rounded border border-red-900">Out</span><span v-else class="text-yellow-400 text-xl ml-2">*</span></td>
+                                    <td class="py-3 pl-4">
+                                        <div class="font-bold flex items-center">{{bName}}<span v-if="stat.out" class="text-red-400 text-sm ml-2 uppercase bg-red-900/30 px-2 py-0.5 rounded border border-red-900">Out</span><span v-else class="text-yellow-400 text-xl ml-2">*</span></div>
+                                        <div v-if="stat.out && stat.dismissal" class="text-sm text-slate-400 mt-1 max-w-[200px]">{{stat.dismissal}}</div>
+                                    </td>
                                     <td class="text-center font-black text-2xl">{{stat.runs}}</td><td class="text-center text-slate-400 font-bold">{{stat.balls}}</td><td class="text-center text-blue-300 font-bold">{{stat.fours}}</td><td class="text-center text-indigo-300 font-bold">{{stat.sixes}}</td><td class="text-center pr-4 text-yellow-400 font-bold">{{ stat.balls > 0 ? ((stat.runs/stat.balls)*100).toFixed(1) : '0.0' }}</td>
                                 </tr>
                             </table>
@@ -974,6 +981,75 @@
                     </div>
                     <div class="flex-1 p-10 bg-slate-900 flex items-center justify-center">
                         <canvas id="matchChartCanvasOverlay" class="w-full h-full"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- OVERLAY FULLSCREEN GRAPHICS: PLAYING 11 -->
+            <div v-if="match.activeOverlayGraphic === 'playing11_home' || match.activeOverlayGraphic === 'playing11_away'" class="absolute inset-0 bg-black/95 z-[600] flex flex-col items-center justify-center p-12 animate-pop">
+                <h2 class="text-6xl font-black text-yellow-400 font-oswald uppercase tracking-widest mb-10 drop-shadow-2xl">
+                    {{ match.activeOverlayGraphic === 'playing11_home' ? setupData.home : setupData.away }} - PLAYING XI
+                </h2>
+                <div class="grid grid-cols-2 gap-x-20 gap-y-6 text-3xl font-bold text-white uppercase w-full max-w-5xl">
+                    <div v-for="(p, i) in (match.activeOverlayGraphic === 'playing11_home' ? squads.home : squads.away).filter(Boolean)" :key="i" class="bg-slate-800/80 px-6 py-4 rounded-xl border border-slate-600 shadow-lg flex items-center gap-4">
+                        <span class="text-blue-400 font-black">{{ i + 1 }}</span> {{ p }}
+                    </div>
+                </div>
+                <div class="mt-10 bg-yellow-600 text-black px-8 py-4 rounded-xl text-3xl font-black uppercase shadow-[0_0_30px_rgba(202,138,4,0.5)]">
+                    SUPER SUB: {{ match.activeOverlayGraphic === 'playing11_home' ? squads.homeSub : squads.awaySub }}
+                </div>
+            </div>
+
+            <!-- OVERLAY FULLSCREEN GRAPHICS: MATCH SUMMARY & AWARDS -->
+            <div v-if="match.activeOverlayGraphic === 'match_summary'" class="absolute inset-0 bg-black/95 z-[600] flex flex-col items-center justify-center p-12 animate-pop overflow-y-auto">
+                <h2 class="text-6xl font-black text-white font-oswald tracking-widest uppercase mb-10 drop-shadow-2xl bg-gradient-to-r from-blue-900 to-indigo-900 px-20 py-6 border-b-4 border-yellow-500 rounded-full">
+                    {{ getSummaryResult() }}
+                </h2>
+                
+                <div class="flex gap-10 w-full max-w-[1600px]">
+                    <div class="flex-1 bg-slate-900/95 rounded-3xl border-2 border-slate-700 p-8 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+                        <h3 class="text-3xl font-black text-blue-400 mb-6 border-b-2 border-slate-700 pb-4">1ST INNINGS TOP PERFORMERS</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-xl text-slate-400 font-bold mb-4">BATSMEN</h4>
+                                <div v-for="bat in getTopPerformers(1).batsmen" :key="bat.name" class="flex justify-between text-2xl text-white mb-3"><span>{{bat.name}}</span><span class="font-bold text-yellow-400">{{bat.runs}} <span class="text-xl text-slate-400">({{bat.balls}})</span></span></div>
+                            </div>
+                            <div>
+                                <h4 class="text-xl text-slate-400 font-bold mb-4">BOWLERS</h4>
+                                <div v-for="bowl in getTopPerformers(1).bowlers" :key="bowl.name" class="flex justify-between text-2xl text-white mb-3"><span>{{bowl.name}}</span><span class="font-bold text-red-400">{{bowl.wickets}}-{{bowl.runs}} <span class="text-xl text-slate-400">({{bowl.overs}})</span></span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div v-if="getTopPerformers(2).batsmen.length > 0" class="flex-1 bg-slate-900/95 rounded-3xl border-2 border-slate-700 p-8 shadow-[0_0_40px_rgba(0,0,0,0.8)]">
+                        <h3 class="text-3xl font-black text-blue-400 mb-6 border-b-2 border-slate-700 pb-4">2ND INNINGS TOP PERFORMERS</h3>
+                        <div class="grid grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-xl text-slate-400 font-bold mb-4">BATSMEN</h4>
+                                <div v-for="bat in getTopPerformers(2).batsmen" :key="bat.name" class="flex justify-between text-2xl text-white mb-3"><span>{{bat.name}}</span><span class="font-bold text-yellow-400">{{bat.runs}} <span class="text-xl text-slate-400">({{bat.balls}})</span></span></div>
+                            </div>
+                            <div>
+                                <h4 class="text-xl text-slate-400 font-bold mb-4">BOWLERS</h4>
+                                <div v-for="bowl in getTopPerformers(2).bowlers" :key="bowl.name" class="flex justify-between text-2xl text-white mb-3"><span>{{bowl.name}}</span><span class="font-bold text-red-400">{{bowl.wickets}}-{{bowl.runs}} <span class="text-xl text-slate-400">({{bowl.overs}})</span></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 flex gap-8 w-full max-w-[1600px]">
+                    <div class="flex-1 bg-gradient-to-r from-yellow-900 to-black border-4 border-yellow-500 rounded-3xl p-8 text-center shadow-[0_0_50px_rgba(234,179,8,0.4)]">
+                        <div class="text-2xl text-yellow-500 font-black uppercase tracking-widest mb-4">MAN OF THE MATCH 🏆</div>
+                        <div class="text-5xl font-black text-white uppercase mb-4">{{ getSummaryAwards().mom.name }}</div>
+                        <div class="text-2xl text-yellow-200 font-bold">{{ getSummaryAwards().mom.desc }}</div>
+                    </div>
+                    <div class="flex-1 bg-slate-800 border-2 border-blue-500 rounded-3xl p-8 text-center shadow-lg">
+                        <div class="text-xl text-blue-400 font-black uppercase tracking-widest mb-4">BEST BATSMAN 🏏</div>
+                        <div class="text-4xl font-black text-white uppercase mb-4">{{ getSummaryAwards().bestBat.name }}</div>
+                        <div class="text-xl text-blue-200 font-bold">{{ getSummaryAwards().bestBat.desc }}</div>
+                    </div>
+                    <div class="flex-1 bg-slate-800 border-2 border-red-500 rounded-3xl p-8 text-center shadow-lg">
+                        <div class="text-xl text-red-400 font-black uppercase tracking-widest mb-4">BEST BOWLER 🎳</div>
+                        <div class="text-4xl font-black text-white uppercase mb-4">{{ getSummaryAwards().bestBowl.name }}</div>
+                        <div class="text-xl text-red-200 font-bold">{{ getSummaryAwards().bestBowl.desc }}</div>
                     </div>
                 </div>
             </div>
@@ -1047,6 +1123,7 @@
             striker: { name: '', runs: 0, balls: 0, fours: 0, sixes: 0 },
             nonStriker: { name: '', runs: 0, balls: 0, fours: 0, sixes: 0 },
             bowler: { name: '', runs: 0, wickets: 0, overs: 0, balls: 0, maidens: 0, wd: 0, nb: 0 },
+            prevBowlerName: '',
             thisOverHistory: [],
             battingStats: {}, bowlingStats: {},
             historyRecords: [], 
@@ -1191,16 +1268,16 @@
                         status: statusStr,
                         setup: setupData, squads, 
                         inn1: innings1Data.value, 
-                        inn2: { runs: match.runs, wickets: match.wickets, overs: `${match.overs}.${match.balls}`, bat: JSON.parse(JSON.stringify(match.battingStats)), bowl: JSON.parse(JSON.stringify(match.bowlingStats)) }, 
+                        inn2: { runs: match.runs, wickets: match.wickets, overs: `${match.overs}.${match.balls}`, bat: match.battingStats, bowl: match.bowlingStats }, 
                         summary: summaryData,
                         fullMatch: JSON.parse(JSON.stringify(match))
                     };
                     
                     const existingIdx = db.findIndex(m => m.id === match.id);
                     if(existingIdx >= 0) {
-                        db[existingIdx] = matchRecord;
+                        db[existingIdx] = matchRecord; 
                     } else {
-                        db.unshift(matchRecord);
+                        db.unshift(matchRecord); 
                     }
                     
                     localStorage.setItem('cricketDatabase', JSON.stringify(db));
@@ -1236,42 +1313,31 @@
 
                 const syncDataToOverlay = async () => {
                     try {
-                        const matchForOverlay = { ...match };
-                        // PRISM 4KB Limit fix: Strip large arrays before sending
-                        delete matchForOverlay.historyRecords;
-                        delete matchForOverlay.commentaryLog;
-                        delete matchForOverlay.overLog;
+                        // PRISM 4KB Limit Bypass: Remove large arrays
+                        const matchForOverlay = JSON.parse(JSON.stringify(match));
+                        matchForOverlay.historyRecords = [];
+                        matchForOverlay.commentaryLog = [];
+                        matchForOverlay.overLog = []; 
+
+                        let inn1Safe = null;
+                        if(innings1Data.value) {
+                            inn1Safe = JSON.parse(JSON.stringify(innings1Data.value));
+                            inn1Safe.commentaryLog = [];
+                            inn1Safe.overLog = [];
+                        }
 
                         const payload = JSON.stringify({ 
-                            match: matchForOverlay, 
-                            tvPopup, 
-                            careerPopup, 
-                            outSummaryPopup, 
-                            innings1Data: innings1Data.value ? {
-                                team: innings1Data.value.team,
-                                runs: innings1Data.value.runs,
-                                wickets: innings1Data.value.wickets,
-                                overs: innings1Data.value.overs,
-                                bat: innings1Data.value.bat,
-                                bowl: innings1Data.value.bowl
-                            } : null,
-                            setupData, 
-                            squads, 
-                            summaryData, 
-                            selectedHistoryMatch: selectedHistoryMatch.value ? {
-                                summary: selectedHistoryMatch.value.summary
-                            } : null
+                            match: matchForOverlay, tvPopup, careerPopup, outSummaryPopup, 
+                            innings1Data: inn1Safe,
+                            setupData, squads, summaryData, 
+                            selectedHistoryMatch: selectedHistoryMatch.value ? { summary: selectedHistoryMatch.value.summary } : null
                         });
                         
-                        await fetch(`https://ntfy.sh/cricket_${match.id}`, { 
-                            method: 'POST', 
-                            body: payload,
-                            headers: { 'Cache': 'yes' } 
-                        });
+                        await fetch(`https://ntfy.sh/cricket_${match.id}`, { method: 'POST', body: payload });
                     } catch(e) {}
                 };
 
-                const processOverlayData = (parsedMessage) => {
+                const applyOverlayData = (parsedMessage) => {
                     if(parsedMessage.match) Object.assign(match, parsedMessage.match);
                     if(parsedMessage.tvPopup) Object.assign(tvPopup, parsedMessage.tvPopup);
                     if(parsedMessage.careerPopup) Object.assign(careerPopup, parsedMessage.careerPopup);
@@ -1283,20 +1349,21 @@
                     if(parsedMessage.selectedHistoryMatch !== undefined) selectedHistoryMatch.value = parsedMessage.selectedHistoryMatch;
                 };
 
-                const setupOverlayListener = async () => {
+                const setupOverlayListener = () => {
                     const id = urlParams.get('id');
+                    if(!id) return;
                     
-                    // PRISM Instant Load Fetch
-                    try {
-                        const res = await fetch(`https://ntfy.sh/cricket_${id}/json?poll=1&count=1`);
-                        const lines = await res.text();
-                        if(lines) {
-                            const latestMsg = lines.trim().split('\n').pop();
-                            const data = JSON.parse(latestMsg);
-                            if(data.message) processOverlayData(JSON.parse(data.message));
-                            overlayConnected.value = true;
-                        }
-                    } catch(e) {}
+                    // PRISM Instant Load Fix
+                    fetch(`https://ntfy.sh/cricket_${id}/json?poll=1&count=1`)
+                        .then(res => res.text())
+                        .then(text => {
+                            if(text) {
+                                const lines = text.trim().split('\n');
+                                const data = JSON.parse(lines[lines.length - 1]);
+                                if(data.message) applyOverlayData(JSON.parse(data.message));
+                                overlayConnected.value = true;
+                            }
+                        }).catch(e => console.log(e));
 
                     const eventSource = new EventSource(`https://ntfy.sh/cricket_${id}/sse`);
                     eventSource.onopen = () => { overlayConnected.value = true; };
@@ -1305,7 +1372,7 @@
                         try {
                             const data = JSON.parse(e.data);
                             if (data.event === 'message' || data.message) {
-                                processOverlayData(JSON.parse(data.message));
+                                applyOverlayData(JSON.parse(data.message));
                             }
                         } catch(err){}
                     };
@@ -1434,15 +1501,10 @@
                     match.activeOverlayGraphic = inn === 3 ? 'match_summary' : `scorecard_${inn}`; 
                     
                     let team = inn === 1 ? (innings1Data.value ? innings1Data.value.team : match.battingTeam) : match.battingTeam;
+                    if(inn === 3) team = "the match";
                     
-                    if(inn === 3) {
-                        let winText = getSummaryResult();
-                        let awd = getSummaryAwards();
-                        speak(aiSettings.lang === 'bn' ? `ম্যাচ শেষ। ${winText}। ম্যান অফ দ্য ম্যাচ হয়েছেন ${awd.mom.name}। সেরা ব্যাটসম্যান ${awd.bestBat.name} এবং সেরা বোলার ${awd.bestBowl.name}। বিস্তারিত স্কোরবোর্ড স্ক্রিনে দেওয়া হলো।` : `The match concludes. ${winText}. The Man of the Match is ${awd.mom.name}. Best Batsman goes to ${awd.bestBat.name}, and Best Bowler is ${awd.bestBowl.name}. Here is the complete match summary.`);
-                    } else {
-                        if(aiSettings.lang === 'bn') speak(`এখন আমরা ${team} এর ফুল স্কোরকার্ড দেখবো। চলুন ব্যাটিং এবং বোলিং ফিগারগুলো দেখে নিই।`);
-                        else speak(`Bringing up the full scorecard for ${team}. Let's look at the stats in detail.`);
-                    }
+                    if(aiSettings.lang === 'bn') speak(`এখন আমরা ${team} এর ফুল স্কোরকার্ড দেখবো। চলুন ব্যাটিং এবং বোলিং ফিগারগুলো দেখে নিই।`);
+                    else speak(`Bringing up the full scorecard for ${team}. Let's look at the stats in detail.`);
                     
                     syncDataToOverlay(); 
                 };
@@ -1501,7 +1563,7 @@
                     if(!name) return false;
                     const uName = name.trim().toUpperCase();
                     if(uName === '') return false;
-                    const allNames = [...squads.home, squads.homeSub, ...squads.away, squads.awaySub].filter(n => n.trim().toUpperCase() === uName);
+                    const allNames = [...squads.home, squads.homeSub, ...squads.away, squads.awaySub].filter(n => n && n.trim().toUpperCase() === uName);
                     return allNames.length > 1;
                 };
 
@@ -1612,7 +1674,7 @@
                         config = {
                             type: 'bar', data: chartData,
                             options: {
-                                devicePixelRatio: 4,
+                                devicePixelRatio: 4, 
                                 responsive: true, maintainAspectRatio: false,
                                 scales: { y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' } }, x: { grid: { display: false } } },
                                 plugins: { legend: { labels: { color: 'white', font: {size: 14} } } }
@@ -1716,7 +1778,7 @@
                     appState.value = 'opening';
                 };
 
-                const startMatch = async () => {
+                const startMatch = () => {
                     if(!tempSetup.striker || !tempSetup.nonStriker || !tempSetup.bowler) return showAlert("Select all opening players!");
                     
                     const uS = tempSetup.striker.toUpperCase(); const uN = tempSetup.nonStriker.toUpperCase(); const uB = tempSetup.bowler.toUpperCase();
@@ -1734,36 +1796,8 @@
                     updatePlayerStat(match.bowler.name, 'bowling');
 
                     appState.value = 'admin';
-                    
-                    match.activeOverlayGraphic = 'playing11_home';
-                    syncDataToOverlay();
-                    
-                    const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute:'2-digit' });
-                    
-                    let introText = aiSettings.lang === 'bn' 
-                        ? `শুভ অপরাহ্ন। আজ ${dateStr}, সময় ${timeStr}। আপনাদের স্বাগত জানাচ্ছি। আবহাওয়া চমৎকার, ক্রিকেট খেলার জন্য দারুণ একটি দিন। টসে জিতে ${setupData.tossWinner} প্রথমে ${setupData.decision === 'BAT' ? 'ব্যাটিং' : 'বোলিং'} করার সিদ্ধান্ত নিয়েছে। চলুন দেখে নিই ${setupData.home} দলের একাদশ। ` + squads.home.filter(Boolean).join(', ') + `, এবং সুপার সাব ${squads.homeSub}।`
-                        : `Good afternoon. It is ${timeStr} on ${dateStr}. Welcome to the broadcast. We have beautiful weather today, absolutely perfect for cricket. The news from the center is ${setupData.tossWinner} have won the toss and elected to ${setupData.decision} first. Let's look at the playing eleven for ${setupData.home}. ` + squads.home.filter(Boolean).join(', ') + `. Super sub is ${squads.homeSub}.`;
-                    
-                    speak(introText);
-                    await delay(17000);
-                    
-                    match.activeOverlayGraphic = 'playing11_away';
-                    syncDataToOverlay();
-                    let awayText = aiSettings.lang === 'bn'
-                        ? `এবার দেখে নিই ${setupData.away} দলের একাদশ। ` + squads.away.filter(Boolean).join(', ') + `, এবং সুপার সাব ${squads.awaySub}।`
-                        : `And now, the playing eleven for ${setupData.away}. ` + squads.away.filter(Boolean).join(', ') + `. Super sub is ${squads.awaySub}.`;
-                    speak(awayText);
-                    await delay(12000);
-                    
-                    match.activeOverlayGraphic = null;
+                    addCommentary(aiSettings.lang==='bn' ? `ইনিংস শুরু হচ্ছে। স্ট্রাইকে ${match.striker.name}। বোলিং ওপেন করবেন ${match.bowler.name}।` : `Innings begins. ${match.striker.name} is on strike. ${match.bowler.name} will open the bowling.`);
                     showCareerPopup(match.striker.name, 'bat');
-                    await delay(9000);
-                    
-                    showCareerPopup(match.bowler.name, 'bowl');
-                    await delay(9000);
-                    
-                    addCommentary(aiSettings.lang==='bn' ? `সবকিছু প্রস্তুত। ইনিংস শুরু হচ্ছে। স্ট্রাইকে ${match.striker.name}। বোলিং ওপেন করবেন ${match.bowler.name}।` : `The umpires and players are out in the middle. We are ready for live action. ${match.striker.name} is on strike. ${match.bowler.name} has the new ball.`);
                 };
 
                 const exitMatch = () => {
@@ -1776,9 +1810,9 @@
                 };
 
                 const copyOverlayUrl = () => {
-                    const id = localStorage.getItem('cricketCurrentMatch') ? JSON.parse(localStorage.getItem('cricketCurrentMatch')).match.id : 'default';
-                    const url = `${window.location.href.split('?')[0]}?mode=overlay&id=${id}`;
-                    navigator.clipboard.writeText(url).then(() => showAlert("URL Copied! Paste as Browser Source in OBS/PRISM."));
+                    const id = localStorage.getItem('cricketCurrentMatch') ? JSON.parse(localStorage.getItem('cricketCurrentMatch')).match.id : match.id;
+                    const url = `${window.location.origin}${window.location.pathname}?mode=overlay&id=${id}`;
+                    navigator.clipboard.writeText(url).then(() => showAlert("PRISM Link Copied! Paste as Browser Source in OBS/PRISM."));
                 };
 
                 const currentBattingSquad = computed(() => match.battingTeam === setupData.home ? [...squads.home, squads.homeSub] : [...squads.away, squads.awaySub]);
@@ -2397,8 +2431,7 @@
                     addRuns, openExtraModal, closeModal, handleExtra, handleWicket, startNewBatter, startNewOver, rotateStrike, handleUndo, abandonMatch,
                     calculateCRR, calculateEconomy, calculateCareerEconomy, getScorecardData, getOverlayScorecardData, getDynamicMessage, toggleVoice,
                     availableBatsmen, availableBowlersXI, innings1Data, closeAlert: () => customAlert.show = false, executeConfirm,
-                    openScorecardDrawer, closeScorecardDrawer, openCommentaryLog, getCurrentCommentaryLogs, getTopPerformers, getSummaryResult, getSummaryAwards,
-                    isDuplicateName
+                    openScorecardDrawer, closeScorecardDrawer, openCommentaryLog, getCurrentCommentaryLogs, getTopPerformers, getSummaryResult, getSummaryAwards, isDuplicateName
                 };
             }
         }).mount('#app');
