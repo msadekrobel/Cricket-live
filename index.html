@@ -286,8 +286,7 @@
             <!-- Header Bar -->
             <div class="bg-slate-950 px-3 py-2 flex justify-between items-center border-b border-slate-800 shrink-0 shadow-lg z-10">
                 <div class="flex items-center gap-2">
-                    <button @click="handleUndo" :disabled="match.historyRecords.length === 0" class="px-5 py-1.5 bg-yellow-500 text-black rounded-lg font-black text-xs shadow-[0_0_15px_rgba(234,179,8,0.5)] disabled:opacity-50 disabled:shadow-none hover:bg-yellow-400 tracking-widest border border-yellow-600">↩ UNDO</button>
-                    <span class="font-black text-sm text-slate-300 font-oswald tracking-widest ml-2">ADMIN</span>
+                    <button @click="abandonMatch" class="px-5 py-1.5 bg-purple-600 text-white hover:bg-purple-500 rounded-lg font-black text-xs shadow-[0_0_15px_rgba(147,51,234,0.5)] border border-purple-700 tracking-widest">🌧️ DLS / ABANDON</button>
                 </div>
                 <div class="flex gap-2">
                     <button @click="copyOverlayUrl" class="px-3 py-1.5 bg-green-600 text-white hover:bg-green-500 rounded font-bold text-xs shadow border border-green-700 flex items-center gap-1">📺 COPY LINK</button>
@@ -300,19 +299,38 @@
             <!-- SCROLLABLE CONTAINER -->
             <div class="flex-1 overflow-y-auto custom-scrollbar p-2 pb-10 space-y-3 bg-slate-900">
                 
-                <!-- TOP PART: Scoring Dashboard -->
-                <div class="bg-gradient-to-r from-blue-900/80 to-slate-900 rounded-xl p-4 border border-slate-700 flex justify-between items-center shadow-lg relative overflow-hidden">
-                    <div class="absolute right-0 top-0 opacity-10 text-8xl pointer-events-none">🏏</div>
-                    <div class="z-10 w-3/5">
-                        <div class="text-xs text-blue-300 font-black tracking-widest uppercase mb-1 drop-shadow truncate">{{ match.battingTeam }}</div>
-                        <div class="text-5xl font-black font-oswald leading-none text-white drop-shadow-lg">{{ match.runs }}<span class="text-2xl text-slate-400">/{{ match.wickets }}</span></div>
-                        <div v-if="match.innings === 2" class="text-xs font-bold text-yellow-400 mt-2 bg-black/50 px-2 py-0.5 rounded inline-block border border-yellow-900/50 truncate w-full">
-                            TARGET: {{ match.target }} | NEED {{ match.target - match.runs }}
+                <!-- TOP PART: Scoring Dashboard (Premium LED Design) -->
+                <div class="bg-[#0a0f1c] rounded-2xl border-2 border-slate-700 shadow-[0_8px_30px_rgb(0,0,0,0.6)] relative overflow-hidden flex flex-col">
+                    <div class="h-1 w-full bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600"></div>
+                    
+                    <div class="p-4 flex justify-between items-center relative z-10">
+                        <div class="flex-1 flex flex-col">
+                            <div class="flex items-center gap-2 mb-1.5">
+                                <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse shadow-[0_0_8px_rgba(220,38,38,0.8)]"></span>
+                                <span class="text-[9px] text-slate-400 font-black tracking-widest uppercase font-oswald">LIVE MATCH</span>
+                            </div>
+                            <div class="text-sm text-blue-400 font-black tracking-widest uppercase drop-shadow truncate mb-0.5">{{ match.battingTeam }}</div>
+                            <div class="flex items-baseline gap-1.5 -mt-1">
+                                <span class="text-[3.5rem] leading-none font-black font-oswald text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.1)]">{{ match.runs }}</span>
+                                <span class="text-3xl font-black text-slate-600">-</span>
+                                <span class="text-[3rem] leading-none font-black font-oswald text-red-500 drop-shadow-[0_2px_15px_rgba(239,68,68,0.3)]">{{ match.wickets }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="w-px h-16 bg-gradient-to-b from-transparent via-slate-700 to-transparent mx-3"></div>
+                        
+                        <div class="text-right flex flex-col justify-center shrink-0">
+                            <div class="text-[10px] text-slate-400 font-black tracking-widest uppercase mb-1">OVERS</div>
+                            <div class="text-[2.75rem] leading-none font-black font-oswald text-white drop-shadow-md">{{ match.overs }}.{{ match.balls }}</div>
+                            <div class="text-[9px] font-black text-slate-300 mt-2 uppercase bg-slate-800/80 px-2 py-1 rounded inline-block border border-slate-700/50 shadow-inner tracking-widest">
+                                CRR: {{ calculateCRR() }}
+                            </div>
                         </div>
                     </div>
-                    <div class="text-right z-10 w-2/5">
-                        <div class="text-xs text-slate-400 font-black tracking-widest uppercase mb-1">OVERS</div>
-                        <div class="text-5xl font-black font-oswald leading-none text-white drop-shadow-lg">{{ match.overs }}.{{ match.balls }}</div>
+
+                    <div v-if="match.innings === 2" class="bg-gradient-to-r from-yellow-900/90 to-black px-4 py-2 border-t border-yellow-700/50 flex justify-between items-center">
+                        <span class="text-[10px] font-black text-yellow-500 uppercase tracking-widest">Target: <span class="text-sm text-white ml-1">{{ match.target }}</span></span>
+                        <span class="text-[10px] font-black text-white uppercase bg-red-700/90 px-2.5 py-1 rounded shadow-lg border border-red-900 tracking-widest">Need {{ match.target - match.runs }} from {{ (match.totalOvers * 6) - (match.overs * 6 + match.balls) }}</span>
                     </div>
                 </div>
 
@@ -425,12 +443,21 @@
 
                 <!-- BOTTOM PART: Tabs -->
                 <div class="border-t border-slate-800 pt-3 mt-3">
-                    <div class="grid grid-cols-3 gap-2 mb-2">
+                    <div class="grid grid-cols-4 gap-2 mb-2">
                         <button @click="openScorecardDrawer(match.innings)" class="py-3 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-blue-400 border border-slate-700 shadow flex flex-col items-center justify-center"><span>📋</span> SCORE</button>
+                        <button @click="activeModal = 'playingXiInfo'" class="py-3 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-green-400 border border-slate-700 shadow flex flex-col items-center justify-center"><span>👥</span> SQUADS</button>
                         <button @click="openCommentaryLog" class="py-3 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-yellow-400 border border-slate-700 shadow flex flex-col items-center justify-center"><span>💬</span> COMM</button>
-                        <button @click="openChartDrawer('barChart')" class="py-3 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-pink-400 border border-slate-700 shadow flex flex-col items-center justify-center"><span>📊</span> CHARTS</button>
+                        <button @click="activeModal = 'matchInfo'" class="py-3 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-orange-400 border border-slate-700 shadow flex flex-col items-center justify-center"><span>ℹ️</span> INFO</button>
                     </div>
-                    <button @click="abandonMatch" class="w-full py-2 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-red-400 border border-slate-700 shadow">🌧️ ABANDON MATCH (APPLY DLS)</button>
+                    
+                    <div class="grid grid-cols-2 gap-2 mt-2">
+                        <button @click="openChartDrawer('barChart')" class="py-2.5 bg-pink-900/50 text-pink-400 hover:bg-pink-800/50 rounded-lg font-black text-sm shadow-[0_0_15px_rgba(236,72,153,0.2)] border border-pink-700/50 tracking-widest flex justify-center items-center gap-2">
+                            <span>📊</span> SHOW CHARTS
+                        </button>
+                        <button @click="handleUndo" :disabled="match.historyRecords.length === 0" class="py-2.5 bg-yellow-600 text-black hover:bg-yellow-500 rounded-lg font-black text-sm shadow-[0_0_15px_rgba(202,138,4,0.3)] disabled:opacity-50 disabled:shadow-none border border-yellow-700 tracking-widest flex justify-center items-center gap-2">
+                            <span>↩</span> UNDO LAST
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -498,6 +525,42 @@
                         <button @click="handleUndo" class="flex-1 py-4 bg-yellow-600 text-black rounded-xl font-black text-lg shadow">↩ UNDO</button>
                         <button @click="startNewBatter" class="flex-1 py-4 bg-red-600 text-white rounded-xl font-black text-lg shadow-[0_0_15px_rgba(220,38,38,0.5)]">READY</button>
                     </div>
+                </div>
+            </div>
+
+            <!-- MATCH INFO MODAL -->
+            <div v-if="activeModal === 'matchInfo'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4">
+                <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-slate-600 shadow-[0_0_30px_rgba(255,255,255,0.1)] animate-pop text-center">
+                    <h2 class="text-2xl font-black text-blue-400 mb-4 font-oswald tracking-widest uppercase">MATCH INFO</h2>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 mb-4">
+                        <p class="text-white font-bold text-sm uppercase leading-relaxed text-yellow-400">{{ setupData.tossWinner }} won the toss and chose to {{ setupData.decision === 'BAT' ? 'bat' : 'bowl' }} first.</p>
+                    </div>
+                    <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 mb-6">
+                        <p class="text-white font-black text-lg uppercase tracking-widest">Total Overs: {{ setupData.overs }}</p>
+                    </div>
+                    <button @click="closeModal" class="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black shadow border border-slate-600">CLOSE</button>
+                </div>
+            </div>
+
+            <!-- PLAYING XI MODAL -->
+            <div v-if="activeModal === 'playingXiInfo'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[100] p-4">
+                <div class="glass-panel p-4 rounded-2xl w-full max-w-2xl border-2 border-slate-600 shadow-[0_0_30px_rgba(255,255,255,0.1)] animate-pop flex flex-col max-h-[80vh]">
+                    <h2 class="text-xl font-black text-white mb-4 text-center font-oswald tracking-widest uppercase shrink-0">PLAYING XI & SUPER SUB</h2>
+                    <div class="flex gap-2 overflow-hidden flex-1">
+                        <div class="flex-1 bg-slate-900 rounded-xl border border-slate-700 p-2 flex flex-col overflow-hidden">
+                            <h3 class="text-center font-black text-blue-400 text-sm mb-2 border-b border-slate-700 pb-1">{{ match.battingTeam }} (BAT)</h3>
+                            <div class="overflow-y-auto custom-scrollbar flex-1 pr-1 space-y-1">
+                                <div v-for="(p, i) in currentBattingSquad.filter(Boolean)" :key="i" class="text-xs font-bold text-white bg-slate-800 p-2 rounded truncate border border-slate-700">{{i+1}}. {{ p }}</div>
+                            </div>
+                        </div>
+                        <div class="flex-1 bg-slate-900 rounded-xl border border-slate-700 p-2 flex flex-col overflow-hidden">
+                            <h3 class="text-center font-black text-red-400 text-sm mb-2 border-b border-slate-700 pb-1">{{ match.bowlingTeam }} (BOWL)</h3>
+                            <div class="overflow-y-auto custom-scrollbar flex-1 pr-1 space-y-1">
+                                <div v-for="(p, i) in currentBowlingSquad.filter(Boolean)" :key="i" class="text-xs font-bold text-white bg-slate-800 p-2 rounded truncate border border-slate-700">{{i+1}}. {{ p }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <button @click="closeModal" class="w-full py-3 mt-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black shadow border border-slate-600 shrink-0">CLOSE</button>
                 </div>
             </div>
         </div>
@@ -736,7 +799,7 @@
                                 <div class="text-[10px] text-yellow-500 font-black uppercase tracking-widest animate-pulse">Man of the Match 🏆</div>
                                 <div class="font-black text-white text-lg font-oswald uppercase drop-shadow truncate w-[130px]">{{ getSummaryAwards().mom.name }}</div>
                             </div>
-                            <div class="text-right shrink-0">
+                            <div class="text-right shrink-0 flex items-center justify-end">
                                 <div class="text-[10px] font-bold text-white bg-yellow-900/80 px-2 py-1 rounded border border-yellow-700 max-w-[150px] leading-tight break-words">{{ getSummaryAwards().mom.desc }}</div>
                             </div>
                         </div>
@@ -2431,7 +2494,8 @@
                     addRuns, openExtraModal, closeModal, handleExtra, handleWicket, startNewBatter, startNewOver, rotateStrike, handleUndo, abandonMatch,
                     calculateCRR, calculateEconomy, calculateCareerEconomy, getScorecardData, getOverlayScorecardData, getDynamicMessage, toggleVoice,
                     availableBatsmen, availableBowlersXI, innings1Data, closeAlert: () => customAlert.show = false, executeConfirm,
-                    openScorecardDrawer, closeScorecardDrawer, openCommentaryLog, getCurrentCommentaryLogs, getTopPerformers, getSummaryResult, getSummaryAwards, isDuplicateName
+                    openScorecardDrawer, closeScorecardDrawer, openCommentaryLog, getCurrentCommentaryLogs, getTopPerformers, getSummaryResult, getSummaryAwards, isDuplicateName,
+                    currentBattingSquad, currentBowlingSquad // 👈 BUG FIXED HERE!
                 };
             }
         }).mount('#app');
