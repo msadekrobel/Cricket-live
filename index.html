@@ -159,7 +159,7 @@
                 <button @click="stopLiveGraphic" class="bg-black hover:bg-gray-900 text-white px-4 py-1.5 rounded font-black text-xs shadow transition-colors">🔴 STOP GRAPHIC</button>
             </div>
 
-            <!-- Top Header (DLS, Exit & Language) -->
+            <!-- Top Header (DLS & Language) -->
             <div class="bg-slate-950 px-3 py-2 flex justify-between items-center border-b border-slate-800 shrink-0 shadow-lg z-10">
                 <div class="flex gap-2">
                     <button @click="abandonMatch" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded font-black text-xs shadow tracking-widest transition-colors">🌧️ DLS</button>
@@ -446,7 +446,7 @@
                         {{ currentBattingSquad.filter(Boolean).filter(p => !match.battingStats[p] && p !== match.striker.name && p !== match.nonStriker.name).join(', ') || 'None' }}
                     </div>
                 </div>
-                <!-- Fixed Live Push Button Logic -->
+                
                 <button v-if="appState === 'admin' && match.activeOverlayGraphic !== 'scorecard'" @click="showGraphicOnLive('scorecard')" class="w-full py-4 mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-black shadow-lg hover:scale-[1.02] transition-transform">📡 PUSH SCORECARD TO LIVE TV</button>
                 <button v-else-if="appState === 'admin' && match.activeOverlayGraphic === 'scorecard'" @click="stopLiveGraphic" class="w-full py-4 mt-4 bg-red-600 text-white rounded-xl font-black shadow-lg transition-transform">🔴 STOP LIVE GRAPHIC</button>
                 
@@ -517,10 +517,9 @@
                             </div>
                             <div class="flex gap-2 mt-1 border-t border-slate-700 pt-2">
                                 <button v-if="historyType === 'MATCH' && !item.isEnded" @click="resumeHistoryMatch(item)" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">▶ RESUME</button>
-                                <button v-if="historyType === 'MATCH' && item.isEnded" @click="viewHistoryScorecard(item)" class="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">📋 SCORECARD</button>
+                                <button v-if="historyType === 'MATCH'" @click="viewHistoryScorecard(item)" class="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">📋 SCORECARD</button>
                                 
-                                <!-- PLAYER PROFILE LIVE PUSH BUTTON -->
-                                <button v-if="historyType === 'PLAYER'" @click="showPlayerOnLiveFromHistory(item)" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">📡 PUSH TO LIVE</button>
+                                <button v-if="historyType === 'PLAYER'" @click="viewPlayerStats(item)" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">📊 VIEW STATS</button>
 
                                 <button @click="deleteHistoryItem(idx)" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded text-[10px] font-black shrink-0 transition-colors">DELETE</button>
                             </div>
@@ -528,6 +527,38 @@
                     </div>
                 </div>
                 <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black transition-colors shrink-0">CLOSE</button>
+            </div>
+        </div>
+
+        <!-- PLAYER STATS MODAL -->
+        <div v-if="activeModal === 'playerStats'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-blue-600 animate-pop flex flex-col">
+                <h2 class="text-2xl font-black text-blue-400 mb-4 text-center font-oswald tracking-widest uppercase">PLAYER PROFILE</h2>
+                
+                <div v-if="selectedPlayerStats" class="bg-slate-900 p-4 rounded-xl border border-slate-700 space-y-3 shadow-inner">
+                    <h3 class="text-xl font-black text-white text-center uppercase border-b border-slate-700 pb-3">{{ selectedPlayerStats.title }}</h3>
+                    
+                    <div class="grid grid-cols-2 gap-3 text-center pt-2">
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 shadow">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Total Runs</div>
+                            <div class="text-3xl font-black text-white font-oswald">{{ selectedPlayerStats.rawStats.runs || 0 }}</div>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 shadow">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Balls Faced</div>
+                            <div class="text-3xl font-black text-white font-oswald">{{ selectedPlayerStats.rawStats.balls || 0 }}</div>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 shadow">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Wickets</div>
+                            <div class="text-3xl font-black text-blue-400 font-oswald">{{ selectedPlayerStats.rawStats.wickets || 0 }}</div>
+                        </div>
+                        <div class="bg-slate-800 p-3 rounded-lg border border-slate-700 shadow">
+                            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">Strike Rate</div>
+                            <div class="text-3xl font-black text-yellow-400 font-oswald">{{ selectedPlayerStats.rawStats.balls > 0 ? ((selectedPlayerStats.rawStats.runs / selectedPlayerStats.rawStats.balls) * 100).toFixed(1) : '0.0' }}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button @click="activeModal = 'history'" class="w-full py-4 mt-6 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black transition-colors">⬅ BACK TO HISTORY</button>
             </div>
         </div>
 
@@ -738,6 +769,7 @@
                 const showAlert = (msg) => { customAlert.message = msg; customAlert.show = true; };
                 
                 const historyType = ref('');
+                const selectedPlayerStats = ref(null);
                 
                 const outSummaryPopup = reactive({ show: false, name: '', dismissal: '', runs: 0, balls: 0 });
                 const playerProfilePopup = reactive({ show: false, type: '', name: '', role: '' });
@@ -818,7 +850,7 @@
                         }
                         
                         // 3. ntfy.sh Server Fallback
-                        fetch(`https://ntfy.sh/cricket_${match.id}`, { method: 'POST', body: payload }).catch(()=>{});
+                        fetch(`https://ntfy.sh/cricket_${match.id}`, { method: 'POST', body: payload, mode: 'no-cors' }).catch(()=>{});
                     } catch(e) {}
                 };
 
@@ -843,6 +875,18 @@
                     window.addEventListener('storage', (e) => {
                         if (e.key === 'cricketLiveSync' && e.newValue) processSyncData(e.newValue);
                     });
+                    
+                    // 1.5 MANUAL POLLING (Ultimate Fallback for PRISM Webview Blocking Events)
+                    let lastSyncPayload = '';
+                    setInterval(() => {
+                        try {
+                            let localData = localStorage.getItem('cricketLiveSync');
+                            if(localData && localData !== lastSyncPayload) {
+                                lastSyncPayload = localData;
+                                processSyncData(localData);
+                            }
+                        } catch(e) {}
+                    }, 1000);
 
                     // 2. Listen to BroadcastChannel
                     if(window.BroadcastChannel) {
@@ -936,10 +980,9 @@
                     if(item.data) { Object.assign(match, item.data); activeModal.value = 'scorecard'; }
                 };
 
-                const showPlayerOnLiveFromHistory = (item) => {
-                    playerProfilePopup.type = 'PLAYER PROFILE'; playerProfilePopup.name = item.title; playerProfilePopup.role = item.subtitle;
-                    playerProfilePopup.show = true; syncDataToOverlay();
-                    setTimeout(() => { playerProfilePopup.show = false; syncDataToOverlay(); }, 8000);
+                const viewPlayerStats = (item) => {
+                    selectedPlayerStats.value = item;
+                    activeModal.value = 'playerStats';
                 };
 
                 const loadTeamMemory = (teamName, isHome) => {
@@ -1064,28 +1107,35 @@
                     speak("আউট!");
                     
                     outSummaryPopup.name = match.striker.name; outSummaryPopup.dismissal = dStr; outSummaryPopup.runs = match.striker.runs; outSummaryPopup.balls = match.striker.balls;
-                    outSummaryPopup.show = true; syncDataToOverlay();
-                    setTimeout(() => { outSummaryPopup.show = false; syncDataToOverlay(); }, 8000);
+                    outSummaryPopup.show = true; 
+                    syncDataToOverlay(); 
+                    setTimeout(() => { outSummaryPopup.show = false; syncDataToOverlay(); }, 8000); 
+                    
                     activeModal.value = 'newBatter'; tempSetup.striker = '';
                 };
                 
                 const startNewBatter = () => { 
                     match.striker = { name: tempSetup.striker, runs: 0, balls: 0, fours: 0, sixes: 0 }; 
-                    updatePlayerStat(tempSetup.striker, 'batting'); activeModal.value = ''; 
+                    updatePlayerStat(tempSetup.striker, 'batting'); 
+                    activeModal.value = ''; 
                     
                     playerProfilePopup.type = 'BATSMAN'; playerProfilePopup.name = tempSetup.striker; playerProfilePopup.role = 'NEW BATTER IN';
-                    playerProfilePopup.show = true; syncDataToOverlay();
+                    playerProfilePopup.show = true;
+                    syncDataToOverlay();
                     setTimeout(() => { playerProfilePopup.show = false; syncDataToOverlay(); }, 8000);
+                    
                     checkOverComplete(); 
                 };
 
                 const startNewOver = () => {
                     if(match.bowler.name) match.prevBowlerName = match.bowler.name;
                     const prevStats = match.bowlingStats[tempSetup.bowler] || { runs:0, wickets:0, overs:0, balls:0, maidens:0, wd:0, nb:0 };
-                    match.bowler = { name: tempSetup.bowler, ...prevStats }; activeModal.value = '';
+                    match.bowler = { name: tempSetup.bowler, ...prevStats }; 
+                    activeModal.value = '';
                     
                     playerProfilePopup.type = 'BOWLER'; playerProfilePopup.name = tempSetup.bowler; playerProfilePopup.role = 'NEW BOWLER IN';
-                    playerProfilePopup.show = true; syncDataToOverlay();
+                    playerProfilePopup.show = true;
+                    syncDataToOverlay();
                     setTimeout(() => { playerProfilePopup.show = false; syncDataToOverlay(); }, 8000);
                 };
 
@@ -1100,10 +1150,17 @@
                         
                         const isLine = chartType.value === 'flowChart';
                         const labels = match.overLog.map((_, i) => 'Ovr ' + (i+1));
+                        
                         const runsData = match.overLog.map(o => typeof o === 'number' ? o : (o ? o.runs : 0));
                         const wicketsData = match.overLog.map(o => typeof o === 'number' ? 0 : (o ? (o.wickets || 0) : 0));
                         
-                        let datasetData = isLine ? runsData.reduce((acc, r, i) => { acc.push((acc[i-1]||0) + r); return acc; }, []) : [...runsData];
+                        let datasetData = [];
+                        if (isLine) {
+                            let cumulative = 0;
+                            datasetData = runsData.map(r => { cumulative += r; return cumulative; });
+                        } else {
+                            datasetData = [...runsData];
+                        }
                         
                         const config = {
                             type: isLine ? 'line' : 'bar',
@@ -1113,23 +1170,40 @@
                                     label: isLine ? 'Cumulative Runs' : 'Runs Per Over', 
                                     data: datasetData, 
                                     backgroundColor: isLine ? 'transparent' : runsData.map((r,i) => wicketsData[i] > 0 ? '#ef4444' : '#0ea5e9'), 
-                                    borderColor: isLine ? '#0ea5e9' : '#fff', borderWidth: isLine ? 4 : 1, tension: 0.2,
+                                    borderColor: isLine ? '#0ea5e9' : '#fff', 
+                                    borderWidth: isLine ? 4 : 1,
+                                    tension: 0.2,
                                     pointBackgroundColor: isLine ? wicketsData.map(w => w > 0 ? '#ef4444' : '#0ea5e9') : undefined,
-                                    pointRadius: isLine ? wicketsData.map(w => w > 0 ? 10 : 4) : undefined,
-                                    pointBorderColor: '#fff', pointBorderWidth: 2
+                                    pointRadius: isLine ? wicketsData.map(w => w > 0 ? 8 : 4) : undefined,
+                                    pointBorderColor: '#fff',
+                                    pointBorderWidth: 2
                                 }]
                             },
-                            options: { responsive: true, maintainAspectRatio: false, layout: { padding: { top: 30 } } },
+                            options: { 
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                layout: { padding: { top: 30 } }
+                            },
                             plugins: [{
                                 id: 'customWicketLabels',
                                 afterDatasetsDraw(chart) {
-                                    const { ctx } = chart; ctx.save();
-                                    chart.getDatasetMeta(0).data.forEach((dp, i) => {
-                                        if (!isLine && wicketsData[i] > 0) {
-                                            ctx.beginPath(); ctx.arc(dp.x, dp.y - (isOvl ? 20 : 12), isOvl ? 15 : 8, 0, 2*Math.PI);
-                                            ctx.fillStyle = '#ef4444'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#fff'; ctx.stroke();
+                                    const { ctx } = chart;
+                                    ctx.save();
+                                    chart.getDatasetMeta(0).data.forEach((dp, index) => {
+                                        const wickets = wicketsData[index];
+                                        if (!isLine && wickets > 0) {
+                                            const yOffset = isOvl ? 20 : 12;
+                                            const radius = isOvl ? 15 : 8;
+                                            ctx.beginPath();
+                                            ctx.arc(dp.x, dp.y - yOffset, radius, 0, 2 * Math.PI);
+                                            ctx.fillStyle = '#ef4444';
+                                            ctx.fill();
+                                            ctx.lineWidth = 2;
+                                            ctx.strokeStyle = '#fff';
+                                            ctx.stroke();
                                         }
-                                    }); ctx.restore();
+                                    });
+                                    ctx.restore();
                                 }
                             }]
                         };
@@ -1138,16 +1212,30 @@
                 };
 
                 const exitMatch = () => {
-                    const isEnded = confirm("Is this match completely FINISHED? \n\nClick [OK] if the match has ENDED.\nClick [Cancel] if you want to PAUSE and Resume later.");
-                    match.isEnded = isEnded; syncRecordsToHistory(); 
-                    localStorage.removeItem('cricketCurrentMatch'); savedMatchExists.value = false; match.activeOverlayGraphic = null; appState.value = 'home';
+                    if(confirm("Are you sure you want to Exit? \n\nClick [OK] if the match is COMPLETELY FINISHED to save it as 'Match Ended'.\nClick [Cancel] to just PAUSE and resume later.")) {
+                        match.isEnded = true;
+                        syncRecordsToHistory(); 
+                        localStorage.removeItem('cricketCurrentMatch');
+                        savedMatchExists.value = false;
+                        match.activeOverlayGraphic = null;
+                        appState.value = 'home';
+                    } else {
+                        // Pause logic
+                        syncRecordsToHistory();
+                        localStorage.removeItem('cricketCurrentMatch');
+                        savedMatchExists.value = false;
+                        match.activeOverlayGraphic = null;
+                        appState.value = 'home';
+                    }
                 };
 
                 const startNewMatchInit = () => {
-                    Object.assign(match, defaultMatchState()); match.id = 'match_' + Date.now();
+                    Object.assign(match, defaultMatchState());
+                    match.id = 'match_' + Date.now();
                     Object.assign(setupData, { home: '', away: '', overs: 20, tossWinner: '', decision: '' });
                     Object.assign(squads, { home: Array(11).fill(''), away: Array(11).fill(''), homeSub: '', awaySub: '' });
-                    localStorage.removeItem('cricketCurrentMatch'); savedMatchExists.value = false; appState.value = 'setup';
+                    localStorage.removeItem('cricketCurrentMatch');
+                    appState.value = 'setup';
                 };
 
                 const historyList = ref([]);
@@ -1157,7 +1245,12 @@
                         historyList.value = JSON.parse(localStorage.getItem('cricketMatchHistory') || '[]');
                     } else {
                         let playerObj = JSON.parse(localStorage.getItem('cricketPlayerHistory') || '{}');
-                        historyList.value = Object.values(playerObj).map(p => ({ title: `${p.name} (${p.team || 'PLAYER'})`, subtitle: `Runs: ${p.runs || 0} (${p.balls || 0}B) | Wickets: ${p.wickets || 0}`, playerKey: p.name }));
+                        historyList.value = Object.values(playerObj).map(p => ({ 
+                            title: `${p.name} (${p.team || 'PLAYER'})`, 
+                            subtitle: `Runs: ${p.runs || 0} (${p.balls || 0}B) | Wickets: ${p.wickets || 0}`, 
+                            playerKey: p.name,
+                            rawStats: p 
+                        }));
                     }
                     activeModal.value = 'history'; 
                 };
@@ -1165,16 +1258,18 @@
                 const deleteHistoryItem = (idx) => {
                     if(!confirm("Delete this record permanently?")) return;
                     if(historyType.value === 'MATCH') {
-                        historyList.value.splice(idx, 1); localStorage.setItem('cricketMatchHistory', JSON.stringify(historyList.value));
+                        historyList.value.splice(idx, 1);
+                        localStorage.setItem('cricketMatchHistory', JSON.stringify(historyList.value));
                     } else {
                         let playerObj = JSON.parse(localStorage.getItem('cricketPlayerHistory') || '{}');
                         delete playerObj[historyList.value[idx].playerKey];
-                        localStorage.setItem('cricketPlayerHistory', JSON.stringify(playerObj)); historyList.value.splice(idx, 1);
+                        localStorage.setItem('cricketPlayerHistory', JSON.stringify(playerObj));
+                        historyList.value.splice(idx, 1);
                     }
                 };
 
                 return { 
-                    appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, outSummaryPopup, playerProfilePopup, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard, showPlayerOnLiveFromHistory 
+                    appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, outSummaryPopup, playerProfilePopup, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard, viewPlayerStats, selectedPlayerStats 
                 };
             }
         }).mount('#app');
