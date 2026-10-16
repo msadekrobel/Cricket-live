@@ -344,8 +344,9 @@
             <div v-if="activeModal === 'extras'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
                 <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-orange-900/50 animate-pop">
                     <h2 class="text-2xl font-black text-orange-400 mb-6 text-center uppercase font-oswald tracking-widest">{{ extraType }} RUNS</h2>
-                    <div class="grid grid-cols-5 gap-3 mb-6">
-                        <button v-for="r in [1,2,3,4,5]" :key="r" @click="handleExtra(r)" class="py-5 bg-slate-800 rounded-xl font-black text-2xl border border-slate-600 text-white active:bg-slate-700">{{r}}</button>
+                    <!-- Added up to 7 runs as requested for NB -->
+                    <div class="grid grid-cols-4 gap-3 mb-6">
+                        <button v-for="r in [1,2,3,4,5,6,7]" :key="r" @click="handleExtra(r)" class="py-5 bg-slate-800 rounded-xl font-black text-2xl border border-slate-600 text-white active:bg-slate-700">{{r}}</button>
                     </div>
                     <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black">⬅ CANCEL</button>
                 </div>
@@ -486,22 +487,29 @@
             </div>
         </div>
 
-        <!-- HISTORY MODAL -->
+        <!-- HISTORY MODAL - UPDATED WITH RESUME & SCORECARD LOGIC -->
         <div v-if="activeModal === 'history'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
-            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-slate-600 animate-pop flex flex-col max-h-[80vh]">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-md border-2 border-slate-600 animate-pop flex flex-col max-h-[80vh]">
                 <h2 class="text-2xl font-black text-white mb-4 text-center font-oswald tracking-widest uppercase shrink-0">{{ historyType }} HISTORY</h2>
                 <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 mb-4 shadow-inner overflow-y-auto custom-scrollbar flex-1">
                     <div v-if="historyList.length === 0" class="text-center py-6">
                         <span class="text-4xl mb-3 block opacity-50">📂</span>
                         <p class="text-slate-400 font-bold text-sm leading-relaxed">No saved records found.</p>
                     </div>
-                    <div v-else class="space-y-2">
-                        <div v-for="(item, idx) in historyList" :key="idx" class="bg-slate-800 p-3 rounded-lg flex justify-between items-center border border-slate-700">
-                            <div class="pr-2 flex-1 text-left overflow-hidden">
-                                <span class="text-white font-bold text-xs block truncate uppercase">{{ item.title }}</span>
-                                <span v-if="item.subtitle" class="text-slate-400 font-bold text-[10px] block truncate mt-0.5">{{ item.subtitle }}</span>
+                    <div v-else class="space-y-3">
+                        <div v-for="(item, idx) in historyList" :key="idx" class="bg-slate-800 p-3 rounded-lg flex flex-col border border-slate-700">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="pr-2 flex-1 text-left overflow-hidden">
+                                    <span class="text-white font-bold text-xs block truncate uppercase">{{ item.title }}</span>
+                                    <span v-if="item.subtitle" class="text-slate-400 font-bold text-[10px] block truncate mt-0.5">{{ item.subtitle }}</span>
+                                    <span v-if="item.isEnded" class="inline-block mt-1 px-1.5 py-0.5 bg-red-900/80 text-red-300 text-[9px] font-black rounded uppercase">Match Ended</span>
+                                </div>
                             </div>
-                            <button @click="deleteHistoryItem(idx)" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded text-xs font-black shrink-0 transition-colors">DEL</button>
+                            <div class="flex gap-2 mt-1 border-t border-slate-700 pt-2">
+                                <button v-if="historyType === 'MATCH' && !item.isEnded && !item.teamKey" @click="resumeHistoryMatch(item)" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">▶ RESUME</button>
+                                <button v-if="historyType === 'MATCH' && item.isEnded && !item.teamKey" @click="viewHistoryScorecard(item)" class="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">📋 SCORECARD</button>
+                                <button @click="deleteHistoryItem(idx)" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded text-[10px] font-black shrink-0 transition-colors">DELETE</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -535,6 +543,7 @@
                                 <span class="text-white font-black text-3xl font-oswald drop-shadow-lg">({{ match.overs }}.{{ match.balls }})</span>
                             </div>
                             <div class="flex-1 min-w-0 flex flex-col justify-center px-3 py-1 overflow-hidden">
+                                <!-- BOWLER NAME DISPLAYED PROPERLY IN THIS BOX -->
                                 <div class="text-slate-200 font-bold text-[15px] leading-tight uppercase tracking-wider mb-1 truncate">
                                     <span class="font-black text-yellow-400">{{ match.bowler.name || 'BOWLER' }}</span> OVER:
                                 </div>
@@ -576,7 +585,7 @@
                             </div>
                         </div>
 
-                        <!-- Batsmen Table -->
+                        <!-- Batsmen Table (Without bowler row) -->
                         <div class="bg-[#0f172a]/95 border-2 border-slate-400/30 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.5)] overflow-hidden">
                             <table class="w-full text-white text-[19px] font-bold">
                                 <tr class="bg-slate-800 text-slate-300 text-[17px] uppercase tracking-wider border-b border-slate-600">
@@ -682,10 +691,11 @@
     <script>
         const { createApp, reactive, ref, computed, onMounted, watch } = Vue;
 
+        // Added isEnded property
         const defaultMatchState = () => ({
             id: 'match_' + Date.now(),
             battingTeam: '', bowlingTeam: '', runs: 0, wickets: 0, overs: 0, balls: 0,
-            totalOvers: 20, innings: 1, target: 0,
+            totalOvers: 20, innings: 1, target: 0, isEnded: false,
             striker: { name: '', runs: 0, balls: 0, fours: 0, sixes: 0 },
             nonStriker: { name: '', runs: 0, balls: 0, fours: 0, sixes: 0 },
             bowler: { name: '', runs: 0, wickets: 0, overs: 0, balls: 0, maidens: 0, wd: 0, nb: 0 },
@@ -727,7 +737,6 @@
                 const currentBattingSquad = computed(() => match.battingTeam === setupData.home ? [...squads.home, squads.homeSub] : [...squads.away, squads.awaySub]);
                 const currentBowlingSquad = computed(() => match.bowlingTeam === setupData.home ? [...squads.home, squads.homeSub] : [...squads.away, squads.awaySub]);
 
-                // Duplicate checking logic
                 const duplicateNames = computed(() => {
                     const all = [...squads.home, squads.homeSub, ...squads.away, squads.awaySub].map(n => (n||'').trim().toUpperCase()).filter(n => n);
                     const counts = {};
@@ -743,7 +752,7 @@
                     if(appState.value === 'overlay') {
                         const scaleX = window.innerWidth / 1920;
                         const scaleY = window.innerHeight / 1080;
-                        // Capped at 4K (2x of 1080p = 3840x2160) for smooth lag-free performance
+                        // Limit to 4K resolution bounds (Scale 2 = 3840x2160) for PRISM stability
                         overlayScale.value = Math.min(scaleX, scaleY, 2);
                     }
                 };
@@ -792,53 +801,60 @@
                     try { await fetch(`https://ntfy.sh/cricket_${match.id}`, { method: 'POST', body: getSyncPayload() }); } catch(e) {}
                 };
 
+                // UPDATED: Added robust polling fallback for PRISM overlay
                 const setupOverlayListener = () => {
                     const id = urlParams.get('id');
                     if(!id) return;
-                    fetch(`https://ntfy.sh/cricket_${id}/json?poll=1&count=1`).then(r=>r.text()).then(t=>{
-                        if(t) {
-                            const lines = t.trim().split('\n'); const data = JSON.parse(lines[lines.length - 1]);
-                            if(data.message) {
-                                const p = JSON.parse(data.message);
-                                if(p.match) Object.assign(match, p.match); if(p.setupData) Object.assign(setupData, p.setupData); if(p.squads) Object.assign(squads, p.squads); 
-                                if(p.outSummaryPopup) Object.assign(outSummaryPopup, p.outSummaryPopup);
-                                if(p.playerProfilePopup) Object.assign(playerProfilePopup, p.playerProfilePopup);
-                            }
+
+                    const processSyncData = (data) => {
+                        if(data.match) Object.assign(match, data.match); 
+                        if(data.setupData) Object.assign(setupData, data.setupData); 
+                        if(data.squads) Object.assign(squads, data.squads); 
+                        if(data.outSummaryPopup) Object.assign(outSummaryPopup, data.outSummaryPopup);
+                        if(data.playerProfilePopup) Object.assign(playerProfilePopup, data.playerProfilePopup);
+                        if(match.activeOverlayGraphic === 'barChart' || match.activeOverlayGraphic === 'flowChart') {
+                            renderChart(true);
                         }
-                    }).catch(e=>{});
+                    };
+
+                    const fetchLatest = () => {
+                        fetch(`https://ntfy.sh/cricket_${id}/json?poll=1&count=1`).then(r=>r.text()).then(t=>{
+                            if(t) {
+                                const lines = t.trim().split('\n'); const data = JSON.parse(lines[lines.length - 1]);
+                                if(data.message) processSyncData(JSON.parse(data.message));
+                            }
+                        }).catch(e=>{});
+                    };
+
+                    fetchLatest(); // Initial Fetch
+                    setInterval(fetchLatest, 3000); // Robust Polling Fallback (ensures PRISM never misses data)
 
                     const es = new EventSource(`https://ntfy.sh/cricket_${id}/sse`);
                     es.onmessage = (e) => {
                         try {
                             const data = JSON.parse(e.data);
-                            if (data.message) {
-                                const p = JSON.parse(data.message);
-                                if(p.match) Object.assign(match, p.match); if(p.setupData) Object.assign(setupData, p.setupData);
-                                if(p.outSummaryPopup) Object.assign(outSummaryPopup, p.outSummaryPopup); 
-                                if(p.playerProfilePopup) Object.assign(playerProfilePopup, p.playerProfilePopup);
-                                if(p.squads) Object.assign(squads, p.squads); 
-                                if(match.activeOverlayGraphic === 'barChart' || match.activeOverlayGraphic === 'flowChart') {
-                                    renderChart(true);
-                                }
-                            }
+                            if (data.message) processSyncData(JSON.parse(data.message));
                         } catch(err){}
                     };
                 };
 
-                // Sync Match & Player Records to History properly
+                // UPDATED: Now supports the isEnded flag to properly mark matched as completely done
                 const syncRecordsToHistory = () => {
                     if(!match.battingTeam || !match.bowlingTeam) return;
                     
-                    // 1. Update Match History
                     let matchHistory = JSON.parse(localStorage.getItem('cricketMatchHistory') || '[]');
                     const matchTitle = `${match.battingTeam} vs ${match.bowlingTeam} (${match.runs}/${match.wickets} - ${match.overs}.${match.balls} Ovr)`;
                     const existingIdx = matchHistory.findIndex(m => m.id === match.id);
+                    
                     const matchEntry = {
                         id: match.id,
                         title: matchTitle,
                         subtitle: `Toss: ${setupData.tossWinner} (${setupData.decision})`,
+                        isEnded: match.isEnded || false,
                         data: JSON.parse(JSON.stringify(match))
                     };
+                    
+                    // Overwrites existing match to prevent duplicate saves!
                     if(existingIdx >= 0) {
                         matchHistory[existingIdx] = matchEntry;
                     } else {
@@ -846,7 +862,6 @@
                     }
                     localStorage.setItem('cricketMatchHistory', JSON.stringify(matchHistory));
 
-                    // 2. Update Player History (Individual Players & Stats)
                     let playerHistory = JSON.parse(localStorage.getItem('cricketPlayerHistory') || '{}');
                     const allHome = [...squads.home, squads.homeSub].map(n => (n||'').trim().toUpperCase()).filter(Boolean);
                     const allAway = [...squads.away, squads.awaySub].map(n => (n||'').trim().toUpperCase()).filter(Boolean);
@@ -891,7 +906,6 @@
                     }
                 }, { deep: true });
 
-                // Squad auto-save
                 watch(squads, () => {
                     if(setupData.home) localStorage.setItem('cricket_team_' + setupData.home.toUpperCase(), JSON.stringify({squad: squads.home, sub: squads.homeSub}));
                     if(setupData.away) localStorage.setItem('cricket_team_' + setupData.away.toUpperCase(), JSON.stringify({squad: squads.away, sub: squads.awaySub}));
@@ -900,6 +914,23 @@
                 const resumeMatch = () => {
                     const saved = JSON.parse(localStorage.getItem('cricketCurrentMatch'));
                     if(saved) { Object.assign(match, saved.match); Object.assign(setupData, saved.setupData); Object.assign(squads, saved.squads); appState.value = 'admin'; }
+                };
+                
+                // NEW: Function to resume match explicitly from Match History
+                const resumeHistoryMatch = (item) => {
+                    if(item.data) {
+                        Object.assign(match, item.data);
+                        appState.value = 'admin';
+                        activeModal.value = '';
+                    }
+                };
+
+                // NEW: Function to view a finished match's scorecard from History
+                const viewHistoryScorecard = (item) => {
+                    if(item.data) {
+                        Object.assign(match, item.data);
+                        activeModal.value = 'scorecard';
+                    }
                 };
 
                 const loadTeamMemory = (teamName, isHome) => {
@@ -937,9 +968,7 @@
                     appState.value = 'admin';
                 };
 
-                const abandonMatch = () => {
-                    activeModal.value = 'dls';
-                };
+                const abandonMatch = () => { activeModal.value = 'dls'; };
 
                 const getDLSParScore = () => {
                     if(match.innings === 1) return 0;
@@ -1093,7 +1122,6 @@
                     chartType.value = type; showChartDrawer.value = true; 
                     setTimeout(() => { renderChart(false); }, 100); 
                 };
-                
                 const closeChartDrawer = () => { showChartDrawer.value = false; };
                 
                 const renderChart = (isOvl) => {
@@ -1161,14 +1189,17 @@
                     }, 100);
                 };
 
+                // UPDATED: Now prompts to mark as match end so it can't be resumed dynamically again
                 const exitMatch = () => {
-                    if(confirm("Are you sure you want to Exit? The match will be saved to History.")) {
-                        syncRecordsToHistory();
-                        localStorage.removeItem('cricketCurrentMatch');
-                        savedMatchExists.value = false;
-                        match.activeOverlayGraphic = null;
-                        appState.value = 'home';
-                    }
+                    const isEnded = confirm("Is this match completely FINISHED? \n\nClick [OK] if the match has ENDED.\nClick [Cancel] if you want to PAUSE and Resume later.");
+                    
+                    match.isEnded = isEnded;
+                    syncRecordsToHistory(); // Auto overwrites correctly in history via match.id
+                    
+                    localStorage.removeItem('cricketCurrentMatch');
+                    savedMatchExists.value = false;
+                    match.activeOverlayGraphic = null;
+                    appState.value = 'home';
                 };
 
                 const startNewMatchInit = () => {
@@ -1185,16 +1216,7 @@
                 const openHistory = (type) => { 
                     historyType.value = type === 'player' ? 'PLAYER' : 'MATCH'; 
                     if(type === 'match') {
-                        let matches = JSON.parse(localStorage.getItem('cricketMatchHistory') || '[]');
-                        // Also include any saved team squads under Match/Team History
-                        for(let i=0; i<localStorage.length; i++) {
-                            let key = localStorage.key(i);
-                            if(key && key.startsWith('cricket_team_')) {
-                                const teamName = key.replace('cricket_team_', '');
-                                matches.push({ title: `SAVED TEAM: ${teamName}`, subtitle: 'Auto-Fill Squad Memory', teamKey: key });
-                            }
-                        }
-                        historyList.value = matches;
+                        historyList.value = JSON.parse(localStorage.getItem('cricketMatchHistory') || '[]');
                     } else {
                         let playerObj = JSON.parse(localStorage.getItem('cricketPlayerHistory') || '{}');
                         historyList.value = Object.values(playerObj).map(p => ({
@@ -1208,25 +1230,20 @@
 
                 const deleteHistoryItem = (idx) => {
                     if(!confirm("Delete this record permanently?")) return;
-                    const item = historyList.value[idx];
                     if(historyType.value === 'MATCH') {
-                        if(item.teamKey) {
-                            localStorage.removeItem(item.teamKey);
-                        } else {
-                            let matches = JSON.parse(localStorage.getItem('cricketMatchHistory') || '[]');
-                            matches = matches.filter(m => m.id !== item.id);
-                            localStorage.setItem('cricketMatchHistory', JSON.stringify(matches));
-                        }
                         historyList.value.splice(idx, 1);
+                        localStorage.setItem('cricketMatchHistory', JSON.stringify(historyList.value));
                     } else {
                         let playerObj = JSON.parse(localStorage.getItem('cricketPlayerHistory') || '{}');
-                        delete playerObj[item.playerKey];
+                        delete playerObj[historyList.value[idx].playerKey];
                         localStorage.setItem('cricketPlayerHistory', JSON.stringify(playerObj));
                         historyList.value.splice(idx, 1);
                     }
                 };
 
-                return { appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, outSummaryPopup, playerProfilePopup, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem };
+                return { 
+                    appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, outSummaryPopup, playerProfilePopup, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard 
+                };
             }
         }).mount('#app');
     </script>
