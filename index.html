@@ -39,7 +39,12 @@
             <div class="glass-panel p-8 rounded-3xl w-full max-w-md mx-auto border-t-4 border-blue-500 shadow-2xl text-center z-10">
                 <h1 class="text-4xl font-black font-oswald text-white mb-8">CRICKET PRO <span class="text-blue-500">AI</span></h1>
                 <button @click="appState = 'setup'" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-black text-xl shadow-lg text-white mb-4 transition-transform active:scale-95">START NEW MATCH</button>
-                <button v-if="savedMatchExists" @click="resumeMatch" class="w-full py-4 bg-orange-600 hover:bg-orange-500 rounded-xl font-black text-xl shadow-lg text-white transition-transform active:scale-95">▶ RESUME MATCH</button>
+                <button v-if="savedMatchExists" @click="resumeMatch" class="w-full py-4 bg-orange-600 hover:bg-orange-500 rounded-xl font-black text-xl shadow-lg text-white transition-transform active:scale-95 mb-4">▶ RESUME MATCH</button>
+                
+                <div class="grid grid-cols-2 gap-3 mt-4 border-t border-slate-700 pt-6">
+                    <button @click="openHistory('player')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-sm shadow text-blue-400 border border-slate-700 transition-colors">👤 PLAYER HISTORY</button>
+                    <button @click="openHistory('match')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-sm shadow text-green-400 border border-slate-700 transition-colors">📊 MATCH HISTORY</button>
+                </div>
             </div>
         </div>
 
@@ -50,11 +55,11 @@
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="text-xs text-blue-400 font-black uppercase mb-1 block">HOME TEAM</label>
-                        <input type="text" v-model="setupData.home" @blur="loadTeamMemory(setupData.home, true)" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-blue-500 outline-none" placeholder="E.g. IND">
+                        <input type="text" v-model="setupData.home" @input="loadTeamMemory(setupData.home, true)" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-blue-500 outline-none" placeholder="E.g. IND">
                     </div>
                     <div>
                         <label class="text-xs text-red-400 font-black uppercase mb-1 block">AWAY TEAM</label>
-                        <input type="text" v-model="setupData.away" @blur="loadTeamMemory(setupData.away, false)" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-red-500 outline-none" placeholder="E.g. AUS">
+                        <input type="text" v-model="setupData.away" @input="loadTeamMemory(setupData.away, false)" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-red-500 outline-none" placeholder="E.g. AUS">
                     </div>
                 </div>
                 <div class="mb-6">
@@ -84,19 +89,27 @@
                     <!-- Home Squad -->
                     <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 space-y-2 shadow-inner">
                         <h3 class="text-center text-blue-400 font-black uppercase mb-3 border-b border-slate-700 pb-2">{{ setupData.home }}</h3>
-                        <input v-for="i in 11" :key="'h'+i" type="text" v-model="squads.home[i-1]" :placeholder="'Player '+i" class="w-full bg-black border border-slate-700 p-2.5 rounded-lg text-sm text-center uppercase font-bold text-white focus:border-blue-500 outline-none transition-colors">
+                        <input v-for="i in 11" :key="'h'+i" type="text" v-model="squads.home[i-1]" :placeholder="'Player '+i" 
+                            :class="isDuplicate(squads.home[i-1]) ? 'border-red-600 bg-red-900/30 text-red-200 focus:border-red-500' : 'border-slate-700 bg-black text-white focus:border-blue-500'"
+                            class="w-full border p-2.5 rounded-lg text-sm text-center uppercase font-bold outline-none transition-colors">
                         <div class="mt-4 pt-3 border-t border-slate-600">
                             <label class="text-[10px] text-yellow-400 font-black uppercase text-center block mb-1">Super Sub (12th)</label>
-                            <input type="text" v-model="squads.homeSub" placeholder="Super Sub" class="w-full bg-slate-950 border-2 border-yellow-600/50 p-2.5 rounded-lg text-sm text-center uppercase font-bold text-yellow-400 outline-none focus:border-yellow-400">
+                            <input type="text" v-model="squads.homeSub" placeholder="Super Sub" 
+                                :class="isDuplicate(squads.homeSub) ? 'border-red-600 bg-red-900/30 text-red-200' : 'bg-slate-950 border-yellow-600/50 text-yellow-400'"
+                                class="w-full border-2 p-2.5 rounded-lg text-sm text-center uppercase font-bold outline-none">
                         </div>
                     </div>
                     <!-- Away Squad -->
                     <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700 space-y-2 shadow-inner">
                         <h3 class="text-center text-red-400 font-black uppercase mb-3 border-b border-slate-700 pb-2">{{ setupData.away }}</h3>
-                        <input v-for="i in 11" :key="'a'+i" type="text" v-model="squads.away[i-1]" :placeholder="'Player '+i" class="w-full bg-black border border-slate-700 p-2.5 rounded-lg text-sm text-center uppercase font-bold text-white focus:border-red-500 outline-none transition-colors">
+                        <input v-for="i in 11" :key="'a'+i" type="text" v-model="squads.away[i-1]" :placeholder="'Player '+i" 
+                            :class="isDuplicate(squads.away[i-1]) ? 'border-red-600 bg-red-900/30 text-red-200 focus:border-red-500' : 'border-slate-700 bg-black text-white focus:border-red-500'"
+                            class="w-full border p-2.5 rounded-lg text-sm text-center uppercase font-bold outline-none transition-colors">
                         <div class="mt-4 pt-3 border-t border-slate-600">
                             <label class="text-[10px] text-yellow-400 font-black uppercase text-center block mb-1">Super Sub (12th)</label>
-                            <input type="text" v-model="squads.awaySub" placeholder="Super Sub" class="w-full bg-slate-950 border-2 border-yellow-600/50 p-2.5 rounded-lg text-sm text-center uppercase font-bold text-yellow-400 outline-none focus:border-yellow-400">
+                            <input type="text" v-model="squads.awaySub" placeholder="Super Sub" 
+                                :class="isDuplicate(squads.awaySub) ? 'border-red-600 bg-red-900/30 text-red-200' : 'bg-slate-950 border-yellow-600/50 text-yellow-400'"
+                                class="w-full border-2 p-2.5 rounded-lg text-sm text-center uppercase font-bold outline-none">
                         </div>
                     </div>
                 </div>
@@ -111,18 +124,27 @@
                 <div class="space-y-5 mb-8">
                     <div>
                         <label class="text-xs font-black text-white uppercase mb-1 block">STRIKER ({{ match.battingTeam }})</label>
-                        <input type="text" list="batting-squad-list" v-model="tempSetup.striker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white outline-none focus:border-white">
+                        <select v-model="tempSetup.striker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white outline-none focus:border-white">
+                            <option value="" disabled>Select Striker</option>
+                            <option v-for="p in availableBatsmen" :key="p" :value="p">{{p}}</option>
+                        </select>
                     </div>
                     <div>
                         <label class="text-xs font-black text-white uppercase mb-1 block">NON-STRIKER ({{ match.battingTeam }})</label>
-                        <input type="text" list="batting-squad-list" v-model="tempSetup.nonStriker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white outline-none focus:border-white">
+                        <select v-model="tempSetup.nonStriker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white outline-none focus:border-white">
+                            <option value="" disabled>Select Non-Striker</option>
+                            <option v-for="p in availableBatsmen" :key="p" :value="p">{{p}}</option>
+                        </select>
                     </div>
                     <div class="border-t border-slate-700 pt-5">
                         <label class="text-xs font-black text-blue-400 uppercase mb-1 block">OPENING BOWLER ({{ match.bowlingTeam }})</label>
-                        <input type="text" list="bowling-squad-list" v-model="tempSetup.bowler" class="w-full bg-black border-2 border-blue-900/50 rounded-xl p-4 font-black uppercase text-white outline-none focus:border-blue-500">
+                        <select v-model="tempSetup.bowler" class="w-full bg-black border-2 border-blue-900/50 rounded-xl p-4 font-black uppercase text-white outline-none focus:border-blue-500">
+                            <option value="" disabled>Select Bowler</option>
+                            <option v-for="b in availableBowlersXI" :key="b" :value="b">{{b}}</option>
+                        </select>
                     </div>
                 </div>
-                <button @click="startMatch" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-black text-xl text-white transition-transform active:scale-95 shadow-lg">PLAY BALL 🏏</button>
+                <button @click="startMatch" :disabled="!tempSetup.striker || !tempSetup.nonStriker || !tempSetup.bowler" class="w-full py-5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 rounded-xl font-black text-xl text-white transition-transform active:scale-95 shadow-lg">PLAY BALL 🏏</button>
             </div>
         </div>
 
@@ -139,7 +161,10 @@
 
             <!-- Top Header (DLS & Language) -->
             <div class="bg-slate-950 px-3 py-2 flex justify-between items-center border-b border-slate-800 shrink-0 shadow-lg z-10">
-                <button @click="abandonMatch" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded font-black text-xs shadow tracking-widest transition-colors">🌧️ DLS</button>
+                <div class="flex gap-2">
+                    <button @click="abandonMatch" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded font-black text-xs shadow tracking-widest transition-colors">🌧️ DLS</button>
+                    <button @click="exitMatch" class="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white rounded font-black text-xs shadow tracking-widest transition-colors">🚪 EXIT</button>
+                </div>
                 <div class="flex gap-2">
                     <button @click="copyOverlayUrl" class="px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white rounded font-bold text-xs shadow flex items-center gap-1 transition-colors">📺 COPY LINK</button>
                     <button @click="toggleVoiceLanguage" class="px-3 py-1.5 rounded bg-indigo-800 hover:bg-indigo-700 text-xs font-bold text-white shadow transition-colors">🌐 {{ aiSettings.language === 'bn' ? 'বাংলা' : 'ENG' }}</button>
@@ -304,10 +329,13 @@
             <div v-if="activeModal === 'fielderSelect'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
                 <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
                     <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">{{ tempSetup.wType }}!</h2>
-                    <input type="text" list="fielding-squad-list" v-model="tempSetup.fielder" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 text-center outline-none focus:border-white" placeholder="Fielder Name">
+                    <select v-model="tempSetup.fielder" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-white">
+                        <option value="" disabled>Select Fielder</option>
+                        <option v-for="f in fieldingSquadList" :key="f" :value="f">{{f}}</option>
+                    </select>
                     <div class="flex gap-3">
                         <button @click="activeModal = 'out'" class="flex-1 py-4 bg-slate-700 text-white rounded-xl font-black">⬅ BACK</button>
-                        <button @click="confirmWicketWithFielder" class="flex-1 py-4 bg-red-600 text-white rounded-xl font-black">CONFIRM</button>
+                        <button @click="confirmWicketWithFielder" :disabled="!tempSetup.fielder" class="flex-1 py-4 bg-red-600 disabled:opacity-50 text-white rounded-xl font-black">CONFIRM</button>
                     </div>
                 </div>
             </div>
@@ -323,13 +351,32 @@
                 </div>
             </div>
 
+            <!-- DLS MODAL -->
+            <div v-if="activeModal === 'dls'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+                <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-purple-900/50 animate-pop text-center">
+                    <h2 class="text-2xl font-black text-purple-400 mb-4 font-oswald tracking-widest uppercase">DLS CALCULATION</h2>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 mb-4">
+                        <p v-if="match.innings === 1" class="text-white font-bold text-sm">DLS is calculated in the 2nd Innings.</p>
+                        <div v-else>
+                            <p class="text-slate-400 text-xs font-bold mb-1">PAR SCORE (At {{match.overs}}.{{match.balls}} overs)</p>
+                            <p class="text-4xl font-black text-yellow-400 font-oswald">{{ getDLSParScore() }}</p>
+                            <p class="text-xs text-slate-400 mt-2">If match stops now.</p>
+                        </div>
+                    </div>
+                    <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black">CLOSE</button>
+                </div>
+            </div>
+
             <div v-if="activeModal === 'newBowler'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
                 <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-blue-900/50 animate-pop">
                     <h2 class="text-3xl font-black text-blue-400 mb-4 text-center font-oswald tracking-widest">OVER COMPLETE</h2>
-                    <input type="text" list="bowling-squad-list" v-model="tempSetup.bowler" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 text-center outline-none focus:border-blue-500" placeholder="Next Bowler">
+                    <select v-model="tempSetup.bowler" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-blue-500">
+                        <option value="" disabled>Select Next Bowler</option>
+                        <option v-for="b in availableBowlersXI" :key="b" :value="b">{{b}}</option>
+                    </select>
                     <div class="flex gap-3">
                         <button @click="handleUndo" class="flex-1 py-4 bg-yellow-600 text-black rounded-xl font-black">↩ UNDO</button>
-                        <button @click="startNewOver" class="flex-1 py-4 bg-blue-600 text-white rounded-xl font-black">START</button>
+                        <button @click="startNewOver" :disabled="!tempSetup.bowler" class="flex-1 py-4 bg-blue-600 disabled:opacity-50 text-white rounded-xl font-black">START</button>
                     </div>
                 </div>
             </div>
@@ -337,10 +384,13 @@
             <div v-if="activeModal === 'newBatter'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
                 <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
                     <h2 class="text-3xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest">WICKET FALLS</h2>
-                    <input type="text" list="batting-squad-list" v-model="tempSetup.striker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 text-center outline-none focus:border-red-500" placeholder="Next Batsman">
+                    <select v-model="tempSetup.striker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-red-500">
+                        <option value="" disabled>Select Next Batsman</option>
+                        <option v-for="p in availableBatsmen" :key="p" :value="p">{{p}}</option>
+                    </select>
                     <div class="flex gap-3">
                         <button @click="handleUndo" class="flex-1 py-4 bg-yellow-600 text-black rounded-xl font-black">↩ UNDO</button>
-                        <button @click="startNewBatter" class="flex-1 py-4 bg-red-600 text-white rounded-xl font-black">READY</button>
+                        <button @click="startNewBatter" :disabled="!tempSetup.striker" class="flex-1 py-4 bg-red-600 disabled:opacity-50 text-white rounded-xl font-black">READY</button>
                     </div>
                 </div>
             </div>
@@ -430,6 +480,21 @@
             <div class="flex-1 p-4 flex items-center justify-center bg-slate-800">
                 <canvas id="matchChartCanvas" class="w-full h-full max-w-4xl max-h-[500px]"></canvas>
             </div>
+            <div class="p-4 bg-slate-900 border-t border-slate-800 shrink-0">
+                <button @click="pushChartToLive" class="w-full py-3 bg-gradient-to-r from-pink-600 to-purple-600 text-white rounded font-black tracking-widest shadow-lg active:scale-95 transition-transform">📡 PUSH CHART TO LIVE TV</button>
+            </div>
+        </div>
+
+        <!-- HISTORY MODAL -->
+        <div v-if="activeModal === 'history'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-slate-600 animate-pop text-center">
+                <h2 class="text-2xl font-black text-white mb-4 font-oswald tracking-widest uppercase">{{ historyType }} HISTORY</h2>
+                <div class="bg-slate-900 p-6 rounded-xl border border-slate-700 mb-6 shadow-inner">
+                    <span class="text-4xl mb-3 block opacity-50">📂</span>
+                    <p class="text-slate-400 font-bold text-sm leading-relaxed">No saved records found in local database yet.</p>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black transition-colors">CLOSE</button>
+            </div>
         </div>
 
         <!-- ========================================================================= -->
@@ -472,13 +537,23 @@
                         </div>
                     </div>
 
-                    <!-- Right: Batsman Box -->
+                    <!-- Right: Batsman & Bowler Box -->
                     <div class="relative w-[560px]">
                         <!-- OUT POPUP -->
-                        <div v-if="outSummaryPopup.show" class="absolute bottom-[110%] right-0 w-full bg-gradient-to-b from-[#112d4e] to-[#0b1e36] border-l-8 border-[#dc2626] rounded-xl shadow-2xl overflow-hidden animate-pop">
+                        <div v-if="outSummaryPopup.show" class="absolute bottom-[110%] right-0 w-full bg-gradient-to-b from-[#112d4e] to-[#0b1e36] border-l-8 border-[#dc2626] rounded-xl shadow-2xl overflow-hidden animate-pop z-50">
                             <div class="flex items-center justify-between px-6 py-4">
                                 <div class="flex flex-col"><span class="text-white font-black text-4xl uppercase drop-shadow">{{ outSummaryPopup.name }}</span><span class="text-slate-300 font-bold text-2xl mt-1">{{ outSummaryPopup.dismissal }}</span></div>
                                 <div class="flex items-baseline gap-2"><span class="text-white font-black text-6xl font-oswald">{{ outSummaryPopup.runs }}</span><span class="text-slate-400 font-bold text-2xl">({{ outSummaryPopup.balls }})</span></div>
+                            </div>
+                        </div>
+
+                        <!-- NEW PLAYER PROFILE POPUP -->
+                        <div v-if="playerProfilePopup.show" class="absolute bottom-[110%] right-0 w-full bg-gradient-to-b from-[#112d4e] to-[#0b1e36] border-l-8 border-[#3b82f6] rounded-xl shadow-2xl overflow-hidden animate-pop z-50">
+                            <div class="flex items-center justify-between px-6 py-4">
+                                <div class="flex flex-col">
+                                    <span class="text-[#3b82f6] font-bold text-xl uppercase tracking-widest">{{ playerProfilePopup.role }}</span>
+                                    <span class="text-white font-black text-4xl uppercase drop-shadow mt-1">{{ playerProfilePopup.name }}</span>
+                                </div>
                             </div>
                         </div>
 
@@ -495,6 +570,15 @@
                                 <tr class="bg-[#0f172a]">
                                     <td class="py-2 pl-4 uppercase text-slate-400"><span class="w-3 inline-block"></span> {{ match.nonStriker.name.substring(0,12) }}</td>
                                     <td class="text-center font-black font-oswald text-2xl">{{ match.nonStriker.runs }}</td><td class="text-center text-slate-400">{{ match.nonStriker.balls }}</td><td class="text-center text-slate-400">{{ match.nonStriker.fours }}</td><td class="text-center text-slate-400">{{ match.nonStriker.sixes }}</td><td class="text-center pr-4 text-slate-400">{{ match.nonStriker.balls > 0 ? ((match.nonStriker.runs/match.nonStriker.balls)*100).toFixed(1) : '0.0' }}</td>
+                                </tr>
+                                <!-- Added Bowler Row in TV Graphic -->
+                                <tr class="border-t-2 border-slate-600 bg-[#1e293b]">
+                                    <td class="py-2 pl-4 uppercase text-blue-300 flex items-center gap-2"><span class="text-blue-400 text-sm animate-pulse">▶</span> {{ match.bowler.name.substring(0,12) }}</td>
+                                    <td class="text-center font-black font-oswald text-2xl text-blue-300">{{ match.bowler.overs }}.{{ match.bowler.balls }}</td>
+                                    <td class="text-center text-slate-300">M:{{ match.bowler.maidens }}</td>
+                                    <td class="text-center text-red-400">{{ match.bowler.runs }}</td>
+                                    <td class="text-center font-black font-oswald text-2xl text-white">{{ match.bowler.wickets }}W</td>
+                                    <td class="text-center pr-4 text-slate-300">E:{{ calculateEconomy(match.bowler.runs, match.bowler.overs, match.bowler.balls) }}</td>
                                 </tr>
                             </table>
                         </div>
@@ -541,7 +625,6 @@
                     </div>
                 </div>
                 
-                <!-- NEW: FULL SCORECARD TV GRAPHIC -->
                 <div v-if="match.activeOverlayGraphic === 'scorecard'" class="absolute inset-0 bg-[#0f172a]/95 flex flex-col items-center justify-center p-12 animate-pop">
                     <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-4 border-blue-400 rounded-3xl p-10 w-full max-w-[1700px] shadow-2xl relative">
                         <div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#166534] text-white px-12 py-4 rounded-xl border-4 border-white font-black text-4xl uppercase font-oswald shadow-2xl tracking-widest">
@@ -584,10 +667,6 @@
 
             </div>
         </div>
-
-        <datalist id="batting-squad-list"><option v-for="p in availableBatsmen" :key="p" :value="p"></option></datalist>
-        <datalist id="bowling-squad-list"><option v-for="b in availableBowlersXI" :key="b" :value="b"></option></datalist>
-        <datalist id="fielding-squad-list"><option v-for="f in fieldingSquadList" :key="f" :value="f"></option></datalist>
     </div>
 
     <script>
@@ -629,11 +708,27 @@
                 const customAlert = reactive({ show: false, message: '' });
                 const showAlert = (msg) => { customAlert.message = msg; customAlert.show = true; };
                 
+                const historyType = ref('');
+                const openHistory = (type) => { historyType.value = type === 'player' ? 'PLAYER' : 'MATCH'; activeModal.value = 'history'; };
+
                 const outSummaryPopup = reactive({ show: false, name: '', dismissal: '', runs: 0, balls: 0 });
+                const playerProfilePopup = reactive({ show: false, type: '', name: '', role: '' });
                 const aiSettings = reactive({ voiceEnabled: true, language: 'bn' });
 
                 const currentBattingSquad = computed(() => match.battingTeam === setupData.home ? [...squads.home, squads.homeSub] : [...squads.away, squads.awaySub]);
                 const currentBowlingSquad = computed(() => match.bowlingTeam === setupData.home ? [...squads.home, squads.homeSub] : [...squads.away, squads.awaySub]);
+
+                // Duplicate checking logic
+                const duplicateNames = computed(() => {
+                    const all = [...squads.home, squads.homeSub, ...squads.away, squads.awaySub].map(n => (n||'').trim().toUpperCase()).filter(n => n);
+                    const counts = {};
+                    all.forEach(n => counts[n] = (counts[n] || 0) + 1);
+                    return Object.keys(counts).filter(n => counts[n] > 1);
+                });
+                const isDuplicate = (name) => {
+                    if(!name) return false;
+                    return duplicateNames.value.includes(name.trim().toUpperCase());
+                };
 
                 const updateScale = () => {
                     if(appState.value === 'overlay') {
@@ -679,7 +774,7 @@
                             battingStats: match.battingStats, bowlingStats: match.bowlingStats
                         },
                         setupData: { tossWinner: setupData.tossWinner, decision: setupData.decision, overs: setupData.overs, home: setupData.home, away: setupData.away },
-                        outSummaryPopup, squads 
+                        outSummaryPopup, playerProfilePopup, squads 
                     });
                 };
 
@@ -696,6 +791,8 @@
                             if(data.message) {
                                 const p = JSON.parse(data.message);
                                 if(p.match) Object.assign(match, p.match); if(p.setupData) Object.assign(setupData, p.setupData); if(p.squads) Object.assign(squads, p.squads); 
+                                if(p.outSummaryPopup) Object.assign(outSummaryPopup, p.outSummaryPopup);
+                                if(p.playerProfilePopup) Object.assign(playerProfilePopup, p.playerProfilePopup);
                             }
                         }
                     }).catch(e=>{});
@@ -707,7 +804,9 @@
                             if (data.message) {
                                 const p = JSON.parse(data.message);
                                 if(p.match) Object.assign(match, p.match); if(p.setupData) Object.assign(setupData, p.setupData);
-                                if(p.outSummaryPopup) Object.assign(outSummaryPopup, p.outSummaryPopup); if(p.squads) Object.assign(squads, p.squads); 
+                                if(p.outSummaryPopup) Object.assign(outSummaryPopup, p.outSummaryPopup); 
+                                if(p.playerProfilePopup) Object.assign(playerProfilePopup, p.playerProfilePopup);
+                                if(p.squads) Object.assign(squads, p.squads); 
                                 if(match.activeOverlayGraphic === 'barChart' || match.activeOverlayGraphic === 'flowChart') {
                                     renderChart(true);
                                 }
@@ -733,6 +832,12 @@
                     }
                 }, { deep: true });
 
+                // Squad auto-save
+                watch(squads, () => {
+                    if(setupData.home) localStorage.setItem('cricket_team_' + setupData.home.toUpperCase(), JSON.stringify({squad: squads.home, sub: squads.homeSub}));
+                    if(setupData.away) localStorage.setItem('cricket_team_' + setupData.away.toUpperCase(), JSON.stringify({squad: squads.away, sub: squads.awaySub}));
+                }, { deep: true });
+
                 const resumeMatch = () => {
                     const saved = JSON.parse(localStorage.getItem('cricketCurrentMatch'));
                     if(saved) { Object.assign(match, saved.match); Object.assign(setupData, saved.setupData); Object.assign(squads, saved.squads); appState.value = 'admin'; }
@@ -746,22 +851,11 @@
                         else { for(let i=0; i<11; i++) squads.away[i] = p.squad[i] || ''; squads.awaySub = p.sub || ''; }
                     }
                 };
-                
-                const saveTeamMemory = () => {
-                    localStorage.setItem('cricket_team_' + setupData.home.toUpperCase(), JSON.stringify({squad: squads.home, sub: squads.homeSub}));
-                    localStorage.setItem('cricket_team_' + setupData.away.toUpperCase(), JSON.stringify({squad: squads.away, sub: squads.awaySub}));
-                };
 
                 const validateAndGoToOpening = () => {
-                    const allNames = [];
-                    const checkAndAdd = (name) => { if (typeof name === 'string' && name.trim() !== '') allNames.push(name.trim().toUpperCase()); };
-                    squads.home.forEach(checkAndAdd); checkAndAdd(squads.homeSub); squads.away.forEach(checkAndAdd); checkAndAdd(squads.awaySub);
-                    const seen = new Set(); const duplicates = new Set();
-                    for (const name of allNames) { if (seen.has(name)) duplicates.add(name); seen.add(name); }
-                    if (duplicates.size > 0) {
-                        showAlert(`ডাবল এন্ট্রি ব্লকড! [ ${Array.from(duplicates).join(', ')} ] - এই নামটি দুইবার দেওয়া হয়েছে। এক প্লেয়ার দুই টিমে বা একই টিমে দুইবার থাকতে পারবে না!`); return;
+                    if (duplicateNames.value.length > 0) {
+                        showAlert(`ডাবল এন্ট্রি ব্লকড! [ ${duplicateNames.value.join(', ')} ] - এক প্লেয়ার দুই টিমে বা একই টিমে দুইবার থাকতে পারবে না!`); return;
                     }
-                    saveTeamMemory();
                     match.battingTeam = setupData.decision === 'BAT' ? setupData.tossWinner : (setupData.tossWinner === setupData.home ? setupData.away : setupData.home);
                     match.bowlingTeam = setupData.decision === 'BOWL' ? setupData.tossWinner : (setupData.tossWinner === setupData.home ? setupData.away : setupData.home);
                     match.totalOvers = setupData.overs; appState.value = 'opening';
@@ -775,12 +869,46 @@
                     appState.value = 'admin';
                 };
 
+                const exitMatch = () => {
+                    if(confirm("Are you sure you want to Exit? The match will be saved.")) {
+                        appState.value = 'home';
+                    }
+                };
+
+                const abandonMatch = () => {
+                    activeModal.value = 'dls';
+                };
+
+                const getDLSParScore = () => {
+                    if(match.innings === 1) return 0;
+                    const t1Runs = match.target - 1;
+                    const totalOvers = setupData.overs;
+                    const oversFaced = match.overs;
+                    const wickets = match.wickets;
+                    const oversLeft = totalOvers - (oversFaced + (match.balls/6));
+                    const baseResource = (oversLeft / totalOvers) * 100;
+                    const wFactor = [0, 5, 12, 20, 30, 42, 55, 70, 85, 100];
+                    const resourceLeft = Math.max(0, baseResource - (wFactor[wickets] || 100));
+                    const resourceStart = 100;
+                    const resourceUsed = resourceStart - resourceLeft;
+                    return Math.floor((t1Runs * (resourceUsed / 100)));
+                };
+
                 const copyOverlayUrl = () => {
                     const url = `${window.location.origin}${window.location.pathname}?mode=overlay&id=${match.id}`;
                     navigator.clipboard.writeText(url).then(() => showAlert("PRISM Link Copied Successfully!"));
                 };
 
-                const showGraphicOnLive = (type) => { match.activeOverlayGraphic = type; activeModal.value = ''; };
+                const showGraphicOnLive = (type) => {
+                    match.activeOverlayGraphic = type;
+                    if (type !== 'barChart' && type !== 'flowChart') { activeModal.value = ''; }
+                };
+
+                const pushChartToLive = () => {
+                    showGraphicOnLive(chartType.value);
+                    setTimeout(() => { renderChart(true); }, 300);
+                };
+                
                 const stopLiveGraphic = () => { match.activeOverlayGraphic = null; };
 
                 const availableBatsmen = computed(() => currentBattingSquad.value.filter(p => p && p !== match.striker.name && p !== match.nonStriker.name));
@@ -829,7 +957,14 @@
                 const startNewOver = () => {
                     if(match.bowler.name) match.prevBowlerName = match.bowler.name;
                     const prevStats = match.bowlingStats[tempSetup.bowler] || { runs:0, wickets:0, overs:0, balls:0, maidens:0, wd:0, nb:0 };
-                    match.bowler = { name: tempSetup.bowler, ...prevStats }; activeModal.value = '';
+                    match.bowler = { name: tempSetup.bowler, ...prevStats }; 
+                    activeModal.value = '';
+                    
+                    // Trigger New Bowler Popup
+                    playerProfilePopup.type = 'BOWLER'; playerProfilePopup.name = tempSetup.bowler; playerProfilePopup.role = 'NEW BOWLER IN';
+                    playerProfilePopup.show = true;
+                    syncDataToOverlay();
+                    setTimeout(() => { playerProfilePopup.show = false; syncDataToOverlay(); }, 8000);
                 };
 
                 const addRuns = (r) => {
@@ -871,14 +1006,32 @@
                     speak("আউট!");
                     
                     outSummaryPopup.name = match.striker.name; outSummaryPopup.dismissal = dStr; outSummaryPopup.runs = match.striker.runs; outSummaryPopup.balls = match.striker.balls;
-                    outSummaryPopup.show = true; setTimeout(() => { outSummaryPopup.show = false; }, 8000);
+                    outSummaryPopup.show = true; 
+                    syncDataToOverlay(); // Force show on overlay
+                    setTimeout(() => { outSummaryPopup.show = false; syncDataToOverlay(); }, 8000); // Hide after 8s
                     
                     activeModal.value = 'newBatter'; tempSetup.striker = '';
                 };
-                const startNewBatter = () => { match.striker = { name: tempSetup.striker, runs: 0, balls: 0, fours: 0, sixes: 0 }; updatePlayerStat(tempSetup.striker, 'batting'); activeModal.value = ''; checkOverComplete(); };
+                const startNewBatter = () => { 
+                    match.striker = { name: tempSetup.striker, runs: 0, balls: 0, fours: 0, sixes: 0 }; 
+                    updatePlayerStat(tempSetup.striker, 'batting'); 
+                    activeModal.value = ''; 
+                    
+                    // Trigger New Batsman Popup
+                    playerProfilePopup.type = 'BATSMAN'; playerProfilePopup.name = tempSetup.striker; playerProfilePopup.role = 'NEW BATTER IN';
+                    playerProfilePopup.show = true;
+                    syncDataToOverlay();
+                    setTimeout(() => { playerProfilePopup.show = false; syncDataToOverlay(); }, 8000);
+                    
+                    checkOverComplete(); 
+                };
 
-                const openChartDrawer = (type) => { chartType.value = type; showChartDrawer.value = true; match.activeOverlayGraphic = type; renderChart(false); };
-                const closeChartDrawer = () => { showChartDrawer.value = false; match.activeOverlayGraphic = null; };
+                const openChartDrawer = (type) => { 
+                    chartType.value = type; showChartDrawer.value = true; 
+                    setTimeout(() => { renderChart(false); }, 100); 
+                };
+                
+                const closeChartDrawer = () => { showChartDrawer.value = false; };
                 
                 const renderChart = (isOvl) => {
                     setTimeout(() => {
@@ -921,7 +1074,7 @@
                                 responsive: true, 
                                 maintainAspectRatio: false,
                                 layout: {
-                                    padding: { top: 30 }
+                                    padding: { top: 30 } 
                                 }
                             },
                             plugins: [{
@@ -929,20 +1082,17 @@
                                 afterDatasetsDraw(chart) {
                                     const { ctx } = chart;
                                     ctx.save();
-                                    
                                     chart.getDatasetMeta(0).data.forEach((datapoint, index) => {
                                         const wickets = wicketsData[index];
                                         if (!isLine && wickets > 0) {
                                             const yOffset = isOvl ? 20 : 12;
-                                            const radius = isOvl ? 8 : 5;
-                                            
-                                            // Draw exactly like Flow Chart: Round Red Dot with White Border
+                                            const dotRadius = isOvl ? 12 : 6;
                                             ctx.beginPath();
-                                            ctx.arc(datapoint.x, datapoint.y - yOffset, radius, 0, 2 * Math.PI);
-                                            ctx.fillStyle = '#ef4444'; // Red Color
+                                            ctx.arc(datapoint.x, datapoint.y - yOffset, dotRadius, 0, 2 * Math.PI);
+                                            ctx.fillStyle = '#ef4444'; // Red Dot
                                             ctx.fill();
                                             ctx.lineWidth = isOvl ? 3 : 2;
-                                            ctx.strokeStyle = '#ffffff'; // White Border
+                                            ctx.strokeStyle = '#fff'; // White border to make it pop
                                             ctx.stroke();
                                         }
                                     });
@@ -954,7 +1104,7 @@
                     }, 100);
                 };
 
-                return { appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, outSummaryPopup, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, loadTeamMemory, validateAndGoToOpening, resumeMatch, startMatch, copyOverlayUrl, showGraphicOnLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, abandonMatch:()=>{} };
+                return { appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, outSummaryPopup, playerProfilePopup, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, validateAndGoToOpening, resumeMatch, startMatch, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, abandonMatch, getDLSParScore, historyType, openHistory };
             }
         }).mount('#app');
     </script>
