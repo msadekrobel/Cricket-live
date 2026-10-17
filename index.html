@@ -43,7 +43,7 @@
                 <button @click="startNewMatchInit" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-black text-xl shadow-lg text-white mb-3 transition-transform active:scale-95">START NEW MATCH</button>
                 <button v-if="savedMatchExists" @click="resumeMatch" class="w-full py-4 bg-orange-600 hover:bg-orange-500 rounded-xl font-black text-xl shadow-lg text-white transition-transform active:scale-95 mb-3">▶ RESUME MATCH</button>
                 
-                <!-- NEW: KNOCKOUT & GROUP TOURNAMENT KEYS -->
+                <!-- KNOCKOUT & GROUP TOURNAMENT KEYS -->
                 <button @click="appState = 'knockout'" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-black text-lg shadow-lg text-white mb-3 transition-transform active:scale-95">🥊 KNOCKOUT TOURNAMENT</button>
                 <button @click="appState = 'group'" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 rounded-xl font-black text-lg shadow-lg text-white mb-2 transition-transform active:scale-95">🏆 GROUP TOURNAMENT</button>
 
@@ -257,10 +257,16 @@
             </div>
         </div>
 
-        <!-- 2. SETUP & TOSS -->
+        <!-- 2. SETUP & TOSS (ADDED BACK BUTTON HERE) -->
         <div v-if="appState === 'setup'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center justify-center">
-            <div class="glass-panel p-6 rounded-2xl w-full max-w-xl mx-auto border border-slate-700 shadow-xl">
-                <h2 class="text-3xl font-black font-oswald text-center mb-6 text-white tracking-widest">MATCH SETUP</h2>
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-xl mx-auto border border-slate-700 shadow-xl relative">
+                <!-- ADDED BACK BUTTON -->
+                <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
+                    <button @click="appState = activeTourneyMatch ? (activeTourneyMatch.mode === 'ko' ? 'knockout' : 'group') : 'home'" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
+                    <h2 class="text-2xl font-black font-oswald text-white tracking-widest uppercase">MATCH SETUP</h2>
+                    <span class="w-12"></span>
+                </div>
+
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div>
                         <label class="text-xs text-blue-400 font-black uppercase mb-1 block">HOME TEAM</label>
@@ -403,7 +409,7 @@
                             <div class="w-px h-16 bg-gradient-to-b from-transparent via-slate-700 to-transparent mx-3"></div>
                             <div class="text-right flex flex-col justify-center shrink-0">
                                 <div class="text-[10px] text-slate-400 font-black tracking-widest uppercase mb-1">OVERS</div>
-                                <div class="text-4xl leading-none font-black font-oswald text-white">{{ match.overs }}.{{ match.balls }}</div>
+                                <div class="text-4xl leading-none font-black font-oswald text-white">{{ match.overs }}.{{ match.balls }} <span class="text-xs text-slate-400">/ {{ match.totalOvers }}</span></div>
                                 <div class="text-[10px] font-black text-slate-300 mt-2 uppercase bg-slate-800 px-2 py-1 rounded tracking-widest">
                                     CRR: {{ calculateCRR() }}
                                 </div>
@@ -1007,7 +1013,6 @@
                 let mqttClient = null;
                 let syncTimeout = null;
                 
-                // Universal Master Channel Name so PRISM works across all matches without changing URL
                 const hostKey = (window.location.hostname || 'sadekrobel').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'sadekrobel';
                 const masterTopic = `cric_pro_master_${hostKey}`;
 
@@ -1021,7 +1026,7 @@
                 const playerProfilePopup = reactive({ show: false, type: '', name: '', role: '' });
                 const aiSettings = reactive({ voiceEnabled: true, language: 'bn' });
 
-                // ==================== KNOCKOUT & GROUP TOURNAMENT STATE ====================
+                // TOURNAMENT STATES
                 const activeTourneyMatch = ref(null);
                 const tourneyWinnerSelect = ref('');
                 const grpTab = ref('table');
@@ -1267,7 +1272,6 @@
                     });
                 };
 
-                // Initialize MQTT for 0.05s Real-Time Sync between Chrome and PRISM
                 const initMqtt = (onMsgCallback) => {
                     if (!window.mqtt) return;
                     try {
@@ -1295,21 +1299,15 @@
                 const syncDataToOverlay = (immediate = false) => {
                     try {
                         const payload = getSyncPayload();
-                        
-                        // 1. Local Storage & BroadcastChannel (Same Browser Tabs)
                         localStorage.setItem('cricketLiveSync', payload);
                         if(window.BroadcastChannel) {
                             if(!window.cricketChannel) window.cricketChannel = new BroadcastChannel('cricket_sync');
                             window.cricketChannel.postMessage(payload);
                         }
-
-                        // 2. MQTT Instant Push with Retain (Cross-App Chrome -> PRISM in 50ms)
                         if (mqttClient && mqttClient.connected) {
                             mqttClient.publish(masterTopic, payload, { qos: 0, retain: true });
                             if (match.id) mqttClient.publish(`cricket_${match.id}`, payload, { qos: 0, retain: true });
                         }
-
-                        // 3. Debounced ntfy.sh Cloud Push (Prevents HTTP 429 Rate Limit)
                         if (syncTimeout) clearTimeout(syncTimeout);
                         const sendNtfy = () => {
                             fetch(`https://ntfy.sh/${masterTopic}`, { method: 'POST', body: payload }).catch(()=>{});
@@ -1345,16 +1343,13 @@
                         } catch(err){}
                     };
 
-                    // 1. Load initial local data if on same browser
                     try {
                         const initialLocal = localStorage.getItem('cricketLiveSync');
                         if (initialLocal) processSyncData(initialLocal);
                     } catch(e) {}
 
-                    // 2. MQTT WebSocket Listener (Primary Instant Engine for PRISM)
                     initMqtt(processSyncData);
 
-                    // 3. LocalStorage & BroadcastChannel Listener
                     window.addEventListener('storage', (e) => {
                         if (e.key === 'cricketLiveSync' && e.newValue) processSyncData(e.newValue);
                     });
@@ -1363,7 +1358,6 @@
                         window.cricketChannel.onmessage = (e) => processSyncData(e.data);
                     }
 
-                    // 4. ntfy.sh Real-Time SSE (EventSource) with ?since=all
                     const connectSSE = (topicName) => {
                         try {
                             const es = new EventSource(`https://ntfy.sh/${topicName}/sse?since=all`);
@@ -1378,7 +1372,6 @@
                     connectSSE(masterTopic);
                     if (id) connectSSE(`cricket_${id}`);
 
-                    // 5. ntfy.sh Polling Fallback with FIXED ?poll=1&since=all parameter
                     const pollNtfyTopic = (topicName) => {
                         fetch(`https://ntfy.sh/${topicName}/json?poll=1&since=all`).then(r => r.text()).then(t => {
                             if(!t) return;
@@ -1580,6 +1573,30 @@
                 const swapStrike = () => { const temp = {...match.striker}; Object.assign(match.striker, match.nonStriker); Object.assign(match.nonStriker, temp); };
                 const rotateStrike = () => { saveStateForUndo(); swapStrike(); };
 
+                // OVERS LIMIT CHECKER (FIXED)
+                const checkMatchOversLimit = () => {
+                    if (match.overs >= match.totalOvers) {
+                        speak("ইনিংস শেষ।");
+                        showAlert(`ইনিংস সমাপ্ত! মোট ${match.totalOvers} ওভার শেষ হয়েছে।`);
+                        if (match.innings === 1) {
+                            match.target = match.runs + 1;
+                            match.innings = 2;
+                            match.overs = 0; match.balls = 0; match.runs = 0; match.wickets = 0;
+                            match.thisOverHistory = []; match.thisOverRuns = 0; match.thisOverWickets = 0;
+                            const tempB = match.battingTeam; match.battingTeam = match.bowlingTeam; match.bowlingTeam = tempB;
+                            appState.value = 'opening';
+                        } else {
+                            match.isEnded = true;
+                            syncRecordsToHistory();
+                            localStorage.removeItem('cricketCurrentMatch');
+                            savedMatchExists.value = false;
+                            appState.value = 'home';
+                        }
+                        return true;
+                    }
+                    return false;
+                };
+
                 const checkOverComplete = () => {
                     if (match.balls >= 6) {
                         speak("ওভার শেষ।");
@@ -1588,18 +1605,34 @@
                         match.overLog.push({ runs: match.thisOverRuns, wickets: match.thisOverWickets });
                         updatePlayerStat(match.bowler.name, 'bowling'); 
                         match.thisOverHistory = []; match.thisOverRuns = 0; match.thisOverWickets = 0; swapStrike();
+                        
+                        // Check if total match overs limit is reached
+                        if (checkMatchOversLimit()) return;
+
                         tempSetup.bowler = ''; activeModal.value = 'newBowler';
                     }
                 };
                 const selectPrevBowler = () => { tempSetup.bowler = match.prevBowlerName; activeModal.value = 'newBowler'; };
 
                 const addRuns = (r) => {
-                    if (match.balls >= 6) return; saveStateForUndo();
+                    if (match.overs >= match.totalOvers) return; saveStateForUndo();
                     match.runs += r; match.thisOverRuns += r; match.balls += 1; match.striker.runs += r; match.striker.balls += 1; match.bowler.runs += r; match.bowler.balls += 1;
                     if(r===4) { match.striker.fours += 1; speak("অসাধারণ চার!"); }
                     if(r===6) { match.striker.sixes += 1; speak("বিশাল ছক্কা!"); }
                     match.thisOverHistory.push(r.toString()); updatePlayerStat(match.striker.name, 'batting');
-                    if (r % 2 !== 0) swapStrike(); checkOverComplete();
+                    if (r % 2 !== 0) swapStrike(); 
+                    
+                    if (match.innings === 2 && match.runs >= match.target) {
+                        speak("টার্গেট পার! ম্যাচ জয়ী হলো " + match.battingTeam);
+                        showAlert(`অভিনন্দন! ${match.battingTeam} লক্ষ্য অর্জন করে জয়ী হয়েছে!`);
+                        match.isEnded = true;
+                        syncRecordsToHistory();
+                        localStorage.removeItem('cricketCurrentMatch');
+                        savedMatchExists.value = false;
+                        appState.value = 'home';
+                        return;
+                    }
+                    checkOverComplete();
                 };
 
                 const openExtraModal = (type) => { if(type === 'out') { tempSetup.wType = ''; activeModal.value = 'out'; } else { extraType.value = type; activeModal.value = 'extras'; } };
@@ -1637,6 +1670,28 @@
                     syncDataToOverlay(true); 
                     setTimeout(() => { outSummaryPopup.show = false; syncDataToOverlay(true); }, 8000); 
                     
+                    if (currentBattingSquad.value.filter(Boolean).filter(p => !match.battingStats[p] && p !== match.striker.name && p !== match.nonStriker.name).length === 0 || match.wickets >= currentBattingSquad.value.filter(Boolean).length - 1) {
+                        speak("সব উইকেট পতন!");
+                        showAlert("সকল উইকেট পতন ঘটেছে!");
+                        if (match.innings === 1) {
+                            match.target = match.runs + 1;
+                            match.innings = 2;
+                            match.overs = 0; match.balls = 0; match.runs = 0; match.wickets = 0;
+                            match.thisOverHistory = []; match.thisOverRuns = 0; match.thisOverWickets = 0;
+                            const tempB = match.battingTeam; match.battingTeam = match.bowlingTeam; match.bowlingTeam = tempB;
+                            activeModal.value = '';
+                            appState.value = 'opening';
+                        } else {
+                            match.isEnded = true;
+                            syncRecordsToHistory();
+                            localStorage.removeItem('cricketCurrentMatch');
+                            savedMatchExists.value = false;
+                            activeModal.value = '';
+                            appState.value = 'home';
+                        }
+                        return;
+                    }
+
                     activeModal.value = 'newBatter'; tempSetup.striker = '';
                 };
                 
@@ -1743,7 +1798,6 @@
 
                 const confirmExit = (isMatchEnd) => {
                     if (isMatchEnd) {
-                        // Option 2: END OF MATCH
                         match.isEnded = true;
                         syncRecordsToHistory();
                         localStorage.removeItem('cricketCurrentMatch');
@@ -1796,7 +1850,6 @@
                             }
                         }
                     } else {
-                        // Option 1: SAVE HISTORY (Resume Later)
                         match.isEnded = false;
                         syncRecordsToHistory();
                         localStorage.setItem('cricketCurrentMatch', JSON.stringify({ match, setupData, squads }));
