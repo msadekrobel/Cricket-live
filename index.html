@@ -15,6 +15,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
+    [v-cloak] { display: none !important; }
     body { font-family: 'Roboto', sans-serif; background: #0a0a0a; color: white; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
     .font-oswald { font-family: 'Oswald', sans-serif; }
     .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -25,14 +26,14 @@
   </style>
 </head>
 <body :class="{ 'overlay-mode': isOverlay }">
-<div id="app">
+<div id="app" v-cloak>
 
   <!-- =========================================================================
-       SECTION 1: PRISM LIVE TV OVERLAY (100% UNCHANGED)
+       1. PRISM LIVE TV OVERLAY MODE (100% UNCHANGED)
        ========================================================================= -->
   <div v-if="isOverlay" class="w-screen h-screen relative flex flex-col justify-end pb-6 px-8 select-none">
     
-    <!-- Event Celebration Animation (4, 6, OUT) -->
+    <!-- Celebration Banner (4, 6, WICKET) -->
     <div v-if="live.bannerEvent" class="fixed inset-0 flex items-center justify-center pointer-events-none z-50">
       <div class="bg-gradient-to-r from-amber-500 via-red-600 to-purple-700 px-16 py-6 rounded-3xl border-4 border-white shadow-2xl animate-bounce">
         <div class="font-oswald text-7xl font-black text-white drop-shadow-lg uppercase text-center">{{ live.bannerEvent }}</div>
@@ -65,7 +66,7 @@
       </div>
     </div>
 
-    <!-- Broadcast Lower-Third Scoreboard -->
+    <!-- Lower-Third Broadcast Scorebar -->
     <div class="w-full max-w-6xl mx-auto glass-panel rounded-2xl shadow-2xl overflow-hidden border-2 border-white/20">
       <div class="grid grid-cols-12 items-center">
         
@@ -84,7 +85,7 @@
           </div>
         </div>
 
-        <!-- Striker & Non-Striker -->
+        <!-- Batsmen -->
         <div class="col-span-4 px-5 py-2.5 border-r border-white/10 text-xs font-bold space-y-1.5">
           <div class="flex justify-between items-center bg-white/10 px-3 py-1.5 rounded">
             <span class="text-amber-300 truncate">🏏 {{ live.striker.name }} *</span>
@@ -113,7 +114,7 @@
         </div>
 
       </div>
-      <!-- Bilingual Commentary Ticker -->
+      <!-- Bottom Ticker -->
       <div class="bg-black/90 border-t border-white/10 px-6 py-1 flex justify-between items-center text-[11px] font-bold">
         <span class="text-amber-400 truncate">🎙️ {{ live.commentary || 'খেলা চলছে / Match in progress...' }}</span>
         <span class="text-gray-500">PRO CRICKET CASTER AI</span>
@@ -122,11 +123,11 @@
   </div>
 
   <!-- =========================================================================
-       SECTION 2: MAIN APPLICATION SCREENS
+       2. MAIN CONTROLLER INTERFACE
        ========================================================================= -->
   <div v-else class="max-w-xl mx-auto min-h-screen p-4 pb-16">
 
-    <!-- Top Brand Header (No PRISM Link Here on 1st Screen) -->
+    <!-- Top Brand Header (Clean on 1st Screen) -->
     <div class="glass-panel rounded-2xl p-4 mb-4 flex justify-between items-center">
       <div>
         <h1 class="font-oswald text-2xl font-black text-amber-400 tracking-wider uppercase">PRO CRICKET CASTER AI</h1>
@@ -138,31 +139,31 @@
     </div>
 
     <!-- =======================================================================
-         1ST SCREEN (HOME): EXISTING KEYS + ONLY 2 NEW TOURNAMENT KEYS
+         1ST SCREEN (HOME): START MATCH + KNOCKOUT + GROUP + PROFILE & HISTORY
          ======================================================================= -->
     <div v-if="screen === 'home'" class="space-y-3">
       
-      <!-- Existing Key: Start New Match -->
+      <!-- 1. Start New Match -->
       <button @click="openSingleMatchSetup" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 font-oswald text-xl font-bold shadow-lg flex items-center justify-center gap-2">
         🏏 START NEW MATCH
       </button>
 
-      <!-- Existing Key: Resume Match (Shows when a match is saved to resume) -->
-      <button v-if="savedMatches.some(m => !m.ended)" @click="showHistoryModal = true" class="w-full py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-500 font-oswald text-lg font-bold shadow-lg">
+      <!-- Resume Saved Match (If Any Unfinished Match Exists) -->
+      <button v-if="hasResumableMatch" @click="showHistoryModal = true" class="w-full py-3.5 rounded-2xl bg-amber-600 hover:bg-amber-500 font-oswald text-lg font-bold shadow-lg">
         ⏯️ RESUME SAVED MATCH
       </button>
 
-      <!-- NEW KEY 1: KNOCKOUT TOURNAMENT -->
+      <!-- 2. Knockout Tournament -->
       <button @click="screen = 'knockout'" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-700 hover:from-indigo-500 hover:to-blue-600 font-oswald text-xl font-bold shadow-lg flex items-center justify-center gap-2 border border-indigo-400/30">
         🥊 KNOCKOUT TOURNAMENT
       </button>
 
-      <!-- NEW KEY 2: GROUP TOURNAMENT -->
+      <!-- 3. Group Tournament -->
       <button @click="screen = 'group'" class="w-full py-4 rounded-2xl bg-gradient-to-r from-purple-600 to-fuchsia-700 hover:from-purple-500 hover:to-fuchsia-600 font-oswald text-xl font-bold shadow-lg flex items-center justify-center gap-2 border border-purple-400/30">
         🏆 GROUP TOURNAMENT
       </button>
 
-      <!-- Existing Keys: Player Profile & Match History (100% Same Page) -->
+      <!-- 4. Player Profile & Match History (Same Page) -->
       <div class="grid grid-cols-2 gap-3 pt-2">
         <button @click="showPlayerModal = true" class="py-4 glass-panel rounded-2xl hover:bg-white/10 font-oswald text-lg font-bold text-cyan-300">
           👤 PLAYER PROFILE
@@ -174,22 +175,22 @@
     </div>
 
     <!-- =======================================================================
-         NEW SCREEN A: KNOCKOUT TOURNAMENT (8 / 16 / 32 TEAMS + DATE/TIME)
+         SCREEN: KNOCKOUT TOURNAMENT (8 / 16 / 32 TEAMS + EDITABLE DATE/TIME)
          ======================================================================= -->
-    <div v-if="screen === 'knockout'" class="glass-panel rounded-2xl p-4 space-y-4">
+    <div v-else-if="screen === 'knockout'" class="glass-panel rounded-2xl p-4 space-y-4">
       <div class="flex justify-between items-center border-b border-white/10 pb-3">
         <h2 class="font-oswald text-2xl text-indigo-400">🥊 KNOCKOUT TOURNAMENT</h2>
         <button @click="screen = 'home'" class="bg-white/10 px-3 py-1 rounded text-xs font-bold">⬅ HOME</button>
       </div>
 
-      <!-- Knockout Setup -->
+      <!-- Setup Knockout Teams -->
       <div v-if="!ko.started" class="space-y-4">
         <div>
           <label class="text-xs font-bold text-gray-400 uppercase">Tournament Name</label>
           <input v-model="ko.name" class="w-full bg-black/60 border border-white/15 rounded-lg p-2.5 text-sm font-bold mt-1" placeholder="Enter Knockout Cup Name" />
         </div>
         <div>
-          <label class="text-xs font-bold text-gray-400 uppercase">Select Knockout Format (Teams)</label>
+          <label class="text-xs font-bold text-gray-400 uppercase">Select Total Teams</label>
           <div class="grid grid-cols-3 gap-2 mt-1">
             <button v-for="n in [8, 16, 32]" :key="n" @click="setKoTeamCount(n)"
               class="py-2.5 rounded-lg font-bold text-sm border"
@@ -198,8 +199,8 @@
             </button>
           </div>
           <p class="text-[11px] text-indigo-300 mt-1 font-semibold">
-            <span v-if="ko.teamCount === 32">32 Teams ➔ 16 Teams ➔ 8 Teams (Quarter) ➔ 4 Teams (Semi) ➔ Final</span>
-            <span v-else-if="ko.teamCount === 16">16 Teams ➔ 8 Teams (Quarter) ➔ 4 Teams (Semi) ➔ Final</span>
+            <span v-if="ko.teamCount === 32">32 Teams ➔ 16 Teams ➔ 8 Teams ➔ 4 Teams (Semi) ➔ Final</span>
+            <span v-else-if="ko.teamCount === 16">16 Teams ➔ 8 Teams ➔ 4 Teams (Semi) ➔ Final</span>
             <span v-else>8 Teams (Quarter) ➔ 4 Teams (Semi) ➔ Final</span>
           </p>
         </div>
@@ -216,7 +217,7 @@
         </button>
       </div>
 
-      <!-- Knockout Active Fixtures & Brackets -->
+      <!-- Active Knockout Bracket -->
       <div v-else class="space-y-4">
         <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl border border-white/10">
           <div>
@@ -237,7 +238,6 @@
               <span :class="m.winner === m.teamB ? 'text-emerald-400' : 'text-white'">{{ m.teamB || 'TBD' }}</span>
             </div>
 
-            <!-- Adjustable Date & Time -->
             <div class="grid grid-cols-2 gap-2 pt-1">
               <input type="date" v-model="m.date" @change="saveKo" class="bg-black/80 border border-white/15 rounded px-2 py-1 text-xs text-gray-300" />
               <input type="time" v-model="m.time" @change="saveKo" class="bg-black/80 border border-white/15 rounded px-2 py-1 text-xs text-gray-300" />
@@ -249,7 +249,7 @@
               <button v-if="!m.winner && m.teamA && m.teamB && m.teamA !== 'TBD' && m.teamB !== 'TBD'"
                 @click="startTournamentMatch('ko', rIdx, mIdx, m)"
                 class="bg-emerald-600 hover:bg-emerald-500 text-xs font-bold px-3 py-1.5 rounded">
-                ▶ START MATCH
+                ▶ START NEW MATCH
               </button>
             </div>
           </div>
@@ -258,15 +258,15 @@
     </div>
 
     <!-- =======================================================================
-         NEW SCREEN B: GROUP TOURNAMENT (GROUPS + TOP 1/2 + AUTO QUARTER/SEMI/FINAL)
+         SCREEN: GROUP TOURNAMENT (GROUPS + TOP 1/2 + AUTO QUARTER/SEMI/FINAL)
          ======================================================================= -->
-    <div v-if="screen === 'group'" class="glass-panel rounded-2xl p-4 space-y-4">
+    <div v-else-if="screen === 'group'" class="glass-panel rounded-2xl p-4 space-y-4">
       <div class="flex justify-between items-center border-b border-white/10 pb-3">
         <h2 class="font-oswald text-2xl text-purple-400">🏆 GROUP TOURNAMENT</h2>
         <button @click="screen = 'home'" class="bg-white/10 px-3 py-1 rounded text-xs font-bold">⬅ HOME</button>
       </div>
 
-      <!-- Group Tournament Setup -->
+      <!-- Setup Groups -->
       <div v-if="!grp.started" class="space-y-3">
         <div>
           <label class="text-xs font-bold text-gray-400 uppercase">Tournament Name</label>
@@ -303,7 +303,6 @@
           Qualifiers: <b>{{ grp.groupCount * grp.qualifiersPerGroup }} Teams</b> ➔ <b>{{ playoffStageLabel }}</b>
         </div>
 
-        <!-- Team Entry Per Group -->
         <div class="max-h-64 overflow-y-auto custom-scrollbar space-y-3 pr-1">
           <div v-for="(g, gIdx) in grp.groups" :key="gIdx" class="bg-black/50 p-3 rounded-lg border border-white/10 space-y-1.5">
             <div class="font-oswald text-sm text-amber-400">{{ g.name }}</div>
@@ -319,7 +318,7 @@
         </button>
       </div>
 
-      <!-- Active Group Tournament View -->
+      <!-- Active Group Tournament -->
       <div v-else class="space-y-4">
         <div class="flex justify-between items-center bg-black/50 p-3 rounded-xl border border-white/10">
           <div>
@@ -422,9 +421,9 @@
     </div>
 
     <!-- =======================================================================
-         EXISTING SCREEN: MATCH & SQUAD SETUP (100% UNCHANGED)
+         SCREEN: MATCH & SQUAD SETUP (BEST 11 & SUB - UNCHANGED)
          ======================================================================= -->
-    <div v-if="screen === 'setup'" class="glass-panel rounded-2xl p-4 space-y-4">
+    <div v-else-if="screen === 'setup'" class="glass-panel rounded-2xl p-4 space-y-4">
       <div class="flex justify-between items-center border-b border-white/10 pb-2">
         <h2 class="font-oswald text-xl text-emerald-400">⚙️ MATCH SETUP (BEST 11 & SUB)</h2>
         <button @click="screen = 'home'" class="bg-white/10 px-3 py-1 rounded text-xs font-bold">CANCEL</button>
@@ -462,7 +461,6 @@
         </div>
       </div>
 
-      <!-- Best 11 & Sub Players Entry -->
       <div class="grid grid-cols-2 gap-3 pt-1">
         <div class="bg-black/50 p-2.5 rounded-lg border border-white/10">
           <div class="text-xs font-bold text-amber-400 mb-2">{{ setup.teamA }} (BEST 11 + SUB)</div>
@@ -478,7 +476,6 @@
         </div>
       </div>
 
-      <!-- Opening Striker, Non-Striker & Bowler -->
       <div class="grid grid-cols-3 gap-2">
         <div>
           <label class="text-[11px] font-bold text-gray-400">STRIKER</label>
@@ -500,9 +497,9 @@
     </div>
 
     <!-- =======================================================================
-         EXISTING SCREEN: LIVE SCORING CONSOLE (100% UNCHANGED + PRISM LINK HERE)
+         SCREEN: LIVE SCORING CONSOLE (PRISM LINK ONLY HERE INSIDE GAME)
          ======================================================================= -->
-    <div v-if="screen === 'scoring'" class="space-y-3">
+    <div v-else-if="screen === 'scoring'" class="space-y-3">
       
       <!-- PRISM Live Overlay Link (Appears ONLY inside Game) -->
       <div class="glass-panel rounded-xl p-2.5 flex gap-2 items-center">
@@ -512,7 +509,7 @@
         </button>
       </div>
 
-      <!-- Main Scoreboard Display -->
+      <!-- Scoreboard Display -->
       <div class="glass-panel rounded-2xl p-4 bg-gradient-to-br from-slate-900/90 to-indigo-950/90 border border-indigo-500/40">
         <div class="flex justify-between items-center text-xs font-bold text-amber-300 mb-1">
           <span>{{ live.matchTitle || (live.teamA + ' VS ' + live.teamB) }} ({{ live.innings === 1 ? '1ST INNINGS' : '2ND INNINGS' }})</span>
@@ -531,7 +528,6 @@
           </div>
         </div>
 
-        <!-- Dual Squad View & TV Squad Overlay Toggle Under Score -->
         <div class="mt-3 pt-2 border-t border-white/10 flex gap-2">
           <button @click="showAdminSquadModal = true" class="flex-1 bg-white/10 hover:bg-white/20 text-xs font-bold py-1.5 rounded text-cyan-300">
             👥 VIEW BOTH TEAMS
@@ -542,7 +538,7 @@
         </div>
       </div>
 
-      <!-- Active Batsmen & Bowler Card -->
+      <!-- Active Batsmen & Bowler -->
       <div class="glass-panel rounded-2xl p-3 space-y-2 text-xs font-bold">
         <div class="flex justify-between items-center bg-black/50 p-2 rounded border border-amber-500/40">
           <span class="text-amber-300">🏏 {{ live.striker.name }} *</span>
@@ -558,7 +554,7 @@
         </div>
       </div>
 
-      <!-- Scoring Keypad & Controls -->
+      <!-- Scoring Keypad -->
       <div class="glass-panel rounded-2xl p-3 space-y-2">
         <div class="grid grid-cols-4 gap-2">
           <button v-for="r in [0,1,2,3]" :key="r" @click="addBall(r, 'RUN')" class="py-3.5 bg-white/10 hover:bg-white/20 rounded-xl font-oswald text-xl font-bold">{{ r }}</button>
@@ -576,7 +572,6 @@
           <button @click="triggerWicket" class="py-3 bg-red-600 hover:bg-red-500 rounded-xl font-oswald text-lg font-bold">OUT</button>
         </div>
 
-        <!-- DLS, UNDO, Bowler, 2nd Innings -->
         <div class="grid grid-cols-4 gap-2 pt-1">
           <button @click="openDlsModal" class="py-2.5 bg-purple-700 hover:bg-purple-600 rounded-xl text-xs font-bold">🌧️ DLS</button>
           <button @click="undoLastAction" class="py-2.5 bg-amber-600 hover:bg-amber-500 rounded-xl text-xs font-bold">↩ UNDO</button>
@@ -584,7 +579,6 @@
           <button @click="startSecondInnings" class="py-2.5 bg-blue-700 hover:bg-blue-600 rounded-xl text-xs font-bold">2ND INN</button>
         </div>
 
-        <!-- Commentary Preview & Toss Banner Button Under Comm + Exit -->
         <div class="bg-black/50 p-2 rounded-lg text-[11px] text-amber-300 font-bold truncate">
           🎙️ {{ live.commentary }}
         </div>
@@ -600,10 +594,10 @@
     </div>
 
     <!-- =======================================================================
-         MODALS: EXIT, SQUAD, MATCH HISTORY, SCORECARD, PLAYER PROFILE
+         POPUP MODALS (EXIT, SQUAD, HISTORY, SCORECARD, PLAYER PROFILE)
          ======================================================================= -->
     
-    <!-- Exit Match Modal (2 Options: Save History OR End of Match) -->
+    <!-- Exit Match Modal -->
     <div v-if="showExitModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
       <div class="glass-panel rounded-3xl p-6 w-full max-w-sm space-y-4 text-center">
         <h3 class="font-oswald text-2xl text-white uppercase">EXIT MATCH OPTIONS</h3>
@@ -653,9 +647,9 @@
         <h3 class="font-oswald text-3xl text-center text-white tracking-wider">MATCH HISTORY</h3>
         <div class="max-h-96 overflow-y-auto custom-scrollbar space-y-3 pr-1">
           <div v-if="!savedMatches.length" class="text-center text-gray-500 py-8 text-sm">No matches recorded yet.</div>
-          <div v-for="(m, idx) in savedMatches" :key="m.id" class="bg-black/60 border border-white/15 rounded-xl p-3.5 space-y-2">
+          <div v-for="(m, idx) in savedMatches" :key="m.id || idx" class="bg-black/60 border border-white/15 rounded-xl p-3.5 space-y-2">
             <div class="font-bold text-sm text-white uppercase">
-              {{ m.teamA }} VS {{ m.teamB }} ({{ m.runs }}/{{ m.wickets }} - {{ formatOvers(m.balls) }} Ov)
+              {{ m.teamA }} VS {{ m.teamB }} ({{ m.runs }}/{{ m.wickets }} - {{ formatOvers(m.balls || 0) }} Ov)
             </div>
             <div class="text-xs text-gray-400">Toss: {{ m.tossWinner }} ({{ m.tossDecision }})</div>
             <div>
@@ -679,7 +673,7 @@
       <div class="glass-panel rounded-3xl p-5 w-full max-w-md space-y-3">
         <h3 class="font-oswald text-2xl text-amber-400 text-center uppercase">{{ selectedScorecard.teamA }} VS {{ selectedScorecard.teamB }}</h3>
         <div class="bg-black/60 p-3 rounded-xl text-center">
-          <div class="text-2xl font-black text-white">{{ selectedScorecard.battingTeam }}: {{ selectedScorecard.runs }}/{{ selectedScorecard.wickets }} ({{ formatOvers(selectedScorecard.balls) }} Ov)</div>
+          <div class="text-2xl font-black text-white">{{ selectedScorecard.battingTeam }}: {{ selectedScorecard.runs }}/{{ selectedScorecard.wickets }} ({{ formatOvers(selectedScorecard.balls || 0) }} Ov)</div>
           <div class="text-xs text-gray-400 mt-1">Toss: {{ selectedScorecard.tossWinner }} ({{ selectedScorecard.tossDecision }})</div>
         </div>
         <div class="bg-black/60 p-3 rounded-xl space-y-1 text-xs">
@@ -693,7 +687,7 @@
       </div>
     </div>
 
-    <!-- Player Profile Modal (Career Stats Only, No Live Overlay Push) -->
+    <!-- Player Profile Modal -->
     <div v-if="showPlayerModal" class="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
       <div class="glass-panel rounded-3xl p-5 w-full max-w-md space-y-4">
         <h3 class="font-oswald text-3xl text-center text-white tracking-wider">PLAYER PROFILE</h3>
@@ -737,12 +731,45 @@
 <script>
 const { createApp } = Vue;
 
+function safeLoad(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return fallback;
+    const parsed = JSON.parse(raw);
+    return parsed !== null && typeof parsed === 'object' ? parsed : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
 createApp({
   data() {
     const params = new URLSearchParams(window.location.search);
     const isOv = params.get('mode') === 'overlay';
     const ch = params.get('ch') || localStorage.getItem('cric_channel_id') || 'pro_caster_live';
     localStorage.setItem('cric_channel_id', ch);
+
+    const savedList = safeLoad('cric_saved_matches', []);
+    const defaultKo = {
+      name: 'KNOCKOUT TOURNAMENT',
+      teamCount: 16,
+      started: false,
+      teams: Array.from({length: 16}, (_, i) => `TEAM ${i+1}`),
+      rounds: []
+    };
+    const loadedKo = safeLoad('cric_v2_ko_state', defaultKo);
+
+    const defaultGrp = {
+      name: 'GROUP STAGE TOURNAMENT',
+      groupCount: 4,
+      teamsPerGroup: 4,
+      qualifiersPerGroup: 2,
+      started: false,
+      groups: [],
+      matches: [],
+      playoffRounds: []
+    };
+    const loadedGrp = safeLoad('cric_v2_grp_state', defaultGrp);
 
     return {
       isOverlay: isOv,
@@ -803,28 +830,12 @@ createApp({
       },
       undoStack: [],
 
-      savedMatches: JSON.parse(localStorage.getItem('cric_saved_matches') || '[]'),
-      playerDB: JSON.parse(localStorage.getItem('cric_player_db') || '{}'),
+      savedMatches: Array.isArray(savedList) ? savedList : [],
+      playerDB: safeLoad('cric_player_db', {}),
 
-      ko: JSON.parse(localStorage.getItem('cric_ko_state') || JSON.stringify({
-        name: 'KNOCKOUT TOURNAMENT',
-        teamCount: 16,
-        started: false,
-        teams: Array.from({length: 16}, (_, i) => `TEAM ${i+1}`),
-        rounds: []
-      })),
-
+      ko: Object.assign({}, defaultKo, loadedKo),
       grpTab: 'table',
-      grp: JSON.parse(localStorage.getItem('cric_grp_state') || JSON.stringify({
-        name: 'GROUP STAGE TOURNAMENT',
-        groupCount: 4,
-        teamsPerGroup: 4,
-        qualifiersPerGroup: 2,
-        started: false,
-        groups: [],
-        matches: [],
-        playoffRounds: []
-      }))
+      grp: Object.assign({}, defaultGrp, loadedGrp)
     };
   },
   computed: {
@@ -836,6 +847,9 @@ createApp({
       if (!this.live.balls) return '0.00';
       return ((this.live.runs / this.live.balls) * 6).toFixed(2);
     },
+    hasResumableMatch() {
+      return Array.isArray(this.savedMatches) && this.savedMatches.some(m => m && !m.ended);
+    },
     playoffStageLabel() {
       const totalQ = this.grp.groupCount * this.grp.qualifiersPerGroup;
       if (totalQ === 16) return 'Round of 16 ➔ Quarter ➔ Semi ➔ Final';
@@ -845,12 +859,15 @@ createApp({
     }
   },
   mounted() {
-    if (!this.grp.groups.length) this.initGroupInputs();
+    if (!Array.isArray(this.grp.groups) || !this.grp.groups.length) {
+      this.initGroupInputs();
+    }
     this.initSyncEngines();
   },
   methods: {
     formatOvers(balls) {
-      return `${Math.floor(balls / 6)}.${balls % 6}`;
+      const b = Number(balls) || 0;
+      return `${Math.floor(b / 6)}.${b % 6}`;
     },
     copyOverlayUrl() {
       navigator.clipboard.writeText(this.overlayUrl);
@@ -862,37 +879,39 @@ createApp({
       if ('BroadcastChannel' in window) {
         this.bc = new BroadcastChannel(this.channelId);
         this.bc.onmessage = (ev) => {
-          if (this.isOverlay && ev.data) this.live = ev.data;
+          if (this.isOverlay && ev.data) this.live = Object.assign({}, this.live, ev.data);
         };
       }
 
       try {
-        this.mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
-        this.mqttClient.on('connect', () => {
-          this.mqttConnected = true;
-          if (this.isOverlay) {
-            this.mqttClient.subscribe(`cricpro/${this.channelId}/state`);
-          } else {
-            this.broadcastState();
-          }
-        });
-        this.mqttClient.on('message', (topic, message) => {
-          if (this.isOverlay) {
-            try { this.live = JSON.parse(message.toString()); } catch (e) {}
-          }
-        });
+        if (typeof mqtt !== 'undefined') {
+          this.mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt');
+          this.mqttClient.on('connect', () => {
+            this.mqttConnected = true;
+            if (this.isOverlay) {
+              this.mqttClient.subscribe(`cricpro/${this.channelId}/state`);
+            } else {
+              this.broadcastState();
+            }
+          });
+          this.mqttClient.on('message', (topic, message) => {
+            if (this.isOverlay) {
+              try {
+                const parsed = JSON.parse(message.toString());
+                if (parsed && parsed.striker) this.live = Object.assign({}, this.live, parsed);
+              } catch (e) {}
+            }
+          });
+        }
       } catch (e) {}
 
       if (this.isOverlay) {
-        const cached = localStorage.getItem('cric_live_state_' + this.channelId);
-        if (cached) {
-          try { this.live = JSON.parse(cached); } catch (e) {}
-        }
+        const cached = safeLoad('cric_live_state_' + this.channelId, null);
+        if (cached && cached.striker) this.live = Object.assign({}, this.live, cached);
+
         setInterval(() => {
-          const local = localStorage.getItem('cric_live_state_' + this.channelId);
-          if (local) {
-            try { this.live = JSON.parse(local); } catch (e) {}
-          }
+          const local = safeLoad('cric_live_state_' + this.channelId, null);
+          if (local && local.striker) this.live = Object.assign({}, this.live, local);
         }, 800);
 
         setInterval(async () => {
@@ -902,7 +921,10 @@ createApp({
             const lines = text.trim().split('\n');
             if (lines.length) {
               const last = JSON.parse(lines[lines.length - 1]);
-              if (last.message) this.live = JSON.parse(last.message);
+              if (last.message) {
+                const parsed = JSON.parse(last.message);
+                if (parsed && parsed.striker) this.live = Object.assign({}, this.live, parsed);
+              }
             }
           } catch (e) {}
         }, 2500);
@@ -1134,13 +1156,13 @@ createApp({
     upsertMatchHistory(ended) {
       const copy = JSON.parse(JSON.stringify(this.live));
       copy.ended = ended;
-      const idx = this.savedMatches.findIndex(m => m.id === copy.id);
+      const idx = this.savedMatches.findIndex(m => m && m.id === copy.id);
       if (idx >= 0) this.savedMatches[idx] = copy;
       else this.savedMatches.unshift(copy);
       localStorage.setItem('cric_saved_matches', JSON.stringify(this.savedMatches));
     },
     resumeSavedMatch(m) {
-      this.live = JSON.parse(JSON.stringify(m));
+      this.live = Object.assign({}, this.live, JSON.parse(JSON.stringify(m)));
       this.showHistoryModal = false;
       this.screen = 'scoring';
       this.broadcastState();
@@ -1156,15 +1178,15 @@ createApp({
 
     setKoTeamCount(n) {
       this.ko.teamCount = n;
-      this.ko.teams = Array.from({length: n}, (_, i) => this.ko.teams[i] || `TEAM ${i+1}`);
+      this.ko.teams = Array.from({length: n}, (_, i) => (this.ko.teams && this.ko.teams[i]) ? this.ko.teams[i] : `TEAM ${i+1}`);
     },
     generateKnockoutBracket() {
-      const n = this.ko.teamCount;
+      const n = this.ko.teamCount || 16;
       const roundTitles = {
         32: ['ROUND OF 32 (32 TEAMS)', 'ROUND OF 16 (16 TEAMS)', 'QUARTER FINALS (8 TEAMS)', 'SEMI FINALS (4 TEAMS)', 'FINAL'],
         16: ['ROUND OF 16 (16 TEAMS)', 'QUARTER FINALS (8 TEAMS)', 'SEMI FINALS (4 TEAMS)', 'FINAL'],
         8: ['QUARTER FINALS (8 TEAMS)', 'SEMI FINALS (4 TEAMS)', 'FINAL']
-      }[n];
+      }[n] || ['QUARTER FINALS', 'SEMI FINALS', 'FINAL'];
 
       const rounds = [];
       let matchCount = n / 2;
@@ -1175,8 +1197,8 @@ createApp({
         for (let i = 0; i < matchCount; i++) {
           matches.push({
             id: `ko_${rIdx}_${i}`,
-            teamA: rIdx === 0 ? this.ko.teams[i * 2] : 'TBD',
-            teamB: rIdx === 0 ? this.ko.teams[i * 2 + 1] : 'TBD',
+            teamA: rIdx === 0 ? (this.ko.teams[i * 2] || `TEAM ${i*2+1}`) : 'TBD',
+            teamB: rIdx === 0 ? (this.ko.teams[i * 2 + 1] || `TEAM ${i*2+2}`) : 'TBD',
             date: today,
             time: '15:00',
             winner: null
@@ -1191,7 +1213,7 @@ createApp({
       this.saveKo();
     },
     saveKo() {
-      localStorage.setItem('cric_ko_state', JSON.stringify(this.ko));
+      localStorage.setItem('cric_v2_ko_state', JSON.stringify(this.ko));
     },
     resetKnockout() {
       this.ko.started = false;
@@ -1235,6 +1257,7 @@ createApp({
       this.saveGrp();
     },
     sortedGroupTeams(group) {
+      if (!group || !Array.isArray(group.teams)) return [];
       return [...group.teams].sort((a, b) => b.pts - a.pts || b.w - a.w);
     },
     generateGroupPlayoffs() {
@@ -1279,7 +1302,7 @@ createApp({
       this.saveGrp();
     },
     saveGrp() {
-      localStorage.setItem('cric_grp_state', JSON.stringify(this.grp));
+      localStorage.setItem('cric_v2_grp_state', JSON.stringify(this.grp));
     },
     resetGroupTournament() {
       this.grp.started = false;
