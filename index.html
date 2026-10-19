@@ -62,7 +62,6 @@
                     <button @click="appState = 'home'" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
                 </div>
 
-                <!-- Knockout Setup -->
                 <div v-if="!koData.started" class="space-y-4">
                     <div>
                         <label class="text-xs text-slate-400 font-black uppercase mb-1 block">TOURNAMENT NAME</label>
@@ -83,7 +82,6 @@
                     <button @click="generateKoFixtures" class="w-full py-4 bg-indigo-600 hover:bg-indigo-500 rounded-xl font-black text-lg text-white shadow-lg transition-transform active:scale-95">GENERATE KNOCKOUT FIXTURES ➡</button>
                 </div>
 
-                <!-- Knockout Active Bracket -->
                 <div v-else class="space-y-5">
                     <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-700">
                         <div>
@@ -126,7 +124,6 @@
                     <button @click="appState = 'home'" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
                 </div>
 
-                <!-- Group Setup -->
                 <div v-if="!grpData.started" class="space-y-4">
                     <div>
                         <label class="text-xs text-slate-400 font-black uppercase mb-1 block">TOURNAMENT NAME</label>
@@ -172,7 +169,6 @@
                     <button @click="startGroupTournamentNow" class="w-full py-4 bg-purple-600 hover:bg-purple-500 rounded-xl font-black text-lg text-white shadow-lg transition-transform active:scale-95">START GROUP TOURNAMENT ➡</button>
                 </div>
 
-                <!-- Active Group Tournament -->
                 <div v-else class="space-y-4">
                     <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-700">
                         <div>
@@ -188,7 +184,6 @@
                         <button @click="grpTab = 'playoffs'" :class="grpTab === 'playoffs' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-slate-400'" class="py-2.5 rounded-xl font-black text-xs">🏆 FINALS STAGE</button>
                     </div>
 
-                    <!-- Points Table Tab -->
                     <div v-if="grpTab === 'table'" class="max-h-[55vh] overflow-y-auto custom-scrollbar space-y-3 pr-1">
                         <div v-for="(g, gIdx) in grpData.groups" :key="gIdx" class="bg-slate-900 border border-slate-700 rounded-xl p-3">
                             <div class="font-oswald text-sm font-black text-yellow-400 mb-2 uppercase">{{ g.name }} (TOP {{ grpData.qualifiersPerGroup }} QUALIFY)</div>
@@ -209,7 +204,6 @@
                         </div>
                     </div>
 
-                    <!-- Group Matches Tab -->
                     <div v-if="grpTab === 'matches'" class="max-h-[55vh] overflow-y-auto custom-scrollbar space-y-2.5 pr-1">
                         <div v-for="(m, mIdx) in grpData.matches" :key="m.id" class="bg-slate-800/80 border border-slate-700 rounded-xl p-3 space-y-2">
                             <div class="flex justify-between items-center text-[10px] font-black text-purple-300 uppercase">
@@ -231,7 +225,6 @@
                         </div>
                     </div>
 
-                    <!-- Playoffs Tab -->
                     <div v-if="grpTab === 'playoffs'" class="max-h-[55vh] overflow-y-auto custom-scrollbar space-y-3 pr-1">
                         <button @click="syncGroupPlayoffBracket" class="w-full py-2.5 bg-yellow-600 hover:bg-yellow-500 text-black font-black text-xs rounded-xl uppercase">🔄 SYNC QUALIFIED TEAMS FROM POINTS TABLE</button>
                         <div v-for="(round, rIdx) in grpData.playoffRounds" :key="rIdx" class="space-y-2">
@@ -592,7 +585,7 @@
                 </div>
             </div>
 
-            <!-- COMMENTARY MODAL (1ST & 2ND INNINGS TABS) -->
+            <!-- COMMENTARY MODAL -->
             <div v-if="activeModal === 'commentary'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
                 <div class="glass-panel p-4 rounded-2xl w-full max-w-lg border-2 border-indigo-600 animate-pop flex flex-col max-h-[85vh]">
                     <h2 class="text-xl font-black text-white mb-3 text-center font-oswald tracking-widest uppercase">🎙️ BALL BY BALL COMMENTARY</h2>
@@ -611,7 +604,7 @@
                 </div>
             </div>
 
-            <!-- ADMIN ONLY MODALS (Out, Fielders, Extras, etc.) -->
+            <!-- OUT MODAL -->
             <div v-if="activeModal === 'out'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
                 <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
                     <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">WICKET!</h2>
@@ -695,7 +688,7 @@
             </div>
         </div>
 
-        <!-- 1ST INNINGS END MODAL (BETWEEN INNINGS SCOREBOARD) -->
+        <!-- 1ST INNINGS BREAK MODAL -->
         <div v-if="appState === 'inningsBreak'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
             <div class="glass-panel p-6 rounded-2xl w-full max-w-2xl border-2 border-blue-600 animate-pop flex flex-col max-h-[90vh]">
                 <h2 class="text-2xl font-black text-yellow-400 mb-4 text-center font-oswald tracking-widest uppercase">1ST INNINGS COMPLETED</h2>
@@ -724,7 +717,6 @@
             <div class="glass-panel p-6 rounded-2xl w-full max-w-3xl border-2 border-green-600 animate-pop flex flex-col max-h-[90vh]">
                 <h2 class="text-2xl font-black text-green-400 mb-3 text-center font-oswald tracking-widest uppercase">FULL MATCH SUMMARY & AWARDS</h2>
                 
-                <!-- 3 Tabs (1st Inn, 2nd Inn, Summary) with Live Stream Keys -->
                 <div class="flex gap-2 mb-3 shrink-0">
                     <button @click="summaryTab = 'inn1'" :class="summaryTab === 'inn1' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-400'" class="flex-1 py-2 rounded-lg font-black text-xs">1ST INNINGS</button>
                     <button @click="summaryTab = 'inn2'" :class="summaryTab === 'inn2' ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400'" class="flex-1 py-2 rounded-lg font-black text-xs">2ND INNINGS</button>
@@ -737,7 +729,6 @@
                 </div>
 
                 <div class="overflow-y-auto custom-scrollbar flex-1 space-y-4 pr-1 mb-4">
-                    <!-- Tab 1: 1st Innings -->
                     <div v-if="summaryTab === 'inn1'" class="space-y-3">
                         <h3 class="font-oswald text-base text-yellow-400 uppercase font-black">{{ match.innings1Data?.battingTeam }} - {{ match.innings1Data?.runs }}/{{ match.innings1Data?.wickets }}</h3>
                         <table class="w-full text-white text-xs">
@@ -748,7 +739,6 @@
                         </table>
                     </div>
 
-                    <!-- Tab 2: 2nd Innings -->
                     <div v-if="summaryTab === 'inn2'" class="space-y-3">
                         <h3 class="font-oswald text-base text-yellow-400 uppercase font-black">{{ match.battingTeam }} - {{ match.runs }}/{{ match.wickets }}</h3>
                         <table class="w-full text-white text-xs">
@@ -759,13 +749,10 @@
                         </table>
                     </div>
 
-                    <!-- Tab 3: Match Summary & Performers -->
                     <div v-if="summaryTab === 'summary'" class="space-y-4">
                         <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 text-center">
                             <h3 class="text-xl font-black text-yellow-400 font-oswald uppercase">{{ matchResultText }}</h3>
                         </div>
-
-                        <!-- Top 3 Batsmen & Bowlers (1st Innings & 2nd Innings side by side) -->
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-slate-900 p-3 rounded-xl border border-slate-700">
                                 <h4 class="text-xs font-black text-blue-400 uppercase mb-2">🏏 TOP 3 BATSMEN</h4>
@@ -782,8 +769,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Awards Section -->
                         <div class="grid grid-cols-3 gap-3 pt-2">
                             <div class="bg-gradient-to-br from-yellow-900/60 to-black p-3 rounded-xl border border-yellow-600/50 text-center">
                                 <div class="text-[10px] text-yellow-400 font-black uppercase mb-1">🏆 MAN OF THE MATCH</div>
@@ -808,7 +793,7 @@
         <!-- CHARTS DRAWER -->
         <div v-if="showChartDrawer" class="absolute inset-0 bg-slate-900 z-[1000] flex flex-col animate-pop">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex justify-between items-center shrink-0">
-                <h2 class="font-black text-pink-400 font-oswald text-xl tracking-widest uppercase">{{ chartType === 'barChart' ? 'Runs & Wickets Per Over (Both Teams)' : 'Run Flow & Wickets Comparison (Both Teams)' }}</h2>
+                <h2 class="font-black text-pink-400 font-oswald text-xl tracking-widest uppercase">{{ chartType === 'barChart' ? 'Runs & Wickets Per Over' : 'Run Flow & Wickets Comparison' }}</h2>
                 <button @click="closeChartDrawer" class="px-4 py-1.5 bg-slate-700 text-white rounded font-bold text-xs">CLOSE</button>
             </div>
             <div class="flex p-2 gap-2 bg-slate-900 shrink-0 border-b border-slate-800">
@@ -824,9 +809,7 @@
             </div>
         </div>
 
-        <!-- ========================================================================= -->
-        <!-- UNIVERSAL MODALS (SCORECARD, SQUADS, INFO, HISTORY, PLAYER STATS)        -->
-        <!-- ========================================================================= -->
+        <!-- SCORECARD MODAL -->
         <div v-if="activeModal === 'scorecard'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
             <div class="glass-panel p-4 rounded-2xl w-full max-w-2xl border-2 border-slate-600 animate-pop flex flex-col max-h-[90vh]">
                 <h2 class="text-xl font-black text-white mb-4 text-center font-oswald tracking-widest uppercase">FULL MATCH SCORECARD</h2>
@@ -984,7 +967,6 @@
                 <!-- MAIN BROADCAST SCOREBAR -->
                 <div v-if="!match.activeOverlayGraphic" class="absolute bottom-[78px] left-1/2 -translate-x-1/2 w-[3640px] h-[146px] flex items-stretch bg-[#240a4e] rounded-[24px] shadow-[0_18px_45px_rgba(0,0,0,0.65)] overflow-hidden border-y-[3px] border-white/20">
                     
-                    <!-- 1. Left White Curved Logo Cap with Team Logo -->
                     <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-r-[85px] border-r-[14px] border-[#a21caf] flex items-center justify-center shrink-0 shadow-[10px_0_25px_rgba(0,0,0,0.45)] z-20 overflow-hidden px-3">
                         <img v-if="currentBattingLogo" :src="currentBattingLogo" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-purple-900 shadow">
                         <div v-else class="w-[100px] h-[100px] bg-white rounded-xl shadow border flex flex-col items-center justify-center">
@@ -992,9 +974,7 @@
                         </div>
                     </div>
 
-                    <!-- 2. Left-Mid Batsmen Section with Round Photos -->
                     <div class="w-[850px] h-full bg-gradient-to-r from-[#22094a] to-[#2c0e5e] flex flex-col justify-center px-8 shrink-0 z-10">
-                        <!-- Striker Row -->
                         <div class="flex items-center justify-between h-[66px] border-b-[2px] border-white/35">
                             <div class="flex items-center gap-3.5 min-w-0 pr-4">
                                 <img v-if="getPlayerPhoto(match.striker.name)" :src="getPlayerPhoto(match.striker.name)" class="w-[52px] h-[52px] rounded-full object-cover border-2 border-yellow-400 shrink-0 shadow">
@@ -1006,7 +986,6 @@
                                 <span class="text-slate-300 font-bold text-[30px] leading-none w-[44px] text-right">{{ match.striker.balls }}</span>
                             </div>
                         </div>
-                        <!-- Non-Striker Row -->
                         <div class="flex items-center justify-between h-[66px]">
                             <div class="flex items-center gap-3.5 min-w-0 pr-4">
                                 <img v-if="getPlayerPhoto(match.nonStriker.name)" :src="getPlayerPhoto(match.nonStriker.name)" class="w-[52px] h-[52px] rounded-full object-cover border-2 border-slate-400 shrink-0 shadow">
@@ -1019,7 +998,6 @@
                         </div>
                     </div>
 
-                    <!-- 3. Center White Score Capsule -->
                     <div class="w-[970px] h-full bg-gradient-to-b from-[#ffffff] via-[#f8fafc] to-[#e2e8f0] rounded-[85px] border-x-[16px] border-[#9d174d] flex flex-col justify-center items-center px-10 shrink-0 shadow-[0_0_35px_rgba(0,0,0,0.55)] z-20">
                         <div class="w-full flex items-center justify-between gap-4 mt-1">
                             <div class="flex items-baseline gap-2.5 pl-3 min-w-0 shrink-0">
@@ -1045,7 +1023,6 @@
                         </div>
                     </div>
 
-                    <!-- 4. Right-Mid Bowler & Over Balls Section with Bowler Photo & 20-Ball Auto-Fit -->
                     <div class="flex-1 min-w-0 h-full bg-gradient-to-r from-[#2c0e5e] to-[#22094a] flex flex-col justify-center px-8 overflow-hidden z-10">
                         <div class="flex items-center justify-between h-[66px] border-b-[2px] border-white/35 w-full overflow-hidden">
                             <div class="flex items-center gap-3.5 min-w-0 pr-4">
@@ -1076,7 +1053,6 @@
                         </div>
                     </div>
 
-                    <!-- 5. Right White Curved Bowling Team Cap with Team Logo -->
                     <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-l-[85px] border-l-[14px] border-[#a21caf] flex items-center justify-center px-6 shrink-0 shadow-[-10px_0_25px_rgba(0,0,0,0.45)] z-20 overflow-hidden">
                         <img v-if="currentBowlingLogo" :src="currentBowlingLogo" class="w-[110px] h-[110px] rounded-full object-cover border-2 border-purple-900 shadow">
                         <span v-else class="text-[#1e1b4b] font-black text-[44px] font-oswald uppercase tracking-wider truncate text-center">{{ (match.bowlingTeam || 'BOWL').substring(0, 6) }}</span>
@@ -1221,6 +1197,7 @@
                 let myChart = null; let myOverlayChart = null;
                 let mqttClient = null;
                 let syncTimeout = null;
+                let stateSaveTimeout = null;
                 
                 const hostKey = (window.location.hostname || 'sadekrobel').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'sadekrobel';
                 const masterTopic = `cric_pro_master_${hostKey}`;
@@ -1531,7 +1508,7 @@
                         if (mqttClient && mqttClient.connected) mqttClient.publish(masterTopic, payload, { qos: 0, retain: true });
                         if (syncTimeout) clearTimeout(syncTimeout);
                         const sendNtfy = () => { fetch(`https://ntfy.sh/${masterTopic}`, { method: 'POST', body: payload }).catch(()=>{}); };
-                        if (immediate) sendNtfy(); else syncTimeout = setTimeout(sendNtfy, 200);
+                        if (immediate) sendNtfy(); else syncTimeout = setTimeout(sendNtfy, 1000); // Increased debounce to prevent Ntfy lag
                     } catch(e) {}
                 };
 
@@ -1556,6 +1533,7 @@
                     window.addEventListener('storage', (e) => { if (e.key === 'cricketLiveSync' && e.newValue) processSyncData(e.newValue); });
                 };
 
+                // FIXED 1: SAFELY ACCUMULATE PLAYER HISTORY FROM ALL COMPLETED/SAVED MATCHES (NO OVERWRITE/DOUBLE-COUNT)
                 const syncRecordsToHistory = () => {
                     if(!match.battingTeam || !match.bowlingTeam) return;
                     let matchHistory = JSON.parse(localStorage.getItem('cricketMatchHistory') || '[]');
@@ -1576,18 +1554,27 @@
                     if(existingIdx >= 0) matchHistory[existingIdx] = matchEntry; else matchHistory.unshift(matchEntry);
                     localStorage.setItem('cricketMatchHistory', JSON.stringify(matchHistory));
 
-                    let playerHistory = JSON.parse(localStorage.getItem('cricketPlayerHistory') || '{}');
-                    const updateP = (key, t) => { if(!playerHistory[key]) playerHistory[key] = { name: key, team: t, runs: 0, balls: 0, wickets: 0 }; playerHistory[key].team = t; };
-                    [...squads.home, squads.homeSub].map(n => (n||'').trim().toUpperCase()).filter(Boolean).forEach(p => updateP(p, setupData.home.toUpperCase()));
-                    [...squads.away, squads.awaySub].map(n => (n||'').trim().toUpperCase()).filter(Boolean).forEach(p => updateP(p, setupData.away.toUpperCase()));
-                    
-                    if (match.innings1Data) {
-                        Object.keys(match.innings1Data.battingStats || {}).forEach(p => { const key = p.trim().toUpperCase(); updateP(key, match.innings1Data.battingTeam.toUpperCase()); playerHistory[key].runs = match.innings1Data.battingStats[p].runs; playerHistory[key].balls = match.innings1Data.battingStats[p].balls; });
-                        Object.keys(match.innings1Data.bowlingStats || {}).forEach(p => { const key = p.trim().toUpperCase(); updateP(key, match.innings1Data.bowlingTeam.toUpperCase()); playerHistory[key].wickets = match.innings1Data.bowlingStats[p].wickets; });
-                    }
-                    Object.keys(match.battingStats).forEach(p => { const key = p.trim().toUpperCase(); updateP(key, match.battingTeam.toUpperCase()); playerHistory[key].runs = match.battingStats[p].runs; playerHistory[key].balls = match.battingStats[p].balls; });
-                    Object.keys(match.bowlingStats).forEach(p => { const key = p.trim().toUpperCase(); updateP(key, match.bowlingTeam.toUpperCase()); playerHistory[key].wickets = match.bowlingStats[p].wickets; });
-                    localStorage.setItem('cricketPlayerHistory', JSON.stringify(playerHistory));
+                    // Accurate Cumulative Calculation from all matches in history
+                    let playerObj = {};
+                    const addStats = (pName, tName, r, b, w) => {
+                        if(!pName) return;
+                        const k = pName.trim().toUpperCase();
+                        if(!playerObj[k]) playerObj[k] = { name: k, team: tName, runs: 0, balls: 0, wickets: 0 };
+                        playerObj[k].runs += (r || 0);
+                        playerObj[k].balls += (b || 0);
+                        playerObj[k].wickets += (w || 0);
+                    };
+
+                    matchHistory.forEach(mRec => {
+                        const d = mRec.data; if(!d) return;
+                        if (d.innings1Data) {
+                            Object.entries(d.innings1Data.battingStats || {}).forEach(([p, s]) => addStats(p, d.innings1Data.battingTeam, s.runs, s.balls, 0));
+                            Object.entries(d.innings1Data.bowlingStats || {}).forEach(([p, s]) => addStats(p, d.innings1Data.bowlingTeam, 0, 0, s.wickets));
+                        }
+                        Object.entries(d.battingStats || {}).forEach(([p, s]) => addStats(p, d.battingTeam, s.runs, s.balls, 0));
+                        Object.entries(d.bowlingStats || {}).forEach(([p, s]) => addStats(p, d.bowlingTeam, 0, 0, s.wickets));
+                    });
+                    localStorage.setItem('cricketPlayerHistory', JSON.stringify(playerObj));
                 };
 
                 onMounted(() => {
@@ -1595,8 +1582,16 @@
                     else { initMqtt(null); savedMatchExists.value = !!localStorage.getItem('cricketCurrentMatch'); if (window.speechSynthesis) window.speechSynthesis.getVoices(); }
                 });
 
+                // FIXED 2: DEBOUNCER FOR STATE SAVING TO PREVENT FREEZE/LAG (400ms buffer)
                 watch(match, () => {
-                    if(appState.value === 'admin') { localStorage.setItem('cricketCurrentMatch', JSON.stringify({ match, setupData, squads, activeTourneyMatch: activeTourneyMatch.value })); syncRecordsToHistory(); syncDataToOverlay(); }
+                    if(appState.value === 'admin') { 
+                        if (stateSaveTimeout) clearTimeout(stateSaveTimeout);
+                        stateSaveTimeout = setTimeout(() => {
+                            localStorage.setItem('cricketCurrentMatch', JSON.stringify({ match, setupData, squads, activeTourneyMatch: activeTourneyMatch.value })); 
+                            syncRecordsToHistory(); 
+                            syncDataToOverlay(false);
+                        }, 400); 
+                    }
                 }, { deep: true });
 
                 const resumeMatch = () => {
@@ -1642,7 +1637,7 @@
                 const copyOverlayUrl = () => { syncDataToOverlay(true); navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}?mode=overlay&id=${match.id}`).then(() => showAlert("PRISM Link Copied!")); };
                 const showGraphicOnLive = (type) => { match.activeOverlayGraphic = type; syncDataToOverlay(true); if (type !== 'barChart' && type !== 'flowChart' && type !== 'match_summary') activeModal.value = ''; };
                 const pushChartToLive = () => { showGraphicOnLive(chartType.value); setTimeout(() => { renderChart(true); }, 300); };
-                const stopLiveGraphic = () => { match.activeOverlayGraphic = null; syncDataTally: syncDataToOverlay(true); };
+                const stopLiveGraphic = () => { match.activeOverlayGraphic = null; syncDataToOverlay(true); };
 
                 const availableBatsmen = computed(() => currentBattingSquad.value.filter(p => p && p !== match.striker.name && p !== match.nonStriker.name && (!match.battingStats[p] || !match.battingStats[p].out)));
                 const availableBowlersXI = computed(() => currentBowlingSquad.value.filter(p => p && p !== match.bowler.name));
@@ -1773,7 +1768,6 @@
                     match.thisOverHistory.push('W'); updatePlayerStat(match.bowler.name, 'bowling');
                     addCommentary(match.striker.name + " is out " + wType);
 
-                    // Out Popup with Full Innings Details
                     outSummaryPopup.name = match.striker.name; outSummaryPopup.dismissal = dStr; outSummaryPopup.runs = match.striker.runs; outSummaryPopup.balls = match.striker.balls; outSummaryPopup.fours = match.striker.fours; outSummaryPopup.sixes = match.striker.sixes;
                     outSummaryPopup.show = true; syncDataToOverlay(true);
                     setTimeout(() => { outSummaryPopup.show = false; syncDataToOverlay(true); }, 8000);
