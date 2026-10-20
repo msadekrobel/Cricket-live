@@ -42,7 +42,7 @@
                 <button @click="appState = 'group'" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 rounded-xl font-black text-lg shadow-lg text-white mb-2 transition-transform active:scale-95">🏆 GROUP TOURNAMENT</button>
 
                 <div class="mt-4 border-t border-slate-700 pt-6">
-                    <button @click="openHistory('match')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-sm shadow text-green-400 border border-slate-700 transition-colors">📊 MATCH HISTORY</button>
+                    <button @click="openHistory()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-sm shadow text-green-400 border border-slate-700 transition-colors">📊 MATCH HISTORY</button>
                 </div>
             </div>
         </div>
@@ -475,6 +475,7 @@
                         <button @click="openExtraModal('out')" class="py-3 bg-red-600 rounded-lg text-sm font-black border-b-4 border-red-800 text-white active:scale-95 transition-transform shadow-lg shadow-red-900/30">OUT</button>
                     </div>
 
+                    <!-- BOTTOM TABS (WITH COMM BUTTON) -->
                     <div class="border-t border-slate-800 pt-3 mt-3">
                         <div class="grid grid-cols-5 gap-2 mb-2">
                             <button @click="activeModal = 'scorecard'" class="py-3 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-blue-400 border border-slate-700 flex flex-col items-center transition-colors"><span>📋</span> SCORE</button>
@@ -752,230 +753,170 @@
             </div>
         </div>
 
-        <!-- OVERLAY MODE (BROADCAST SCOREBAR & FULL SCREEN GRAPHICS) -->
-        <div v-if="appState === 'overlay'" class="w-screen h-screen bg-[#00FF00] relative overflow-hidden flex items-center justify-center">
-            <div :style="{ transform: `scale(${overlayScale}) translateZ(0)`, willChange: 'transform', backfaceVisibility: 'hidden' }" class="w-[3840px] h-[2160px] relative origin-center shrink-0 font-sans">
-                
-                <div v-if="!match.activeOverlayGraphic" class="absolute bottom-[235px] right-[120px] w-[1050px] z-50">
-                    <div v-if="outSummaryPopup.show" class="w-full bg-gradient-to-r from-[#23084c] via-[#311068] to-[#1a0538] border-l-[14px] border-[#e11d48] rounded-2xl shadow-2xl overflow-hidden animate-pop mb-4 border-2 border-pink-500/40">
-                        <div class="flex items-center justify-between px-10 py-6">
-                            <div class="flex flex-col"><span class="text-white font-black text-[64px] uppercase drop-shadow leading-none">{{ outSummaryPopup.name }}</span><span class="text-pink-300 font-bold text-[36px] mt-2">{{ outSummaryPopup.dismissal }}</span></div>
-                            <div class="flex items-baseline gap-3"><span class="text-white font-black text-[90px] font-oswald leading-none">{{ outSummaryPopup.runs }}</span><span class="text-slate-300 font-bold text-[38px]">({{ outSummaryPopup.balls }})</span></div>
-                        </div>
+        <div v-if="activeModal === 'playingXiInfo'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-4 rounded-2xl w-full max-w-2xl border-2 border-slate-600 animate-pop flex flex-col max-h-[90vh]">
+                <h2 class="text-xl font-black text-white mb-4 text-center font-oswald tracking-widest uppercase">PLAYING XI & SUPER SUB</h2>
+                <div class="grid grid-cols-2 gap-2 sm:gap-3 flex-1 min-h-0">
+                    <div class="bg-slate-900 rounded-xl border border-slate-700 p-2 min-h-[150px] overflow-y-auto custom-scrollbar flex flex-col">
+                        <h3 class="text-center font-black text-blue-400 text-[11px] sm:text-sm mb-2 border-b border-slate-700 pb-1 shrink-0">{{ match.battingTeam }} (BAT)</h3>
+                        <div class="space-y-1"><div v-for="(p, i) in currentBattingSquad.filter(Boolean)" :key="i" class="text-[10px] sm:text-xs font-bold text-white bg-slate-800 p-1.5 sm:p-2 rounded truncate border border-slate-700">{{i+1}}. {{ p }}</div></div>
                     </div>
-                    <div v-if="playerProfilePopup.show" class="w-full bg-gradient-to-r from-[#23084c] via-[#311068] to-[#1a0538] border-l-[14px] border-[#ec4899] rounded-2xl shadow-2xl overflow-hidden animate-pop border-2 border-pink-500/40">
-                        <div class="flex items-center justify-between px-10 py-6">
-                            <div class="flex flex-col">
-                                <span class="text-[#f472b6] font-bold text-[32px] uppercase tracking-widest">{{ playerProfilePopup.role }}</span>
-                                <span class="text-white font-black text-[64px] uppercase drop-shadow mt-1 leading-none">{{ playerProfilePopup.name }}</span>
-                            </div>
-                        </div>
+                    <div class="bg-slate-900 rounded-xl border border-slate-700 p-2 min-h-[150px] overflow-y-auto custom-scrollbar flex flex-col">
+                        <h3 class="text-center font-black text-red-400 text-[11px] sm:text-sm mb-2 border-b border-slate-700 pb-1 shrink-0">{{ match.bowlingTeam }} (BOWL)</h3>
+                        <div class="space-y-1"><div v-for="(p, i) in currentBowlingSquad.filter(Boolean)" :key="i" class="text-[10px] sm:text-xs font-bold text-white bg-slate-800 p-1.5 sm:p-2 rounded truncate border border-slate-700">{{i+1}}. {{ p }}</div></div>
                     </div>
                 </div>
-
-                <div v-if="!match.activeOverlayGraphic" class="absolute bottom-[78px] left-1/2 -translate-x-1/2 w-[3640px] h-[146px] flex items-stretch bg-[#240a4e] rounded-[24px] shadow-[0_18px_45px_rgba(0,0,0,0.65)] overflow-hidden border-y-[3px] border-white/20">
-                    <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-r-[85px] border-r-[14px] border-[#a21caf] flex items-center justify-center shrink-0 shadow-[10px_0_25px_rgba(0,0,0,0.45)] z-20">
-                        <div class="w-[106px] h-[106px] bg-white rounded-xl shadow-md border border-slate-200 flex flex-col items-center justify-center p-1">
-                            <span class="text-[58px] leading-none">🏏</span>
-                            <span class="text-[13px] font-black text-[#240a4e] tracking-tighter uppercase mt-0.5">CRIC PRO</span>
-                        </div>
-                    </div>
-                    <div class="w-[820px] h-full bg-gradient-to-r from-[#22094a] to-[#2c0e5e] flex flex-col justify-center px-10 shrink-0 z-10">
-                        <div class="flex items-center justify-between h-[66px] border-b-[2px] border-white/35">
-                            <div class="flex items-center gap-3 min-w-0 pr-4">
-                                <span class="text-white font-black text-[40px] uppercase tracking-wide truncate">{{ (match.striker.name || 'STRIKER').substring(0, 14) }}</span>
-                                <span class="text-pink-400 text-[32px] shrink-0 transform -rotate-12">🏏</span>
-                            </div>
-                            <div class="flex items-baseline gap-3 shrink-0">
-                                <span class="text-white font-black text-[46px] leading-none">{{ match.striker.runs }}</span>
-                                <span class="text-slate-300 font-bold text-[32px] leading-none w-[48px] text-right">{{ match.striker.balls }}</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between h-[66px]">
-                            <div class="flex items-center gap-3 min-w-0 pr-4">
-                                <span class="text-white font-black text-[40px] uppercase tracking-wide truncate">{{ (match.nonStriker.name || 'NON-STRIKER').substring(0, 14) }}</span>
-                            </div>
-                            <div class="flex items-baseline gap-3 shrink-0">
-                                <span class="text-white font-black text-[46px] leading-none">{{ match.nonStriker.runs }}</span>
-                                <span class="text-slate-300 font-bold text-[32px] leading-none w-[48px] text-right">{{ match.nonStriker.balls }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-[990px] h-full bg-gradient-to-b from-[#ffffff] via-[#f8fafc] to-[#e2e8f0] rounded-[85px] border-x-[16px] border-[#9d174d] flex flex-col justify-center items-center px-10 shrink-0 shadow-[0_0_35px_rgba(0,0,0,0.55)] z-20">
-                        <div class="w-full flex items-center justify-between gap-4 mt-1">
-                            <div class="flex items-baseline gap-2.5 pl-3 min-w-0 shrink-0">
-                                <span class="text-[#1e1b4b] font-black text-[46px] font-oswald uppercase tracking-tight leading-none truncate max-w-[180px]">{{ (match.battingTeam || 'BAT').substring(0, 6) }}</span>
-                                <span class="text-[#475569] font-bold text-[32px] lowercase leading-none">v</span>
-                                <span class="text-[#db2777] font-black text-[46px] font-oswald uppercase tracking-tight leading-none truncate max-w-[180px]">{{ (match.bowlingTeam || 'BOWL').substring(0, 6) }}</span>
-                            </div>
-                            <div class="h-[74px] rounded-full bg-gradient-to-r from-[#581c87] via-[#86198f] to-[#ec4899] flex items-center px-7 gap-6 shadow-inner border-2 border-purple-900/20 shrink-0">
-                                <span class="text-white font-black text-[56px] font-oswald tracking-tight leading-none drop-shadow">{{ match.runs }}-{{ match.wickets }}</span>
-                                <div class="flex items-baseline gap-1.5 text-white leading-none">
-                                    <span class="font-black text-[42px]">{{ match.overs }}.{{ match.balls }}</span>
-                                    <span class="font-bold text-[30px] text-pink-100">({{ match.totalOvers }})</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="w-full text-center mt-1.5">
-                            <span class="text-[#1e1b4b] font-black text-[27px] uppercase tracking-wider leading-none">
-                                RUN RATE {{ calculateCRR() }}
-                                <span v-if="match.innings === 2 && match.target" class="text-[#be185d] ml-3">| TARGET {{ match.target }} (NEED {{ Math.max(0, match.target - match.runs) }} OFF {{ Math.max(0, (Number(match.totalOvers) * 6) - (match.overs * 6 + match.balls)) }}B)</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="flex-1 min-w-0 h-full bg-gradient-to-r from-[#2c0e5e] to-[#22094a] flex flex-col justify-center px-10 overflow-hidden z-10">
-                        <div class="flex items-center justify-between h-[66px] border-b-[2px] border-white/35 w-full overflow-hidden">
-                            <span class="text-white font-black text-[40px] uppercase tracking-wide truncate pr-4">{{ (match.bowler.name || 'BOWLER').substring(0, 16) }}</span>
-                            <div class="flex items-baseline gap-4 shrink-0">
-                                <span class="text-white font-black text-[46px] leading-none">{{ match.bowler.wickets }}-{{ match.bowler.runs }}</span>
-                                <span class="text-slate-200 font-bold text-[34px] leading-none">{{ match.bowler.overs }}.{{ match.bowler.balls }}</span>
-                            </div>
-                        </div>
-                        <div class="h-[66px] w-full flex items-center overflow-hidden">
-                            <div class="flex items-center w-full overflow-hidden" :class="match.thisOverHistory.length > 14 ? 'gap-1' : (match.thisOverHistory.length > 9 ? 'gap-1.5' : 'gap-2.5')">
-                                <span v-if="match.thisOverHistory.length === 0" class="text-pink-300/60 text-[28px] font-black tracking-widest uppercase">THIS OVER...</span>
-                                <div v-for="(b, i) in match.thisOverHistory" :key="i"
-                                    class="rounded-[7px] flex items-center justify-center font-black border-[2px] shadow-sm shrink-0 transition-all"
-                                    :class="[
-                                        b === 'W' ? 'bg-[#dc2626] border-red-300 text-white' : 'bg-[#d91b81] border-[#f472b6] text-white',
-                                        match.thisOverHistory.length > 15 ? 'h-[34px] min-w-[30px] px-1 text-[18px]' :
-                                        match.thisOverHistory.length > 11 ? 'h-[40px] min-w-[38px] px-1.5 text-[22px]' :
-                                        match.thisOverHistory.length > 8  ? 'h-[44px] min-w-[44px] px-2 text-[25px]' :
-                                                                            'h-[48px] min-w-[50px] px-2.5 text-[28px]'
-                                    ]">
-                                    {{ b }}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-l-[85px] border-l-[14px] border-[#a21caf] flex items-center justify-center px-6 shrink-0 shadow-[-10px_0_25px_rgba(0,0,0,0.45)] z-20">
-                        <span class="text-[#1e1b4b] font-black text-[48px] font-oswald uppercase tracking-wider truncate text-center">{{ (match.bowlingTeam || 'BOWL').substring(0, 6) }}</span>
-                    </div>
+                <div v-if="appState === 'admin'" class="grid grid-cols-2 gap-2 mt-4 shrink-0">
+                    <button v-if="match.activeOverlayGraphic !== 'playing11_bat'" @click="showGraphicOnLive('playing11_bat')" class="py-3 bg-blue-600 hover:bg-blue-500 text-white rounded font-black text-[10px] sm:text-xs transition-colors">📡 PUSH BATTING XI</button>
+                    <button v-else @click="stopLiveGraphic" class="py-3 bg-red-600 hover:bg-red-500 text-white rounded font-black text-[10px] sm:text-xs transition-colors">🔴 STOP GRAPHIC</button>
+                    <button v-if="match.activeOverlayGraphic !== 'playing11_bowl'" @click="showGraphicOnLive('playing11_bowl')" class="py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-black text-[10px] sm:text-xs transition-colors">📡 PUSH BOWLING XI</button>
+                    <button v-else @click="stopLiveGraphic" class="py-3 bg-red-600 hover:bg-red-500 text-white rounded font-black text-[10px] sm:text-xs transition-colors">🔴 STOP GRAPHIC</button>
                 </div>
-
-                <div v-if="!match.activeOverlayGraphic" class="absolute bottom-0 left-0 w-full h-[64px] bg-slate-200 flex items-center border-t-[4px] border-slate-400 shadow-xl overflow-hidden">
-                    <marquee scrollamount="15" class="text-[#0f172a] font-black text-[36px] uppercase tracking-widest pt-1">
-                        <span class="text-[#166534] mr-4">BAT:</span> {{ currentBattingSquad.filter(Boolean).join(' • ') }}
-                        <span class="text-slate-400 mx-16">|</span>
-                        <span class="text-[#1e3a8a] mr-4">FLD:</span> {{ currentBowlingSquad.filter(Boolean).join(' • ') }}
-                    </marquee>
-                </div>
-
-                <div v-if="match.activeOverlayGraphic === 'scorecard_inn1'" class="absolute inset-0 bg-[#0f172a]/95 flex flex-col items-center justify-center p-20 animate-pop">
-                    <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-blue-400 rounded-[50px] p-20 w-full max-w-[3200px] shadow-2xl relative">
-                        <div class="absolute -top-16 left-1/2 -translate-x-1/2 bg-[#166534] text-white px-24 py-8 rounded-3xl border-8 border-white font-black text-[70px] uppercase font-oswald shadow-2xl tracking-widest">
-                            1ST INNINGS: {{ match.innings1Data?.battingTeam }} ({{ match.innings1Data?.runs }}/{{ match.innings1Data?.wickets }})
-                        </div>
-                        <div class="grid grid-cols-2 gap-16 mt-12">
-                            <div class="bg-slate-900/80 border-4 border-slate-700 rounded-3xl overflow-hidden shadow-inner">
-                                <h3 class="bg-[#1e3a8a] text-white text-center py-6 font-black text-[55px] tracking-widest font-oswald border-b-4 border-blue-400">BATTING</h3>
-                                <table class="w-full text-white text-[40px] font-bold text-left">
-                                    <tr class="bg-slate-800 text-slate-300 text-[35px] uppercase border-b-4 border-slate-600"><th class="py-6 pl-10">Batsman</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center">4s</th><th class="text-center">6s</th><th class="text-center pr-10">SR</th></tr>
-                                    <tr v-for="(s, name) in match.innings1Data?.battingStats" :key="'o1b'+name" class="border-b-2 border-slate-700/50 bg-[#1e293b]">
-                                        <td class="py-6 pl-10 uppercase">{{name}} <span v-if="s.out" class="block text-[25px] text-red-400 mt-2 font-normal">{{s.dismissal}}</span><span v-else class="block text-[25px] text-green-400 mt-2 font-normal">Not Out</span></td>
-                                        <td class="text-center font-black text-[55px] font-oswald">{{s.runs}}</td><td class="text-center text-slate-300">{{s.balls}}</td><td class="text-center text-slate-400">{{s.fours}}</td><td class="text-center text-slate-400">{{s.sixes}}</td><td class="text-center pr-10 text-slate-400">{{s.balls > 0 ? ((s.runs/s.balls)*100).toFixed(1) : '0.0'}}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="bg-slate-900/80 border-4 border-slate-700 rounded-3xl overflow-hidden shadow-inner">
-                                <h3 class="bg-[#b91c1c] text-white text-center py-6 font-black text-[55px] tracking-widest font-oswald border-b-4 border-red-400">BOWLING</h3>
-                                <table class="w-full text-white text-[40px] font-bold text-left">
-                                    <tr class="bg-slate-800 text-slate-300 text-[35px] uppercase border-b-4 border-slate-600"><th class="py-6 pl-10">Bowler</th><th class="text-center">O</th><th class="text-center">M</th><th class="text-center">R</th><th class="text-center">W</th><th class="text-center pr-10">ECO</th></tr>
-                                    <tr v-for="(s, name) in match.innings1Data?.bowlingStats" :key="'o1bw'+name" class="border-b-2 border-slate-700/50 bg-[#1e293b]">
-                                        <td class="py-6 pl-10 uppercase">{{name}}</td>
-                                        <td class="text-center text-slate-300">{{s.overs}}.{{s.balls}}</td><td class="text-center text-slate-400">{{s.maidens}}</td><td class="text-center font-black text-[55px] font-oswald text-white">{{s.runs}}</td><td class="text-center font-black text-[55px] font-oswald text-red-500">{{s.wickets}}</td><td class="text-center pr-10 text-slate-400">{{calculateEconomy(s.runs, s.overs, s.balls)}}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="match.activeOverlayGraphic === 'scorecard_inn2' || match.activeOverlayGraphic === 'scorecard'" class="absolute inset-0 bg-[#0f172a]/95 flex flex-col items-center justify-center p-20 animate-pop">
-                    <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-blue-400 rounded-[50px] p-20 w-full max-w-[3200px] shadow-2xl relative">
-                        <div class="absolute -top-16 left-1/2 -translate-x-1/2 bg-[#166534] text-white px-24 py-8 rounded-3xl border-8 border-white font-black text-[70px] uppercase font-oswald shadow-2xl tracking-widest">
-                            {{ match.innings1Data ? '2ND INNINGS' : 'SCORECARD' }}: {{ match.battingTeam }} ({{ match.runs }}/{{ match.wickets }})
-                        </div>
-                        <div class="grid grid-cols-2 gap-16 mt-12">
-                            <div class="bg-slate-900/80 border-4 border-slate-700 rounded-3xl overflow-hidden shadow-inner">
-                                <h3 class="bg-[#1e3a8a] text-white text-center py-6 font-black text-[55px] tracking-widest font-oswald border-b-4 border-blue-400">BATTING</h3>
-                                <table class="w-full text-white text-[40px] font-bold text-left">
-                                    <tr class="bg-slate-800 text-slate-300 text-[35px] uppercase border-b-4 border-slate-600"><th class="py-6 pl-10">Batsman</th><th class="text-center">R</th><th class="text-center">B</th><th class="text-center">4s</th><th class="text-center">6s</th><th class="text-center pr-10">SR</th></tr>
-                                    <tr v-for="(s, name) in match.battingStats" :key="'o2b'+name" class="border-b-2 border-slate-700/50 bg-[#1e293b]">
-                                        <td class="py-6 pl-10 uppercase">{{name}} <span v-if="s.out" class="block text-[25px] text-red-400 mt-2 font-normal">{{s.dismissal}}</span><span v-else class="block text-[25px] text-green-400 mt-2 font-normal">Not Out</span></td>
-                                        <td class="text-center font-black text-[55px] font-oswald">{{s.runs}}</td><td class="text-center text-slate-300">{{s.balls}}</td><td class="text-center text-slate-400">{{s.fours}}</td><td class="text-center text-slate-400">{{s.sixes}}</td><td class="text-center pr-10 text-slate-400">{{s.balls > 0 ? ((s.runs/s.balls)*100).toFixed(1) : '0.0'}}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="bg-slate-900/80 border-4 border-slate-700 rounded-3xl overflow-hidden shadow-inner">
-                                <h3 class="bg-[#b91c1c] text-white text-center py-6 font-black text-[55px] tracking-widest font-oswald border-b-4 border-red-400">BOWLING</h3>
-                                <table class="w-full text-white text-[40px] font-bold text-left">
-                                    <tr class="bg-slate-800 text-slate-300 text-[35px] uppercase border-b-4 border-slate-600"><th class="py-6 pl-10">Bowler</th><th class="text-center">O</th><th class="text-center">M</th><th class="text-center">R</th><th class="text-center">W</th><th class="text-center pr-10">ECO</th></tr>
-                                    <tr v-for="(s, name) in match.bowlingStats" :key="'o2bw'+name" class="border-b-2 border-slate-700/50 bg-[#1e293b]">
-                                        <td class="py-6 pl-10 uppercase">{{name}}</td>
-                                        <td class="text-center text-slate-300">{{s.overs}}.{{s.balls}}</td><td class="text-center text-slate-400">{{s.maidens}}</td><td class="text-center font-black text-[55px] font-oswald text-white">{{s.runs}}</td><td class="text-center font-black text-[55px] font-oswald text-red-500">{{s.wickets}}</td><td class="text-center pr-10 text-slate-400">{{calculateEconomy(s.runs, s.overs, s.balls)}}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="match.activeOverlayGraphic === 'match_summary'" class="absolute inset-0 bg-[#0f172a]/95 flex flex-col items-center justify-center p-20 animate-pop">
-                    <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-yellow-400 rounded-[50px] p-24 w-full max-w-[2800px] shadow-2xl relative text-center">
-                        <div class="absolute -top-16 left-1/2 -translate-x-1/2 bg-[#b91c1c] text-white px-20 py-8 rounded-3xl border-8 border-white font-black text-[70px] uppercase font-oswald shadow-2xl tracking-widest">
-                            MATCH SUMMARY
-                        </div>
-                        <h2 class="text-[90px] font-black text-yellow-400 uppercase mt-10 mb-12 font-oswald">{{ finalMatchResultText }}</h2>
-                        <div class="grid grid-cols-3 gap-10 mt-10">
-                            <div class="bg-slate-900/80 p-10 rounded-3xl border-4 border-yellow-600/50 text-center shadow-xl">
-                                <h3 class="text-[45px] text-yellow-500 font-bold uppercase tracking-widest mb-4">🏆 Man of the Match</h3>
-                                <p class="text-[75px] font-black text-white uppercase font-oswald leading-none">{{ match.awards.mom || '-' }}</p>
-                            </div>
-                            <div class="bg-slate-900/80 p-10 rounded-3xl border-4 border-blue-600/50 text-center shadow-xl">
-                                <h3 class="text-[45px] text-blue-400 font-bold uppercase tracking-widest mb-4">🏏 Best Batsman</h3>
-                                <p class="text-[75px] font-black text-white uppercase font-oswald leading-none">{{ match.awards.bestBatter || '-' }}</p>
-                            </div>
-                            <div class="bg-slate-900/80 p-10 rounded-3xl border-4 border-red-600/50 text-center shadow-xl">
-                                <h3 class="text-[45px] text-red-400 font-bold uppercase tracking-widest mb-4">🎯 Best Bowler</h3>
-                                <p class="text-[75px] font-black text-white uppercase font-oswald leading-none">{{ match.awards.bestBowler || '-' }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="match.activeOverlayGraphic === 'playing11_bat' || match.activeOverlayGraphic === 'playing11_bowl'" class="absolute inset-0 bg-[#0f172a]/95 flex flex-col items-center justify-center p-20 animate-pop">
-                    <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-blue-400 rounded-[50px] p-24 w-full max-w-[2600px] shadow-2xl relative">
-                        <div class="absolute -top-16 left-1/2 -translate-x-1/2 bg-[#b91c1c] text-white px-20 py-8 rounded-3xl border-8 border-white font-black text-[70px] uppercase font-oswald shadow-2xl">
-                            {{ match.activeOverlayGraphic === 'playing11_bat' ? match.battingTeam : match.bowlingTeam }} - PLAYING XI
-                        </div>
-                        <div class="grid grid-cols-2 gap-x-32 gap-y-10 text-[65px] font-bold text-white uppercase mt-12">
-                            <div v-for="(p, i) in (match.activeOverlayGraphic === 'playing11_bat' ? currentBattingSquad : currentBowlingSquad).filter(Boolean)" :key="i" class="bg-slate-800/80 px-10 py-6 rounded-2xl border-l-[15px] border-blue-500 flex items-center gap-10">
-                                <span class="text-blue-400 font-black w-16 text-right">{{ i + 1 }}</span> <span>{{ p }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div v-if="match.activeOverlayGraphic === 'match_info'" class="absolute inset-0 bg-[#0f172a]/95 flex flex-col items-center justify-center p-20 animate-pop">
-                    <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-yellow-400 rounded-[50px] p-32 w-full max-w-[2200px] text-center shadow-2xl">
-                        <h2 class="text-[100px] font-black text-white font-oswald uppercase mb-24 drop-shadow-xl border-b-8 border-yellow-500 inline-block pb-8">MATCH INFORMATION</h2>
-                        <div class="bg-slate-900/80 p-16 rounded-3xl border-4 border-slate-700 mb-16"><h3 class="text-[55px] text-slate-400 font-bold uppercase mb-10">TOSS</h3><p class="text-[85px] font-black text-yellow-400 uppercase font-oswald">{{ setupData.tossWinner }} won the toss and chose to {{ setupData.decision === 'BAT' ? 'bat' : 'bowl' }} first.</p></div>
-                        <div class="bg-slate-900/80 p-16 rounded-3xl border-4 border-slate-700"><h3 class="text-[55px] text-slate-400 font-bold uppercase mb-10">FORMAT</h3><p class="text-[85px] font-black text-white uppercase font-oswald">Total Overs: {{ setupData.overs }}</p></div>
-                    </div>
-                </div>
-
-                <div v-if="match.activeOverlayGraphic === 'barChart' || match.activeOverlayGraphic === 'flowChart'" class="absolute inset-0 bg-[#0f172a]/95 flex flex-col p-24 animate-pop">
-                    <div class="w-full h-full bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-pink-500 rounded-[50px] flex flex-col shadow-2xl">
-                        <div class="bg-slate-900/50 p-12 text-center border-b-8 border-slate-700">
-                            <h2 class="text-[80px] font-black text-white font-oswald uppercase">{{ match.activeOverlayGraphic === 'barChart' ? 'RUNS & WICKETS PER OVER ANALYSIS' : 'RUN FLOW & WICKETS COMPARISON' }}</h2>
-                        </div>
-                        <div class="flex-1 p-16 flex items-center justify-center relative"><canvas id="matchChartCanvasOverlay" class="w-full h-full"></canvas></div>
-                    </div>
-                </div>
-
+                <button @click="activeModal = ''" class="w-full py-3 mt-2 bg-slate-700 text-white rounded-xl font-black">CLOSE</button>
             </div>
         </div>
+
+        <div v-if="activeModal === 'matchInfo'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-slate-600 animate-pop text-center">
+                <h2 class="text-2xl font-black text-blue-400 mb-4 font-oswald tracking-widest uppercase">MATCH INFO</h2>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 mb-4"><p class="text-white font-bold text-sm uppercase text-yellow-400">{{ setupData.tossWinner }} won the toss and chose to {{ setupData.decision === 'BAT' ? 'bat' : 'bowl' }} first.</p></div>
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 mb-6"><p class="text-white font-black text-lg uppercase">Total Overs: {{ setupData.overs }}</p></div>
+                <button v-if="appState === 'admin' && match.activeOverlayGraphic !== 'match_info'" @click="showGraphicOnLive('match_info')" class="w-full py-4 mb-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black transition-colors">📡 SHOW ON LIVE STREAM</button>
+                <button v-else-if="appState === 'admin' && match.activeOverlayGraphic === 'match_info'" @click="stopLiveGraphic" class="w-full py-4 mb-3 bg-red-600 hover:bg-red-500 text-white rounded-xl font-black transition-colors">🔴 STOP GRAPHIC</button>
+                <button @click="activeModal = ''" class="w-full py-3 bg-slate-700 text-white rounded-xl font-black">CLOSE</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'commentary'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-4 rounded-2xl w-full max-w-lg border-2 border-pink-500 animate-pop flex flex-col max-h-[85vh]">
+                <h2 class="text-2xl font-black text-pink-400 mb-2 text-center font-oswald tracking-widest uppercase">BALL BY BALL COMM</h2>
+                <div class="flex gap-2 mb-3 shrink-0">
+                    <button @click="commTab = 'inn1'" :class="commTab === 'inn1' ? 'bg-pink-600 text-white' : 'bg-slate-800 text-slate-400'" class="flex-1 py-2 rounded text-xs font-black uppercase">1st Innings</button>
+                    <button @click="commTab = 'inn2'" :class="commTab === 'inn2' ? 'bg-pink-600 text-white' : 'bg-slate-800 text-slate-400'" class="flex-1 py-2 rounded text-xs font-black uppercase">2nd Innings</button>
+                </div>
+                <div class="flex-1 overflow-y-auto custom-scrollbar bg-slate-900 border border-slate-700 rounded-lg p-3">
+                    <div v-if="(commTab === 'inn1' ? match.commentary.inn1 : match.commentary.inn2).length === 0" class="text-center text-slate-500 font-bold text-sm mt-10">No commentary yet.</div>
+                    <div v-for="(comm, idx) in (commTab === 'inn1' ? match.commentary.inn1 : match.commentary.inn2)" :key="idx" class="border-b border-slate-800 pb-2 mb-2 last:border-0">
+                        <span class="text-[10px] text-slate-400 font-black uppercase">{{ comm.over }}</span>
+                        <p class="text-xs text-white mt-0.5"><span class="font-bold text-blue-300">{{ comm.bowler }}</span> to <span class="font-bold text-yellow-300">{{ comm.batter }}</span>: <span class="font-black" :class="comm.isWicket ? 'text-red-400' : (comm.isBoundary ? 'text-green-400' : 'text-white')">{{ comm.text }}</span></p>
+                    </div>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-3 mt-3 bg-slate-700 text-white rounded-xl font-black">CLOSE</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'history'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-md border-2 border-slate-600 animate-pop flex flex-col max-h-[80vh]">
+                <h2 class="text-2xl font-black text-white mb-4 text-center font-oswald tracking-widest uppercase shrink-0">MATCH HISTORY</h2>
+                <div class="bg-slate-900 p-3 rounded-xl border border-slate-700 mb-4 shadow-inner overflow-y-auto custom-scrollbar flex-1">
+                    <div v-if="historyList.length === 0" class="text-center py-6">
+                        <span class="text-4xl mb-3 block opacity-50">📂</span>
+                        <p class="text-slate-400 font-bold text-sm leading-relaxed">No saved records found.</p>
+                    </div>
+                    <div v-else class="space-y-3">
+                        <div v-for="(item, idx) in historyList" :key="idx" class="bg-slate-800 p-3 rounded-lg flex flex-col border border-slate-700">
+                            <div class="flex justify-between items-start mb-2">
+                                <div class="pr-2 flex-1 text-left overflow-hidden space-y-1">
+                                    <span class="text-white font-black text-xs block uppercase leading-snug">{{ item.title }}</span>
+                                    <span v-if="item.battingSummary" class="text-yellow-400 font-bold text-[10px] block leading-snug">{{ item.battingSummary }}</span>
+                                    <span v-if="item.subtitle" class="text-cyan-300 font-bold text-[10px] block leading-snug">{{ item.subtitle }}</span>
+                                    <span v-if="item.isEnded" class="inline-block mt-1 px-1.5 py-0.5 bg-red-900/80 text-red-300 text-[9px] font-black rounded uppercase">Match Ended</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 mt-1 border-t border-slate-700 pt-2">
+                                <button v-if="!item.isEnded" @click="resumeHistoryMatch(item)" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">▶ RESUME</button>
+                                <button @click="viewHistoryScorecard(item)" class="flex-1 bg-slate-600 hover:bg-slate-500 text-white py-1.5 rounded text-[10px] font-black transition-colors">📋 SCORECARD</button>
+                                <button @click="deleteHistoryItem(idx)" class="bg-red-600 hover:bg-red-500 text-white px-3 py-1.5 rounded text-[10px] font-black shrink-0 transition-colors">DELETE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black transition-colors shrink-0">CLOSE</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'out'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
+                <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">WICKET!</h2>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button @click="handleWicket('Bowled')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Bowled</button>
+                    <button @click="handleWicket('Caught')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Caught</button>
+                    <button @click="handleWicket('LBW')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">LBW</button>
+                    <button @click="handleWicket('Run Out')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Run Out</button>
+                    <button @click="handleWicket('Stumped')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Stumped</button>
+                    <button @click="handleWicket('Hit Wicket')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Hit Wicket</button>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black shadow">⬅ CANCEL</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'fielderSelect'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
+                <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">{{ tempSetup.wType }}!</h2>
+                <select v-model="tempSetup.fielder" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-white">
+                    <option value="" disabled>Select Fielder</option>
+                    <option v-for="f in fieldingSquadList" :key="f" :value="f">{{f}}</option>
+                </select>
+                <div class="flex gap-3">
+                    <button @click="activeModal = 'out'" class="flex-1 py-4 bg-slate-700 text-white rounded-xl font-black">⬅ BACK</button>
+                    <button @click="confirmWicketWithFielder" :disabled="!tempSetup.fielder" class="flex-1 py-4 bg-red-600 disabled:opacity-50 text-white rounded-xl font-black">CONFIRM</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'extras'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-orange-900/50 animate-pop">
+                <h2 class="text-2xl font-black text-orange-400 mb-6 text-center uppercase font-oswald tracking-widest">{{ extraType }} RUNS</h2>
+                <div class="grid grid-cols-4 gap-3 mb-6">
+                    <button v-for="r in (extraType === 'wd' || extraType === 'lb' ? [1,2,3,4,5] : (extraType === 'nb' ? [1,2,3,4,5,6,7] : [1,2,3,4]))" :key="r" @click="handleExtra(r)" class="py-5 bg-slate-800 rounded-xl font-black text-2xl border border-slate-600 text-white active:bg-slate-700">{{r}}</button>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black">⬅ CANCEL</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'dls'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-purple-900/50 animate-pop text-center">
+                <h2 class="text-2xl font-black text-purple-400 mb-4 font-oswald tracking-widest uppercase">DLS CALCULATION</h2>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 mb-4">
+                    <p v-if="match.innings === 1" class="text-white font-bold text-sm">DLS is calculated in the 2nd Innings.</p>
+                    <div v-else>
+                        <p class="text-slate-400 text-xs font-bold mb-1">PAR SCORE (At {{match.overs}}.{{match.balls}} overs)</p>
+                        <p class="text-4xl font-black text-yellow-400 font-oswald">{{ getDLSParScore() }}</p>
+                        <p class="text-xs text-slate-400 mt-2">If match stops now.</p>
+                    </div>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black">CLOSE</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'newBowler'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-blue-900/50 animate-pop">
+                <h2 class="text-3xl font-black text-blue-400 mb-4 text-center font-oswald tracking-widest">OVER COMPLETE</h2>
+                <select v-model="tempSetup.bowler" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-blue-500">
+                    <option value="" disabled>Select Next Bowler</option>
+                    <option v-for="b in availableBowlersXI" :key="b" :value="b">{{b}}</option>
+                </select>
+                <div class="flex gap-3">
+                    <button @click="handleUndo" class="flex-1 py-4 bg-yellow-600 text-black rounded-xl font-black">↩ UNDO</button>
+                    <button @click="startNewOver" :disabled="!tempSetup.bowler" class="flex-1 py-4 bg-blue-600 disabled:opacity-50 text-white rounded-xl font-black">START</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'newBatter'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
+                <h2 class="text-3xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest">WICKET FALLS</h2>
+                <select v-model="tempSetup.striker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-red-500">
+                    <option value="" disabled>Select Next Batsman</option>
+                    <option v-for="p in availableBatsmen" :key="p" :value="p">{{p}}</option>
+                </select>
+                <div class="flex gap-3">
+                    <button @click="handleUndo" class="flex-1 py-4 bg-yellow-600 text-black rounded-xl font-black">↩ UNDO</button>
+                    <button @click="startNewBatter" :disabled="!tempSetup.striker" class="flex-1 py-4 bg-red-600 disabled:opacity-50 text-white rounded-xl font-black">READY</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -1502,7 +1443,13 @@
                     else addCommentary(r === 0 ? 'Dot ball.' : `Takes ${r} runs.`);
                     match.thisOverHistory.push(r.toString()); updatePlayerStat(match.striker.name, 'batting'); updatePlayerStat(match.bowler.name, 'bowling');
                     if (r % 2 !== 0) swapStrike(); 
-                    if (match.innings === 2 && match.runs >= match.target) { speak("টার্গেট পার!"); completeSecondInningsMatch(match.battingTeam); return; }
+                    
+                    // Match end fix: check instantly on run
+                    if (match.innings === 2 && match.runs >= match.target) {
+                        speak("টার্গেট পার!");
+                        completeSecondInningsMatch(match.battingTeam);
+                        return;
+                    }
                     checkOverComplete();
                 };
 
