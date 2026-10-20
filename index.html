@@ -42,7 +42,6 @@
                 <button @click="appState = 'group'" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 rounded-xl font-black text-lg shadow-lg text-white mb-2 transition-transform active:scale-95">🏆 GROUP TOURNAMENT</button>
 
                 <div class="mt-4 border-t border-slate-700 pt-6">
-                    <!-- PLAYER HISTORY REMOVED -->
                     <button @click="openHistory('match')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-sm shadow text-green-400 border border-slate-700 transition-colors">📊 MATCH HISTORY</button>
                 </div>
             </div>
@@ -437,7 +436,7 @@
                             <div class="w-10 bg-slate-900 border border-slate-600 rounded py-1.5 text-[11px] font-bold text-center text-yellow-500">{{ calculateEconomy(match.bowler.runs, match.bowler.overs, match.bowler.balls) }}</div>
                         </div>
                         
-                        <!-- PREVIOUS BOWLER CLICK DISABLED SO BOWLER DOES NOT REPEAT ACCIDENTALLY -->
+                        <!-- PREVIOUS BOWLER PANEL (NOT CLICKABLE) -->
                         <div v-if="match.prevBowlerName && match.bowlingStats[match.prevBowlerName]" class="flex items-center gap-1 bg-slate-800/50 p-1.5 rounded mt-1.5 border border-slate-700/50">
                             <span class="w-4 shrink-0 text-slate-500 text-xs text-center">⏮</span>
                             <div class="flex-1 text-xs font-bold text-slate-400 uppercase truncate min-w-0">{{ match.prevBowlerName }}</div>
@@ -497,8 +496,9 @@
         </div>
 
         <!-- ========================================================================= -->
-        <!-- CHARTS DRAWER GLOBALLY ACCESSIBLE                                         -->
+        <!-- ALL GLOBALLY AVAILABLE MODALS                                             -->
         <!-- ========================================================================= -->
+
         <div v-show="showChartDrawer" class="fixed inset-0 bg-slate-900 z-[2000] flex flex-col animate-pop">
             <div class="p-3 bg-slate-950 border-b border-slate-800 flex justify-between items-center shrink-0">
                 <h2 class="font-black text-pink-400 font-oswald text-sm tracking-widest uppercase">{{ chartType === 'barChart' ? 'Runs & Wickets / Over' : 'Run Flow & Wickets' }}</h2>
@@ -516,10 +516,6 @@
                 <button v-else @click="stopLiveGraphic" class="w-full py-3 bg-red-600 hover:bg-red-500 text-white rounded font-black tracking-widest shadow-lg active:scale-95 transition-transform">🔴 STOP LIVE GRAPHIC</button>
             </div>
         </div>
-
-        <!-- ========================================================================= -->
-        <!-- ALL GLOBALLY AVAILABLE MODALS                                             -->
-        <!-- ========================================================================= -->
 
         <div v-if="activeModal === 'scorecard'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
             <div class="glass-panel p-4 rounded-2xl w-full max-w-2xl border-2 border-slate-600 animate-pop flex flex-col max-h-[90vh]">
@@ -836,6 +832,88 @@
                     </div>
                 </div>
                 <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black transition-colors shrink-0">CLOSE</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'out'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
+                <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">WICKET!</h2>
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button @click="handleWicket('Bowled')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Bowled</button>
+                    <button @click="handleWicket('Caught')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Caught</button>
+                    <button @click="handleWicket('LBW')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">LBW</button>
+                    <button @click="handleWicket('Run Out')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Run Out</button>
+                    <button @click="handleWicket('Stumped')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Stumped</button>
+                    <button @click="handleWicket('Hit Wicket')" class="py-4 bg-slate-800 rounded-xl font-bold border border-slate-600 text-white active:bg-slate-700">Hit Wicket</button>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black shadow">⬅ CANCEL</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'fielderSelect'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
+                <h2 class="text-2xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest uppercase">{{ tempSetup.wType }}!</h2>
+                <select v-model="tempSetup.fielder" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-white">
+                    <option value="" disabled>Select Fielder</option>
+                    <option v-for="f in fieldingSquadList" :key="f" :value="f">{{f}}</option>
+                </select>
+                <div class="flex gap-3">
+                    <button @click="activeModal = 'out'" class="flex-1 py-4 bg-slate-700 text-white rounded-xl font-black">⬅ BACK</button>
+                    <button @click="confirmWicketWithFielder" :disabled="!tempSetup.fielder" class="flex-1 py-4 bg-red-600 disabled:opacity-50 text-white rounded-xl font-black">CONFIRM</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'extras'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-orange-900/50 animate-pop">
+                <h2 class="text-2xl font-black text-orange-400 mb-6 text-center uppercase font-oswald tracking-widest">{{ extraType }} RUNS</h2>
+                <div class="grid grid-cols-4 gap-3 mb-6">
+                    <button v-for="r in (extraType === 'wd' || extraType === 'lb' ? [1,2,3,4,5] : (extraType === 'nb' ? [1,2,3,4,5,6,7] : [1,2,3,4]))" :key="r" @click="handleExtra(r)" class="py-5 bg-slate-800 rounded-xl font-black text-2xl border border-slate-600 text-white active:bg-slate-700">{{r}}</button>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black">⬅ CANCEL</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'dls'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-purple-900/50 animate-pop text-center">
+                <h2 class="text-2xl font-black text-purple-400 mb-4 font-oswald tracking-widest uppercase">DLS CALCULATION</h2>
+                <div class="bg-slate-900 p-4 rounded-xl border border-slate-700 mb-4">
+                    <p v-if="match.innings === 1" class="text-white font-bold text-sm">DLS is calculated in the 2nd Innings.</p>
+                    <div v-else>
+                        <p class="text-slate-400 text-xs font-bold mb-1">PAR SCORE (At {{match.overs}}.{{match.balls}} overs)</p>
+                        <p class="text-4xl font-black text-yellow-400 font-oswald">{{ getDLSParScore() }}</p>
+                        <p class="text-xs text-slate-400 mt-2">If match stops now.</p>
+                    </div>
+                </div>
+                <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black">CLOSE</button>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'newBowler'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-blue-900/50 animate-pop">
+                <h2 class="text-3xl font-black text-blue-400 mb-4 text-center font-oswald tracking-widest">OVER COMPLETE</h2>
+                <select v-model="tempSetup.bowler" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-blue-500">
+                    <option value="" disabled>Select Next Bowler</option>
+                    <option v-for="b in availableBowlersXI" :key="b" :value="b">{{b}}</option>
+                </select>
+                <div class="flex gap-3">
+                    <button @click="handleUndo" class="flex-1 py-4 bg-yellow-600 text-black rounded-xl font-black">↩ UNDO</button>
+                    <button @click="startNewOver" :disabled="!tempSetup.bowler" class="flex-1 py-4 bg-blue-600 disabled:opacity-50 text-white rounded-xl font-black">START</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="activeModal === 'newBatter'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
+            <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop">
+                <h2 class="text-3xl font-black text-red-500 mb-4 text-center font-oswald tracking-widest">WICKET FALLS</h2>
+                <select v-model="tempSetup.striker" class="w-full bg-black border-2 border-slate-600 rounded-xl p-4 font-black uppercase text-white mb-6 outline-none focus:border-red-500">
+                    <option value="" disabled>Select Next Batsman</option>
+                    <option v-for="p in availableBatsmen" :key="p" :value="p">{{p}}</option>
+                </select>
+                <div class="flex gap-3">
+                    <button @click="handleUndo" class="flex-1 py-4 bg-yellow-600 text-black rounded-xl font-black">↩ UNDO</button>
+                    <button @click="startNewBatter" :disabled="!tempSetup.striker" class="flex-1 py-4 bg-red-600 disabled:opacity-50 text-white rounded-xl font-black">READY</button>
+                </div>
             </div>
         </div>
 
