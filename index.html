@@ -42,7 +42,8 @@
                 <button @click="appState = 'group'" class="w-full py-3.5 bg-purple-600 hover:bg-purple-500 rounded-xl font-black text-lg shadow-lg text-white mb-2 transition-transform active:scale-95">🏆 GROUP TOURNAMENT</button>
 
                 <div class="mt-4 border-t border-slate-700 pt-6">
-                    <button @click="openHistory()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-sm shadow text-green-400 border border-slate-700 transition-colors">📊 MATCH HISTORY</button>
+                    <!-- Player History Completely Removed -->
+                    <button @click="openHistory('match')" class="w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-xl font-bold text-sm shadow text-green-400 border border-slate-700 transition-colors">📊 MATCH HISTORY</button>
                 </div>
             </div>
         </div>
@@ -349,6 +350,7 @@
                 <button @click="stopLiveGraphic" class="bg-black hover:bg-gray-900 text-white px-4 py-1.5 rounded font-black text-xs shadow transition-colors">🔴 STOP GRAPHIC</button>
             </div>
 
+            <!-- Top Header -->
             <div class="bg-slate-950 px-3 py-2 flex justify-between items-center border-b border-slate-800 shrink-0 shadow-lg z-10">
                 <div class="flex gap-2">
                     <button @click="abandonMatch" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white rounded font-black text-xs shadow tracking-widest transition-colors">🌧️ DLS</button>
@@ -474,7 +476,7 @@
                         <button @click="openExtraModal('out')" class="py-3 bg-red-600 rounded-lg text-sm font-black border-b-4 border-red-800 text-white active:scale-95 transition-transform shadow-lg shadow-red-900/30">OUT</button>
                     </div>
 
-                    <!-- BOTTOM TABS -->
+                    <!-- BOTTOM TABS (WITH COMM BUTTON) -->
                     <div class="border-t border-slate-800 pt-3 mt-3">
                         <div class="grid grid-cols-5 gap-2 mb-2">
                             <button @click="activeModal = 'scorecard'" class="py-3 bg-slate-800 hover:bg-slate-700 rounded font-bold text-[10px] text-blue-400 border border-slate-700 flex flex-col items-center transition-colors"><span>📋</span> SCORE</button>
@@ -494,7 +496,7 @@
         </div>
 
         <!-- ========================================================================= -->
-        <!-- ALL GLOBALLY AVAILABLE MODALS (ACCESSIBLE FROM ANY PAGE)                  -->
+        <!-- ALL GLOBALLY AVAILABLE MODALS                                             -->
         <!-- ========================================================================= -->
 
         <div v-if="activeModal === 'exitConfirm'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
@@ -589,10 +591,6 @@
                                     <td class="p-2">{{s.overs}}.{{s.balls}}</td><td class="p-2">{{s.maidens}}</td><td class="p-2 font-black text-red-400">{{s.runs}}</td><td class="p-2 font-black text-blue-400">{{s.wickets}}</td><td class="p-2">{{calculateEconomy(s.runs, s.overs, s.balls)}}</td>
                                 </tr>
                             </table>
-                            <div class="mt-4 flex gap-2">
-                                <button v-if="match.activeOverlayGraphic !== 'scorecard_inn1'" @click="showGraphicOnLive('scorecard_inn1')" class="flex-1 py-3 bg-blue-600 text-white rounded font-black text-xs">📡 LIVE STREAM 1ST INN</button>
-                                <button v-else @click="stopLiveGraphic" class="flex-1 py-3 bg-red-600 text-white rounded font-black text-xs">🔴 STOP LIVE STREAM</button>
-                            </div>
                         </template>
                         <div v-else class="text-center text-slate-500 font-bold py-10">1st Innings data not available.</div>
                     </div>
@@ -614,10 +612,6 @@
                                 <td class="p-2">{{s.overs}}.{{s.balls}}</td><td class="p-2">{{s.maidens}}</td><td class="p-2 font-black text-red-400">{{s.runs}}</td><td class="p-2 font-black text-blue-400">{{s.wickets}}</td><td class="p-2">{{calculateEconomy(s.runs, s.overs, s.balls)}}</td>
                             </tr>
                         </table>
-                        <div class="mt-4 flex gap-2">
-                            <button v-if="match.activeOverlayGraphic !== 'scorecard_inn2'" @click="showGraphicOnLive('scorecard_inn2')" class="flex-1 py-3 bg-blue-600 text-white rounded font-black text-xs">📡 LIVE STREAM 2ND INN</button>
-                            <button v-else @click="stopLiveGraphic" class="flex-1 py-3 bg-red-600 text-white rounded font-black text-xs">🔴 STOP LIVE STREAM</button>
-                        </div>
                     </div>
 
                     <div v-if="postMatchTab === 'summary'" class="space-y-4">
@@ -663,15 +657,17 @@
                                 <div class="text-sm font-black text-white uppercase truncate">{{ match.awards?.bestBowler || '-' }}</div>
                             </div>
                         </div>
-
-                        <div class="mt-4 flex gap-2">
-                            <button v-if="match.activeOverlayGraphic !== 'match_summary'" @click="showGraphicOnLive('match_summary')" class="flex-1 py-3 bg-yellow-600 text-black rounded font-black text-xs">📡 LIVE STREAM SUMMARY</button>
-                            <button v-else @click="stopLiveGraphic" class="flex-1 py-3 bg-red-600 text-white rounded font-black text-xs">🔴 STOP LIVE STREAM</button>
-                        </div>
                     </div>
                 </div>
 
-                <button @click="finalizePostMatch" class="w-full py-4 mt-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black transition-colors shrink-0">FINISH & RETURN HOME ➡</button>
+                <!-- NEW: Action Buttons for End Game -->
+                <div class="mt-4 grid grid-cols-2 gap-3 shrink-0">
+                    <button @click="handleUndoPostMatch" class="py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-black text-sm transition-colors border border-slate-500">⬅ BACK (UNDO)</button>
+                    <button @click="activeModal = 'scorecard'" class="py-4 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-sm shadow-lg">📺 FULL SCREEN SCORE</button>
+                    <button v-if="match.activeOverlayGraphic !== 'match_summary'" @click="showGraphicOnLive('match_summary')" class="py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-black text-sm shadow-lg">📡 LIVE STREAM PRISM</button>
+                    <button v-else @click="stopLiveGraphic" class="py-4 bg-red-600 hover:bg-red-500 text-white rounded-xl font-black text-sm shadow-lg">🔴 STOP LIVE STREAM</button>
+                    <button @click="finalizePostMatch" class="col-span-2 py-4 bg-green-600 hover:bg-green-500 text-white rounded-xl font-black text-lg shadow-lg">🏁 END OF THE GAME</button>
+                </div>
             </div>
         </div>
 
@@ -817,7 +813,8 @@
                 </div>
                 <button v-if="appState === 'admin' && match.activeOverlayGraphic !== 'scorecard'" @click="showGraphicOnLive('scorecard')" class="w-full py-4 mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-black shadow-lg hover:scale-[1.02] transition-transform">📡 PUSH SCORECARD TO LIVE TV</button>
                 <button v-else-if="appState === 'admin' && match.activeOverlayGraphic === 'scorecard'" @click="stopLiveGraphic" class="w-full py-4 mt-4 bg-red-600 text-white rounded-xl font-black shadow-lg transition-transform">🔴 STOP LIVE GRAPHIC</button>
-                <button @click="activeModal = (appState === 'home' ? 'history' : '')" class="w-full py-3 mt-2 bg-slate-700 text-white rounded-xl font-black">CLOSE</button>
+                <!-- Close Button modified to handle Full Screen view from Post Match correctly -->
+                <button @click="activeModal = match.isEnded ? 'postMatch' : (appState === 'home' ? 'history' : '')" class="w-full py-3 mt-2 bg-slate-700 text-white rounded-xl font-black border border-slate-500">CLOSE</button>
             </div>
         </div>
 
@@ -1432,6 +1429,7 @@
                     setInterval(() => { try { const localData = localStorage.getItem('cricketLiveSync'); if (localData) processSyncData(localData); } catch(e) {} pollNtfyTopic(masterTopic); if (id) pollNtfyTopic(`cricket_${id}`); }, 2500);
                 };
 
+                // FIX 1: Completely Removed Player History. Only Match History saves once when match is ended.
                 const syncRecordsToHistory = () => {
                     if(!match.battingTeam || !match.bowlingTeam) return;
                     let matchHistory = JSON.parse(localStorage.getItem('cricketMatchHistory') || '[]');
@@ -1532,6 +1530,12 @@
                     if(match.historyRecords.length > 5) match.historyRecords.shift(); 
                 };
                 const handleUndo = () => { if(match.historyRecords.length > 0) { Object.assign(match, match.historyRecords.pop()); activeModal.value = ''; } };
+                
+                const handleUndoPostMatch = () => {
+                    match.isEnded = false; match.activeOverlayGraphic = null; syncDataToOverlay(true); handleUndo();
+                    localStorage.setItem('cricketCurrentMatch', JSON.stringify({ match, setupData, squads, activeTourneyMatch: activeTourneyMatch.value }));
+                    savedMatchExists.value = true;
+                };
 
                 const updatePlayerStat = (name, type) => {
                     if(!name) return;
@@ -1600,16 +1604,18 @@
                     }
                 };
 
+                // FIX 2: AUTO MATCH END FIX
                 const completeSecondInningsMatch = (winnerOverride = null) => {
                     if (match.balls > 0 || match.thisOverRuns > 0 || match.thisOverWickets > 0) { match.overLog.push({ runs: match.thisOverRuns, wickets: match.thisOverWickets }); match.thisOverRuns = 0; match.thisOverWickets = 0; }
                     match.isEnded = true; calculateAwards(); syncRecordsToHistory(); localStorage.removeItem('cricketCurrentMatch'); savedMatchExists.value = false;
-                    processTournamentAutoAdvance(winnerOverride); activeTourneyMatch.value = null; 
+                    try { processTournamentAutoAdvance(winnerOverride); } catch(e){} activeTourneyMatch.value = null; 
                     match.activeOverlayGraphic = 'match_summary'; syncDataToOverlay(true);
                     activeModal.value = 'postMatch'; postMatchTab.value = 'summary';
                 };
 
                 const finalizePostMatch = () => { match.activeOverlayGraphic = null; syncDataToOverlay(true); activeModal.value = ''; appState.value = 'home'; };
 
+                // Auto Match Check
                 const checkMatchOversLimit = () => {
                     if (match.overs >= Number(match.totalOvers)) {
                         speak("ইনিংস শেষ।");
@@ -1787,7 +1793,7 @@
                 return { 
                     appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, outSummaryPopup, playerProfilePopup, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, confirmExit, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard,
                     koData, grpData, grpTab, activeTourneyMatch, tourneyWinnerSelect, setKoTeamCount, generateKoFixtures, resetKoTournament, saveKoState, initGroupSetupTeams, groupPlayoffPathText, getSortedGroupTeams, syncGroupPlayoffBracket, startGroupTournamentNow, resetGroupTournamentNow, saveGrpState, launchTournamentMatch,
-                    executeSwitchToSecondInnings, handleTieBreaker, postMatchTab, commTab, getTopPerformers, finalMatchResultText, finalizePostMatch
+                    executeSwitchToSecondInnings, handleTieBreaker, postMatchTab, commTab, getTopPerformers, finalMatchResultText, finalizePostMatch, handleUndoPostMatch
                 };
             }
         }).mount('#app');
