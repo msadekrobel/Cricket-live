@@ -6,7 +6,9 @@
   <title>Pro Cricket Caster AI</title>
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700;900&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    html, body { font-family: 'Roboto', sans-serif; background: transparent !important; color: white; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+    html, body { font-family: 'Roboto', sans-serif; background: radial-gradient(circle at 50% 18%, #1e293b 0%, #0f172a 55%, #070a12 100%); background-color: #0f172a; color: white; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
+    .app-dark-bg { background: radial-gradient(circle at 50% 18%, #1e293b 0%, #0f172a 55%, #070a12 100%) !important; background-color: #0f172a !important; }
+    html.is-overlay-mode, html.is-overlay-mode body, html.is-overlay-mode #app { background: transparent !important; background-color: transparent !important; }
     [v-cloak] { display: none; }
     .font-oswald { font-family: 'Oswald', sans-serif; }
     .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -22,7 +24,7 @@
   <script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
 </head>
 <body>
-  <div id="app" :class="appState === 'overlay' ? 'bg-transparent' : 'bg-slate-900'" class="h-screen w-full flex flex-col relative overflow-hidden">
+  <div id="app" :class="appState === 'overlay' ? 'bg-transparent' : 'app-dark-bg bg-slate-900'" class="h-screen w-full flex flex-col relative overflow-hidden">
 
     <!-- ALERTS -->
     <div v-if="customAlert.show" class="fixed inset-0 bg-black/95 z-[9999] flex items-center justify-center p-4">
@@ -44,7 +46,7 @@
     </div>
 
     <!-- 1. HOME SCREEN -->
-    <div v-if="appState === 'home'" class="flex-1 flex flex-col p-6 items-center justify-center relative overflow-y-auto custom-scrollbar">
+    <div v-if="appState === 'home'" class="flex-1 flex flex-col p-6 items-center justify-center relative overflow-y-auto custom-scrollbar app-dark-bg">
       <div class="glass-panel p-8 rounded-3xl w-full max-w-md mx-auto border-t-4 border-blue-500 shadow-2xl text-center z-10 my-auto">
         <h1 class="text-4xl font-black font-oswald text-white mb-8">CRICKET PRO <span class="text-blue-500">AI</span></h1>
         <button @click="startNewMatchInit" class="w-full py-4 bg-blue-600 hover:bg-blue-500 rounded-xl font-black text-xl shadow-lg text-white mb-3 transition-transform active:scale-95">START NEW MATCH</button>
@@ -61,7 +63,7 @@
     </div>
 
     <!-- 1A. KNOCKOUT TOURNAMENT SCREEN -->
-    <div v-if="appState === 'knockout'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center">
+    <div v-if="appState === 'knockout'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center app-dark-bg">
       <div class="glass-panel p-6 rounded-2xl w-full max-w-2xl mx-auto border border-slate-700 shadow-xl my-auto">
         <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
           <h2 class="text-2xl font-black font-oswald text-indigo-400 tracking-widest uppercase">🥊 KNOCKOUT TOURNAMENT</h2>
@@ -123,7 +125,7 @@
     </div>
 
     <!-- 1B. GROUP TOURNAMENT SCREEN -->
-    <div v-if="appState === 'group'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center">
+    <div v-if="appState === 'group'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center app-dark-bg">
       <div class="glass-panel p-6 rounded-2xl w-full max-w-2xl mx-auto border border-slate-700 shadow-xl my-auto">
         <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
           <h2 class="text-2xl font-black font-oswald text-purple-400 tracking-widest uppercase">🏆 GROUP TOURNAMENT</h2>
@@ -250,7 +252,7 @@
     </div>
 
     <!-- 2. SETUP & TOSS -->
-    <div v-if="appState === 'setup'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center justify-center">
+    <div v-if="appState === 'setup'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center justify-center app-dark-bg">
       <div class="glass-panel p-6 rounded-2xl w-full max-w-xl mx-auto border border-slate-700 shadow-xl relative">
         <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
           <button @click="appState = activeTourneyMatch ? (activeTourneyMatch.mode === 'ko' ? 'knockout' : 'group') : 'home'" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
@@ -259,13 +261,38 @@
         </div>
 
         <div class="grid grid-cols-2 gap-4 mb-6">
-          <div>
-            <label class="text-xs text-blue-400 font-black uppercase mb-1 block">HOME TEAM</label>
-            <input type="text" v-model="setupData.home" @input="loadTeamMemory(setupData.home, true)" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-blue-500 outline-none" placeholder="E.g. IND">
+          <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-700/80 space-y-2.5">
+            <label class="text-xs text-blue-400 font-black uppercase block text-center">HOME TEAM</label>
+            <input type="text" v-model="setupData.home" @input="loadTeamMemory(setupData.home, true)" class="w-full bg-black border border-slate-600 rounded-lg p-3 font-black text-lg uppercase text-white text-center focus:border-blue-500 outline-none" placeholder="E.g. IND">
+            <div class="flex items-center gap-2 pt-1">
+              <div class="w-11 h-11 rounded-full bg-black border-2 border-blue-500/60 flex items-center justify-center overflow-hidden shrink-0 shadow">
+                <img v-if="setupData.homeLogo" :src="setupData.homeLogo" class="w-full h-full object-contain" alt="Home Logo">
+                <span v-else class="text-lg">🛡️</span>
+              </div>
+              <label class="flex-1 py-2 px-2 bg-blue-600/80 hover:bg-blue-600 text-white rounded-lg font-black text-[10px] text-center cursor-pointer transition-colors shadow">
+                📷 ADD LOGO
+                <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload($event, true)">
+              </label>
+              <button v-if="setupData.homeLogo" @click="setupData.homeLogo = ''" class="px-2 py-2 bg-red-600/80 hover:bg-red-600 text-white rounded-lg font-black text-[10px]" title="Remove Logo">✕</button>
+            </div>
+            <input type="text" v-model="setupData.homeLogo" class="w-full bg-black/70 border border-slate-700 rounded px-2 py-1 text-[10px] text-slate-300 outline-none focus:border-blue-500" placeholder="Or paste Logo Image URL...">
           </div>
-          <div>
-            <label class="text-xs text-red-400 font-black uppercase mb-1 block">AWAY TEAM</label>
-            <input type="text" v-model="setupData.away" @input="loadTeamMemory(setupData.away, false)" class="w-full bg-black border border-slate-600 rounded p-4 font-black text-lg uppercase text-white text-center focus:border-red-500 outline-none" placeholder="E.g. AUS">
+
+          <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-700/80 space-y-2.5">
+            <label class="text-xs text-red-400 font-black uppercase block text-center">AWAY TEAM</label>
+            <input type="text" v-model="setupData.away" @input="loadTeamMemory(setupData.away, false)" class="w-full bg-black border border-slate-600 rounded-lg p-3 font-black text-lg uppercase text-white text-center focus:border-red-500 outline-none" placeholder="E.g. AUS">
+            <div class="flex items-center gap-2 pt-1">
+              <div class="w-11 h-11 rounded-full bg-black border-2 border-red-500/60 flex items-center justify-center overflow-hidden shrink-0 shadow">
+                <img v-if="setupData.awayLogo" :src="setupData.awayLogo" class="w-full h-full object-contain" alt="Away Logo">
+                <span v-else class="text-lg">🛡️</span>
+              </div>
+              <label class="flex-1 py-2 px-2 bg-red-600/80 hover:bg-red-600 text-white rounded-lg font-black text-[10px] text-center cursor-pointer transition-colors shadow">
+                📷 ADD LOGO
+                <input type="file" accept="image/*" class="hidden" @change="handleLogoUpload($event, false)">
+              </label>
+              <button v-if="setupData.awayLogo" @click="setupData.awayLogo = ''" class="px-2 py-2 bg-red-600/80 hover:bg-red-600 text-white rounded-lg font-black text-[10px]" title="Remove Logo">✕</button>
+            </div>
+            <input type="text" v-model="setupData.awayLogo" class="w-full bg-black/70 border border-slate-700 rounded px-2 py-1 text-[10px] text-slate-300 outline-none focus:border-red-500" placeholder="Or paste Logo Image URL...">
           </div>
         </div>
         <div class="mb-6">
@@ -275,8 +302,14 @@
         <div v-if="setupData.home && setupData.away && setupData.overs > 0" class="border-t border-slate-700 pt-6">
           <h3 class="text-center font-black mb-4 text-white uppercase">TOSS WINNER</h3>
           <div class="flex justify-center gap-4 mb-6">
-            <button @click="setupData.tossWinner = setupData.home" :class="setupData.tossWinner === setupData.home ? 'bg-blue-600 ring-4 ring-blue-300' : 'bg-slate-700'" class="px-6 py-3 rounded-xl font-black uppercase text-white w-1/2 transition-all">{{ setupData.home }}</button>
-            <button @click="setupData.tossWinner = setupData.away" :class="setupData.tossWinner === setupData.away ? 'bg-red-600 ring-4 ring-red-300' : 'bg-slate-700'" class="px-6 py-3 rounded-xl font-black uppercase text-white w-1/2 transition-all">{{ setupData.away }}</button>
+            <button @click="setupData.tossWinner = setupData.home" :class="setupData.tossWinner === setupData.home ? 'bg-blue-600 ring-4 ring-blue-300' : 'bg-slate-700'" class="px-4 py-3 rounded-xl font-black uppercase text-white w-1/2 transition-all flex items-center justify-center gap-2">
+              <img v-if="setupData.homeLogo" :src="setupData.homeLogo" class="w-6 h-6 rounded-full object-contain bg-white/10">
+              <span>{{ setupData.home }}</span>
+            </button>
+            <button @click="setupData.tossWinner = setupData.away" :class="setupData.tossWinner === setupData.away ? 'bg-red-600 ring-4 ring-red-300' : 'bg-slate-700'" class="px-4 py-3 rounded-xl font-black uppercase text-white w-1/2 transition-all flex items-center justify-center gap-2">
+              <img v-if="setupData.awayLogo" :src="setupData.awayLogo" class="w-6 h-6 rounded-full object-contain bg-white/10">
+              <span>{{ setupData.away }}</span>
+            </button>
           </div>
           <div v-if="setupData.tossWinner" class="flex justify-center gap-4 mb-6 animate-pop">
             <button @click="setupData.decision = 'BAT'" :class="setupData.decision === 'BAT' ? 'bg-yellow-500 text-black' : 'bg-slate-700 text-white'" class="px-8 py-3 rounded-xl font-black transition-colors">BAT FIRST</button>
@@ -288,7 +321,7 @@
     </div>
 
     <!-- 3. SQUADS SELECTION -->
-    <div v-if="appState === 'squads'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center">
+    <div v-if="appState === 'squads'" class="flex-1 flex flex-col p-4 overflow-y-auto custom-scrollbar items-center app-dark-bg">
       <div class="w-full max-w-4xl animate-pop">
         <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-3">
           <button @click="appState = 'setup'" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
@@ -326,7 +359,7 @@
     </div>
 
     <!-- 4. OPENING BATSMAN & BOWLER -->
-    <div v-if="appState === 'opening'" class="flex-1 flex flex-col p-6 items-center justify-center">
+    <div v-if="appState === 'opening'" class="flex-1 flex flex-col p-6 items-center justify-center app-dark-bg">
       <div class="glass-panel p-8 rounded-2xl w-full max-w-md border border-slate-700 shadow-2xl animate-pop">
         <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-3">
           <button @click="goBackFromOpening" class="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
@@ -395,7 +428,10 @@
                   <span class="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
                   <span class="text-[9px] text-slate-400 font-black tracking-widest uppercase font-oswald">LIVE MATCH</span>
                 </div>
-                <div class="text-sm sm:text-base text-blue-400 font-black tracking-widest uppercase truncate mb-0.5">{{ match.battingTeam }}</div>
+                <div class="flex items-center gap-2 mb-1">
+                  <img v-if="currentBattingLogo" :src="currentBattingLogo" class="w-7 h-7 rounded-full object-contain bg-white/10 border border-blue-400/50 p-0.5 shrink-0">
+                  <div class="text-sm sm:text-base text-blue-400 font-black tracking-widest uppercase truncate">{{ match.battingTeam }}</div>
+                </div>
                 <div class="flex items-baseline gap-1.5 -mt-1 flex-wrap">
                   <span class="text-5xl leading-none font-black font-oswald text-white">{{ match.runs }}</span>
                   <span class="text-3xl font-black text-slate-600">-</span>
@@ -1173,9 +1209,12 @@
 
         <div v-if="!match.activeOverlayGraphic" class="absolute bottom-[78px] left-1/2 -translate-x-1/2 w-[3640px] h-[146px] flex items-stretch bg-[#240a4e] rounded-[24px] shadow-[0_18px_45px_rgba(0,0,0,0.65)] overflow-hidden border-y-[3px] border-white/20">
           <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-r-[85px] border-r-[14px] border-[#a21caf] flex items-center justify-center shrink-0 shadow-[10px_0_25px_rgba(0,0,0,0.45)] z-20">
-            <div class="w-[106px] h-[106px] bg-white rounded-xl shadow-md border border-slate-200 flex flex-col items-center justify-center p-1">
-              <span class="text-[58px] leading-none">🏏</span>
-              <span class="text-[13px] font-black text-[#240a4e] tracking-tighter uppercase mt-0.5">CRIC PRO</span>
+            <div class="w-[116px] h-[116px] bg-white rounded-2xl shadow-md border-2 border-slate-200 flex flex-col items-center justify-center p-1.5 overflow-hidden">
+              <img v-if="currentBattingLogo" :src="currentBattingLogo" class="w-full h-full object-contain" alt="Bat Logo">
+              <template v-else>
+                <span class="text-[58px] leading-none">🏏</span>
+                <span class="text-[13px] font-black text-[#240a4e] tracking-tighter uppercase mt-0.5">CRIC PRO</span>
+              </template>
             </div>
           </div>
           <div class="w-[820px] h-full bg-gradient-to-r from-[#22094a] to-[#2c0e5e] flex flex-col justify-center px-10 shrink-0 z-10">
@@ -1201,10 +1240,12 @@
           </div>
           <div class="w-[990px] h-full bg-gradient-to-b from-[#ffffff] via-[#f8fafc] to-[#e2e8f0] rounded-[85px] border-x-[16px] border-[#9d174d] flex flex-col justify-center items-center px-10 shrink-0 shadow-[0_0_35px_rgba(0,0,0,0.55)] z-20">
             <div class="w-full flex items-center justify-between gap-4 mt-1">
-              <div class="flex items-baseline gap-2.5 pl-3 min-w-0 shrink-0">
-                <span class="text-[#1e1b4b] font-black text-[46px] font-oswald uppercase tracking-tight leading-none truncate max-w-[180px]">{{ (match.battingTeam || 'BAT').substring(0, 6) }}</span>
-                <span class="text-[#475569] font-bold text-[32px] lowercase leading-none">v</span>
-                <span class="text-[#db2777] font-black text-[46px] font-oswald uppercase tracking-tight leading-none truncate max-w-[180px]">{{ (match.bowlingTeam || 'BOWL').substring(0, 6) }}</span>
+              <div class="flex items-center gap-2 pl-2 min-w-0 shrink-0">
+                <img v-if="currentBattingLogo" :src="currentBattingLogo" class="w-[44px] h-[44px] rounded-full object-contain bg-white border border-slate-300 p-0.5 shrink-0">
+                <span class="text-[#1e1b4b] font-black text-[44px] font-oswald uppercase tracking-tight leading-none truncate max-w-[165px]">{{ (match.battingTeam || 'BAT').substring(0, 6) }}</span>
+                <span class="text-[#475569] font-bold text-[30px] lowercase leading-none">v</span>
+                <span class="text-[#db2777] font-black text-[44px] font-oswald uppercase tracking-tight leading-none truncate max-w-[165px]">{{ (match.bowlingTeam || 'BOWL').substring(0, 6) }}</span>
+                <img v-if="currentBowlingLogo" :src="currentBowlingLogo" class="w-[44px] h-[44px] rounded-full object-contain bg-white border border-slate-300 p-0.5 shrink-0">
               </div>
               <div class="h-[74px] rounded-full bg-gradient-to-r from-[#581c87] via-[#86198f] to-[#ec4899] flex items-center px-7 gap-6 shadow-inner border-2 border-purple-900/20 shrink-0">
                 <span class="text-white font-black text-[56px] font-oswald tracking-tight leading-none drop-shadow">{{ match.runs }}-{{ match.wickets }}</span>
@@ -1246,8 +1287,9 @@
               </div>
             </div>
           </div>
-          <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-l-[85px] border-l-[14px] border-[#a21caf] flex items-center justify-center px-6 shrink-0 shadow-[-10px_0_25px_rgba(0,0,0,0.45)] z-20">
-            <span class="text-[#1e1b4b] font-black text-[48px] font-oswald uppercase tracking-wider truncate text-center">{{ (match.bowlingTeam || 'BOWL').substring(0, 6) }}</span>
+          <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-l-[85px] border-l-[14px] border-[#a21caf] flex items-center justify-center gap-3 px-5 shrink-0 shadow-[-10px_0_25px_rgba(0,0,0,0.45)] z-20">
+            <img v-if="currentBowlingLogo" :src="currentBowlingLogo" class="w-[96px] h-[96px] rounded-2xl object-contain bg-white border-2 border-slate-200 p-1 shadow shrink-0" alt="Bowl Logo">
+            <span class="text-[#1e1b4b] font-black text-[44px] font-oswald uppercase tracking-wider truncate text-center">{{ (match.bowlingTeam || 'BOWL').substring(0, 6) }}</span>
           </div>
         </div>
 
@@ -1411,6 +1453,9 @@
   </div>
 
   <script>
+    if (new URLSearchParams(window.location.search).get('mode') === 'overlay') {
+      document.documentElement.classList.add('is-overlay-mode');
+    }
     const { createApp, reactive, ref, computed, onMounted, watch } = Vue;
 
     const safeStorage = {
@@ -1444,7 +1489,7 @@
         const overlayScale = ref(1);
         const savedMatchExists = ref(false);
         const match = reactive(defaultMatchState());
-        const setupData = reactive({ home: '', away: '', overs: 20, tossWinner: '', decision: '' });
+        const setupData = reactive({ home: '', away: '', homeLogo: '', awayLogo: '', overs: 20, tossWinner: '', decision: '' });
         const squads = reactive({ home: Array(11).fill(''), away: Array(11).fill(''), homeSub: '', awaySub: '' });
         const tempSetup = reactive({ striker: '', nonStriker: '', bowler: '', fielder: '', wType: '' });
 
@@ -1658,7 +1703,7 @@
         const launchTournamentMatch = (mode, rIdx, mIdx, mObj) => {
           activeTourneyMatch.value = { mode, rIdx, mIdx };
           Object.assign(match, defaultMatchState()); match.id = 'match_' + Date.now();
-          Object.assign(setupData, { home: mObj.teamA, away: mObj.teamB, overs: 20, tossWinner: '', decision: '' });
+          Object.assign(setupData, { home: mObj.teamA, away: mObj.teamB, homeLogo: '', awayLogo: '', overs: 20, tossWinner: '', decision: '' });
           Object.assign(squads, { home: Array(11).fill(''), away: Array(11).fill(''), homeSub: '', awaySub: '' });
           loadTeamMemory(mObj.teamA, true); loadTeamMemory(mObj.teamB, false);
           tourneyWinnerSelect.value = 'AUTO'; safeStorage.removeItem('cricketCurrentMatch'); savedMatchExists.value = false; appState.value = 'setup';
@@ -1717,6 +1762,50 @@
 
         const currentBattingSquad = computed(() => match.battingTeam === setupData.home ? [...squads.home, squads.homeSub] : [...squads.away, squads.awaySub]);
         const currentBowlingSquad = computed(() => match.bowlingTeam === setupData.home ? [...squads.home, squads.homeSub] : [...squads.away, squads.awaySub]);
+
+        const getTeamLogo = (teamName) => {
+          const norm = (s) => (s || '').trim().toUpperCase();
+          if (!teamName) return '';
+          if (norm(teamName) === norm(setupData.home) && setupData.homeLogo) return setupData.homeLogo;
+          if (norm(teamName) === norm(setupData.away) && setupData.awayLogo) return setupData.awayLogo;
+          return '';
+        };
+        const currentBattingLogo = computed(() => getTeamLogo(match.battingTeam));
+        const currentBowlingLogo = computed(() => getTeamLogo(match.bowlingTeam));
+
+        // 0% Lag Logo Compressor: resizes any gallery image to a tiny 72x72 WebP/PNG icon (~1.2KB)
+        const handleLogoUpload = (event, isHome) => {
+          const file = event.target?.files?.[0];
+          if (!file) return;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              const canvas = document.createElement('canvas');
+              const maxDim = 72;
+              let w = img.width || maxDim;
+              let h = img.height || maxDim;
+              if (w > h) { if (w > maxDim) { h = Math.round((h * maxDim) / w); w = maxDim; } }
+              else { if (h > maxDim) { w = Math.round((w * maxDim) / h); h = maxDim; } }
+              canvas.width = w;
+              canvas.height = h;
+              const ctx = canvas.getContext('2d');
+              ctx.clearRect(0, 0, w, h);
+              ctx.drawImage(img, 0, 0, w, h);
+              let dataUrl = '';
+              try {
+                dataUrl = canvas.toDataURL('image/webp', 0.78);
+                if (!dataUrl.startsWith('data:image/webp')) dataUrl = canvas.toDataURL('image/png');
+              } catch (err) {
+                dataUrl = canvas.toDataURL('image/png');
+              }
+              if (isHome) setupData.homeLogo = dataUrl;
+              else setupData.awayLogo = dataUrl;
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        };
         const duplicateNames = computed(() => {
           const all = [...squads.home, squads.homeSub, ...squads.away, squads.awaySub].map(n => (n||'').trim().toUpperCase()).filter(n => n);
           const counts = {}; all.forEach(n => counts[n] = (counts[n] || 0) + 1);
@@ -1784,7 +1873,7 @@
               thisOverHistory: match.thisOverHistory, activeOverlayGraphic: match.activeOverlayGraphic, overLog: match.overLog, innings: match.innings, target: match.target,
               battingStats: match.battingStats, bowlingStats: match.bowlingStats, innings1Data: match.innings1Data, awards: match.awards, matchResultString: match.matchResultString
             },
-            setupData: { tossWinner: setupData.tossWinner, decision: setupData.decision, overs: setupData.overs, home: setupData.home, away: setupData.away },
+            setupData: { tossWinner: setupData.tossWinner, decision: setupData.decision, overs: setupData.overs, home: setupData.home, away: setupData.away, homeLogo: setupData.homeLogo || '', awayLogo: setupData.awayLogo || '' },
             outSummaryPopup, playerProfilePopup, liveCommPopup, squads
           });
         };
@@ -2264,9 +2353,18 @@
         const loadTeamMemory = (teamName, isHome) => {
           if(!teamName) return; const saved = safeStorage.getItem('cricket_team_' + teamName.toUpperCase());
           if(saved) {
-            const p = JSON.parse(saved);
-            if(isHome) { for(let i=0; i<11; i++) squads.home[i] = p.squad[i] || ''; squads.homeSub = p.sub || ''; }
-            else { for(let i=0; i<11; i++) squads.away[i] = p.squad[i] || ''; squads.awaySub = p.sub || ''; }
+            try {
+              const p = JSON.parse(saved);
+              if(isHome) {
+                for(let i=0; i<11; i++) squads.home[i] = (p.squad && p.squad[i]) || '';
+                squads.homeSub = p.sub || '';
+                if (p.logo && !setupData.homeLogo) setupData.homeLogo = p.logo;
+              } else {
+                for(let i=0; i<11; i++) squads.away[i] = (p.squad && p.squad[i]) || '';
+                squads.awaySub = p.sub || '';
+                if (p.logo && !setupData.awayLogo) setupData.awayLogo = p.logo;
+              }
+            } catch (e) {}
           }
         };
 
@@ -2274,8 +2372,8 @@
 
         const validateAndGoToOpening = () => {
           if (duplicateNames.value.length > 0) { showAlert(`ডাবল এন্ট্রি ব্লকড! [ ${duplicateNames.value.join(', ')} ]`); return; }
-          if(setupData.home) safeStorage.setItem('cricket_team_' + setupData.home.toUpperCase(), JSON.stringify({squad: squads.home, sub: squads.homeSub}));
-          if(setupData.away) safeStorage.setItem('cricket_team_' + setupData.away.toUpperCase(), JSON.stringify({squad: squads.away, sub: squads.awaySub}));
+          if(setupData.home) safeStorage.setItem('cricket_team_' + setupData.home.toUpperCase(), JSON.stringify({squad: squads.home, sub: squads.homeSub, logo: setupData.homeLogo || ''}));
+          if(setupData.away) safeStorage.setItem('cricket_team_' + setupData.away.toUpperCase(), JSON.stringify({squad: squads.away, sub: squads.awaySub, logo: setupData.awayLogo || ''}));
           match.battingTeam = setupData.decision === 'BAT' ? setupData.tossWinner : (setupData.tossWinner === setupData.home ? setupData.away : setupData.home);
           match.bowlingTeam = setupData.decision === 'BOWL' ? setupData.tossWinner : (setupData.tossWinner === setupData.home ? setupData.away : setupData.home);
           match.totalOvers = Number(setupData.overs) || 20; appState.value = 'opening';
@@ -2861,7 +2959,7 @@
           else { match.isEnded = false; syncRecordsToHistory(); safeStorage.setItem('cricketCurrentMatch', JSON.stringify({ match, setupData, squads, activeTourneyMatch: activeTourneyMatch.value })); savedMatchExists.value = true; match.activeOverlayGraphic = null; syncDataToOverlay(true); activeModal.value = ''; appState.value = 'home'; }
         };
 
-        const startNewMatchInit = () => { activeTourneyMatch.value = null; Object.assign(match, defaultMatchState()); match.id = 'match_' + Date.now(); Object.assign(setupData, { home: '', away: '', overs: 20, tossWinner: '', decision: '' }); Object.assign(squads, { home: Array(11).fill(''), away: Array(11).fill(''), homeSub: '', awaySub: '' }); safeStorage.removeItem('cricketCurrentMatch'); savedMatchExists.value = false; appState.value = 'setup'; };
+        const startNewMatchInit = () => { activeTourneyMatch.value = null; Object.assign(match, defaultMatchState()); match.id = 'match_' + Date.now(); Object.assign(setupData, { home: '', away: '', homeLogo: '', awayLogo: '', overs: 20, tossWinner: '', decision: '' }); Object.assign(squads, { home: Array(11).fill(''), away: Array(11).fill(''), homeSub: '', awaySub: '' }); safeStorage.removeItem('cricketCurrentMatch'); savedMatchExists.value = false; appState.value = 'setup'; };
 
         const historyList = ref([]);
         const openHistory = (type) => {
@@ -2897,7 +2995,7 @@
         };
 
         return {
-          appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, customConfirm, executeConfirmAction, outSummaryPopup, playerProfilePopup, liveCommPopup, overlayInn1Data, overlayInn2Data, aiSettings, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, confirmExit, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard, viewPlayerStats, selectedPlayerStats,
+          appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, customConfirm, executeConfirmAction, outSummaryPopup, playerProfilePopup, liveCommPopup, overlayInn1Data, overlayInn2Data, aiSettings, currentBattingSquad, currentBowlingSquad, getTeamLogo, currentBattingLogo, currentBowlingLogo, handleLogoUpload, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, selectPrevBowler, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, toggleVoice, toggleVoiceLanguage, exitMatch, confirmExit, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard, viewPlayerStats, selectedPlayerStats,
           koData, grpData, grpTab, activeTourneyMatch, tourneyWinnerSelect, setKoTeamCount, generateKoFixtures, resetKoTournament, saveKoState, initGroupSetupTeams, groupPlayoffPathText, getSortedGroupTeams, syncGroupPlayoffBracket, startGroupTournamentNow, resetGroupTournamentNow, saveGrpState, launchTournamentMatch,
           previousModal, goBackFromOpening, goBackFromAdmin, undoFromPostMatch, executeSwitchToSecondInnings, handleTieBreaker, postMatchTab, scorecardTab, commTab, getTopPerformers, finalMatchResultText, finalizePostMatch
         };
