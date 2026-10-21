@@ -1444,31 +1444,43 @@
           </div>
         </div>
 
-        <div v-if="match.activeOverlayGraphic === 'match_summary'" class="absolute inset-0 bg-transparent flex flex-col items-center justify-center p-16 animate-pop">
-          <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-yellow-400 rounded-[50px] p-20 w-full max-w-[3200px] shadow-2xl relative text-center">
+        <div v-if="match.activeOverlayGraphic === 'match_summary'" class="absolute inset-0 bg-transparent flex flex-col items-center justify-center p-16 animate-pop z-[75]">
+          <div class="bg-gradient-to-b from-[#1e3a8a] to-[#0f172a] border-8 border-yellow-400 rounded-[50px] p-20 w-full max-w-[3300px] shadow-2xl relative text-center">
             <div class="absolute -top-16 left-1/2 -translate-x-1/2 bg-[#b91c1c] text-white px-20 py-6 rounded-3xl border-8 border-white font-black text-[65px] uppercase font-oswald shadow-2xl tracking-widest">
-              MATCH SUMMARY
+              MATCH SUMMARY & AWARDS
             </div>
-            <h2 class="text-[75px] font-black text-yellow-400 uppercase mt-6 mb-8 font-oswald">{{ finalMatchResultText }}</h2>
+            <h2 class="text-[75px] font-black text-yellow-400 uppercase mt-6 mb-8 font-oswald drop-shadow-lg">{{ finalMatchResultText }}</h2>
             <div class="grid grid-cols-2 gap-10 mb-8 text-left">
-              <div class="bg-slate-900/85 p-8 rounded-3xl border-4 border-slate-700 grid grid-cols-2 gap-8">
-                <div>
-                  <h4 class="text-[34px] font-black text-blue-400 uppercase mb-4 border-b-2 border-slate-700 pb-2">1st Inn Top Batters</h4>
-                  <div v-for="(p, i) in getTopPerformers('bat', 1)" :key="'ov_t1b'+i" class="flex justify-between text-[34px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-yellow-400 shrink-0">{{p.runs}} ({{p.balls}})</span></div>
+              <div class="bg-slate-900/90 p-8 rounded-3xl border-4 border-blue-500/60 space-y-5">
+                <div class="flex justify-between items-center bg-blue-950/80 px-6 py-3 rounded-2xl border-2 border-blue-400/40">
+                  <span class="font-oswald font-black text-[42px] text-yellow-400 uppercase">1ST INN: {{ overlayInn1Data.battingTeam }}</span>
+                  <span class="font-oswald font-black text-[46px] text-white">{{ overlayInn1Data.runs }}/{{ overlayInn1Data.wickets }} ({{ overlayInn1Data.overs }}.{{ overlayInn1Data.balls }} OVR)</span>
                 </div>
-                <div>
-                  <h4 class="text-[34px] font-black text-red-400 uppercase mb-4 border-b-2 border-slate-700 pb-2">1st Inn Top Bowlers</h4>
-                  <div v-for="(p, i) in getTopPerformers('bowl', 1)" :key="'ov_t1bw'+i" class="flex justify-between text-[34px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-cyan-400 shrink-0">{{p.wickets}}-{{p.runs}}</span></div>
+                <div class="grid grid-cols-2 gap-8">
+                  <div>
+                    <h4 class="text-[32px] font-black text-blue-400 uppercase mb-3 border-b-2 border-slate-700 pb-2">Top Batters</h4>
+                    <div v-for="(p, i) in getTopPerformers('bat', 1)" :key="'ov_t1b'+i" class="flex justify-between text-[32px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-yellow-400 shrink-0">{{p.runs}} ({{p.balls}})</span></div>
+                  </div>
+                  <div>
+                    <h4 class="text-[32px] font-black text-red-400 uppercase mb-3 border-b-2 border-slate-700 pb-2">Top Bowlers</h4>
+                    <div v-for="(p, i) in getTopPerformers('bowl', 1)" :key="'ov_t1bw'+i" class="flex justify-between text-[32px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-cyan-400 shrink-0">{{p.wickets}}-{{p.runs}}</span></div>
+                  </div>
                 </div>
               </div>
-              <div class="bg-slate-900/85 p-8 rounded-3xl border-4 border-slate-700 grid grid-cols-2 gap-8">
-                <div>
-                  <h4 class="text-[34px] font-black text-blue-400 uppercase mb-4 border-b-2 border-slate-700 pb-2">2nd Inn Top Batters</h4>
-                  <div v-for="(p, i) in getTopPerformers('bat', 2)" :key="'ov_t2b'+i" class="flex justify-between text-[34px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-yellow-400 shrink-0">{{p.runs}} ({{p.balls}})</span></div>
+              <div class="bg-slate-900/90 p-8 rounded-3xl border-4 border-indigo-500/60 space-y-5">
+                <div class="flex justify-between items-center bg-indigo-950/80 px-6 py-3 rounded-2xl border-2 border-indigo-400/40">
+                  <span class="font-oswald font-black text-[42px] text-yellow-400 uppercase">2ND INN: {{ overlayInn2Data.battingTeam }}</span>
+                  <span class="font-oswald font-black text-[46px] text-white">{{ overlayInn2Data.runs }}/{{ overlayInn2Data.wickets }} ({{ overlayInn2Data.overs }}.{{ overlayInn2Data.balls }} OVR)</span>
                 </div>
-                <div>
-                  <h4 class="text-[34px] font-black text-red-400 uppercase mb-4 border-b-2 border-slate-700 pb-2">2nd Inn Top Bowlers</h4>
-                  <div v-for="(p, i) in getTopPerformers('bowl', 2)" :key="'ov_t2bw'+i" class="flex justify-between text-[34px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-cyan-400 shrink-0">{{p.wickets}}-{{p.runs}}</span></div>
+                <div class="grid grid-cols-2 gap-8">
+                  <div>
+                    <h4 class="text-[32px] font-black text-blue-400 uppercase mb-3 border-b-2 border-slate-700 pb-2">Top Batters</h4>
+                    <div v-for="(p, i) in getTopPerformers('bat', 2)" :key="'ov_t2b'+i" class="flex justify-between text-[32px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-yellow-400 shrink-0">{{p.runs}} ({{p.balls}})</span></div>
+                  </div>
+                  <div>
+                    <h4 class="text-[32px] font-black text-red-400 uppercase mb-3 border-b-2 border-slate-700 pb-2">Top Bowlers</h4>
+                    <div v-for="(p, i) in getTopPerformers('bowl', 2)" :key="'ov_t2bw'+i" class="flex justify-between text-[32px] text-white mb-2"><span class="font-bold uppercase truncate pr-3">{{ i+1 }}. {{p.name}}</span><span class="font-black text-cyan-400 shrink-0">{{p.wickets}}-{{p.runs}}</span></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2531,6 +2543,7 @@
           match.striker = { name: sName, runs: 0, balls: 0, fours: 0, sixes: 0 };
           match.nonStriker = { name: nsName, runs: 0, balls: 0, fours: 0, sixes: 0 };
           match.bowler = { name: bName, runs: 0, wickets: 0, overs: 0, balls: 0, maidens: 0, wd: 0, nb: 0 };
+          match.activeOverlayGraphic = null;
           updatePlayerStat(match.striker.name, 'batting');
           updatePlayerStat(match.nonStriker.name, 'batting');
           updatePlayerStat(match.bowler.name, 'bowling');
@@ -2892,6 +2905,7 @@
           match.historyRecords = [];
           match.battingTeam = inn1Bowl;
           match.bowlingTeam = inn1Bat;
+          match.activeOverlayGraphic = null;
           tempSetup.striker = '';
           tempSetup.nonStriker = '';
           tempSetup.bowler = '';
@@ -2921,10 +2935,12 @@
             }
             match.isEnded = true;
             calculateAwards();
+            match.activeOverlayGraphic = 'match_summary';
             syncRecordsToHistory();
             safeStorage.removeItem('cricketCurrentMatch');
             savedMatchExists.value = false;
             processTournamentAutoAdvance(winnerOverride);
+            syncDataToOverlay(true);
             announceLiveEvent(
               `ম্যাচ সমাপ্ত! ${finalMatchResultText.value}! ম্যান অব দ্য ম্যাচ নির্বাচিত হয়েছেন ${match.awards?.mom || '-'}, সেরা ব্যাটসম্যান ${match.awards?.bestBatter || '-'}, এবং সেরা বোলার ${match.awards?.bestBowler || '-'}।`,
               `Match Completed! ${finalMatchResultText.value}! Man of the Match is ${match.awards?.mom || '-'}.`,
@@ -2934,7 +2950,7 @@
           } catch (err) {
             console.error('Match completion error:', err);
           }
-          postMatchTab.value = 'inn1';
+          postMatchTab.value = 'summary';
           activeModal.value = 'postMatch';
         };
 
@@ -2995,12 +3011,14 @@
           const maxOvers = getEffectiveTotalOvers();
           if (match.overs >= maxOvers) {
             if (match.innings === 1 && !match.innings1Data) {
+              match.activeOverlayGraphic = 'scorecard_inn1';
+              activeModal.value = 'innings1End';
+              syncDataToOverlay(true);
               announceLiveEvent(
                 `প্রথম ইনিংস শেষ! নির্ধারিত ${maxOvers} ওভারে ${match.battingTeam} করেছে ${match.runs} রানে ${match.wickets} উইকেট। জয়ের জন্য ${match.bowlingTeam}-এর টার্গেট ${match.runs + 1} রান।`,
                 `1st Innings Completed! ${match.battingTeam} scored ${match.runs} for ${match.wickets}. Target for ${match.bowlingTeam} is ${match.runs + 1} runs.`,
                 `1st Innings Ended: ${match.battingTeam} ${match.runs}/${match.wickets} (${match.overs}.${match.balls} Ovr). Target: ${match.runs + 1}`
               );
-              activeModal.value = 'innings1End';
               syncDataToOverlay(true);
             } else {
               match.innings = 2;
@@ -3183,13 +3201,15 @@
           if (match.wickets >= maxWickets || (squadCount > 1 && remainingBatters.length === 0)) {
             activeModal.value = '';
             if (match.innings === 1 && !match.innings1Data) {
+              match.activeOverlayGraphic = 'scorecard_inn1';
+              activeModal.value = 'innings1End';
+              syncDataToOverlay(true);
               announceLiveEvent(
                 `সব উইকেট পতন! প্রথম ইনিংস শেষ। ${match.battingTeam} করেছে ${match.runs} রান। জয়ের জন্য ${match.bowlingTeam}-এর টার্গেট ${match.runs + 1} রান।`,
                 `All Out! 1st Innings complete. ${match.battingTeam} scored ${match.runs}. Target for ${match.bowlingTeam} is ${match.runs + 1}.`,
                 `ALL OUT! 1st Innings Ended: ${match.battingTeam} ${match.runs}/${match.wickets}. Target: ${match.runs + 1}`,
                 true, false
               );
-              activeModal.value = 'innings1End';
               syncDataToOverlay(true);
             } else {
               match.innings = 2;
