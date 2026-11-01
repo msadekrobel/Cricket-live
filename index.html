@@ -237,8 +237,8 @@
   <div class="w-10 bg-slate-900/50 border border-slate-700 rounded py-1.5 text-[10px] font-bold text-center text-slate-500">{{ calculateEconomy(match.bowlingStats[match.prevBowlerName].runs, match.bowlingStats[match.prevBowlerName].overs, match.bowlingStats[match.prevBowlerName].balls) }}</div>
   </div> <div class="mt-3 pt-3 border-t border-slate-700"> <div class="text-xs text-slate-400 font-black mb-1.5 tracking-widest">THIS OVER:</div> <div class="flex flex-wrap gap-1.5 pb-1">
   <span v-if="match.thisOverHistory.length === 0" class="text-slate-600 text-sm font-bold">-</span>
-  <div v-for="(b, i) in match.thisOverHistory" :key="i" class="w-7 h-7 shrink-0 rounded-full flex items-center justify-center text-xs font-black shadow border border-black"
-  :class="{'bg-red-600 text-white': b==='W', 'bg-blue-600 text-white': b==='4', 'bg-indigo-600 text-white border-2 border-yellow-400': b==='6', 'bg-yellow-500 text-black': b.includes('WD') || b.includes('NB'), 'bg-slate-300 text-black': !['W','4','6'].includes(b) && !b.includes('WD') && !b.includes('NB')}">
+  <div v-for="(b, i) in match.thisOverHistory" :key="i" class="min-w-[28px] h-7 px-1.5 shrink-0 rounded-full flex items-center justify-center text-[11px] font-black shadow border border-black"
+  :class="{'bg-red-600 text-white': b==='W' || b.endsWith('W'), 'bg-blue-600 text-white': b==='4', 'bg-indigo-600 text-white border-2 border-yellow-400': b==='6', 'bg-yellow-500 text-black': (b.includes('WD') || b.includes('NB')) && !b.endsWith('W'), 'bg-slate-300 text-black': !['W','4','6'].includes(b) && !b.includes('WD') && !b.includes('NB') && !b.endsWith('W')}">
   {{ b }} </div> </div> </div> </div>
   <div class="grid grid-cols-4 gap-2"> <button @click="addRuns(0)" class="py-5 bg-slate-700 active:bg-slate-600 rounded-xl text-2xl font-black border-b-4 border-slate-800 text-white transition-colors">0</button>
   <button @click="addRuns(1)" class="py-5 bg-slate-700 active:bg-slate-600 rounded-xl text-2xl font-black border-b-4 border-slate-800 text-white transition-colors">1</button>
@@ -371,18 +371,44 @@
   <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black shadow">⬅ BACK</button> </div> </div>
   <div v-if="activeModal === 'fielderSelect'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
   <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-red-900/50 animate-pop"> <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
-  <button @click="activeModal = 'out'" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
-  <h2 class="text-2xl font-black text-red-500 text-center font-oswald tracking-widest uppercase">{{ tempSetup.wType }}!</h2> <span class="w-12"></span> </div>
+  <button @click="activeModal = tempSetup.extraOutType ? 'extras' : 'out'; tempSetup.extraOutType = ''" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
+  <h2 class="text-2xl font-black text-red-500 text-center font-oswald tracking-widest uppercase">{{ tempSetup.extraOutType ? tempSetup.extraOutType.toUpperCase() + ' + ' + tempSetup.extraOutBonus + ' RUN OUT' : tempSetup.wType + '!' }}</h2> <span class="w-12"></span> </div>
   <select v-model="tempSetup.fielder" class="w-full bg-black border-2 border-slate-600 rounded-xl p-3.5 font-black uppercase text-white mb-2.5 outline-none focus:border-white">
   <option value="" disabled>Select Fielder from Squad ▾</option> <option v-for="f in fieldingSquadList" :key="f" :value="f">{{f}}</option> </select>
   <input type="text" list="savedPlayersList" v-model="tempSetup.fielder" placeholder="Or Type / Edit Fielder Name..." class="w-full bg-slate-950 border-2 border-slate-600 rounded-xl p-3.5 text-sm font-black uppercase text-yellow-300 mb-5 outline-none focus:border-yellow-400">
-  <div class="flex gap-3"> <button @click="activeModal = 'out'" class="flex-1 py-4 bg-slate-700 text-white rounded-xl font-black">⬅ BACK</button>
+  <div class="flex gap-3"> <button @click="activeModal = tempSetup.extraOutType ? 'extras' : 'out'; tempSetup.extraOutType = ''" class="flex-1 py-4 bg-slate-700 text-white rounded-xl font-black">⬅ BACK</button>
   <button @click="confirmWicketWithFielder" :disabled="!tempSetup.fielder" class="flex-1 py-4 bg-red-600 disabled:opacity-50 text-white rounded-xl font-black">CONFIRM</button> </div> </div> </div>
-  <div v-if="activeModal === 'extras'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
-  <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-orange-900/50 animate-pop"> <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-2">
+  <div v-if="activeModal === 'extras'" class="fixed inset-0 bg-black/80 flex items-end sm:items-center justify-center z-[1000] p-0 sm:p-4">
+  <div v-if="extraType === 'wd' || extraType === 'nb'" class="bg-white text-slate-900 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl animate-pop">
+  <div class="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-4"></div>
+  <div class="flex items-center justify-between mb-4">
+  <div class="flex items-center gap-2.5">
+  <svg class="w-7 h-7 text-orange-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+  <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{{ extraType === 'wd' ? 'Wide Ball (WD)' : 'No Ball (NB)' }}</h2>
+  </div>
+  <button @click="activeModal = ''" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-black text-xs">⬅ BACK</button>
+  </div>
+  <div class="text-sm font-bold text-slate-500 mb-3">Regular Delivery (Runs)</div>
+  <div class="grid grid-cols-4 gap-2.5 mb-5">
+  <button v-for="b in (extraType === 'wd' ? [0,1,2,3,4] : [0,1,2,3,4,6])" :key="'reg_'+b" @click="handleExtra(b)" class="py-3.5 bg-[#eaf4ff] hover:bg-[#dbeafe] active:scale-95 border border-[#93c5fd] rounded-2xl font-black text-sm sm:text-base text-[#0f4c81] shadow-sm transition-all">
+  {{ extraType.toUpperCase() }} + {{ b }}
+  </button>
+  </div>
+  <div class="flex items-center gap-2 text-sm font-bold text-[#e11d48] mb-3">
+  <span class="w-2.5 h-2.5 rounded-full bg-[#ef4444] inline-block"></span>
+  <span>{{ extraType.toUpperCase() }} + Run Out (Wicket)</span>
+  </div>
+  <div class="grid grid-cols-3 gap-2.5 mb-2">
+  <button v-for="b in [0,1,2,3,4]" :key="'out_'+b" @click="handleExtraRunOut(b)" class="py-3.5 px-2 bg-[#fff1f2] hover:bg-[#ffe4e6] active:scale-95 border border-[#fca5a5] rounded-2xl font-black text-xs sm:text-sm text-[#991b1b] flex items-center justify-center gap-1.5 shadow-sm transition-all">
+  <span>{{ extraType.toUpperCase() }} + {{ b }}</span>
+  <span class="bg-[#dc2626] text-white text-[10px] font-black px-1.5 py-0.5 rounded uppercase leading-none">OUT</span>
+  </button>
+  </div>
+  </div>
+  <div v-else class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-orange-900/50 animate-pop m-4"> <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-2">
   <button @click="activeModal = ''" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-lg font-black text-xs text-white">⬅ BACK</button>
   <h2 class="text-2xl font-black text-orange-400 text-center uppercase font-oswald tracking-widest">{{ extraType }} RUNS</h2> <span class="w-12"></span> </div> <div class="grid grid-cols-4 gap-3 mb-6">
-  <button v-for="r in (extraType === 'wd' || extraType === 'lb' ? [1,2,3,4,5] : (extraType === 'nb' ? [1,2,3,4,5,6,7] : [1,2,3,4]))" :key="r" @click="handleExtra(r)" class="py-5 bg-slate-800 rounded-xl font-black text-2xl border border-slate-600 text-white active:bg-slate-700">{{r}}</button>
+  <button v-for="r in (extraType === 'lb' ? [1,2,3,4,5] : [1,2,3,4])" :key="r" @click="handleExtra(r)" class="py-5 bg-slate-800 rounded-xl font-black text-2xl border border-slate-600 text-white active:bg-slate-700">{{r}}</button>
   </div> <button @click="activeModal = ''" class="w-full py-4 bg-slate-700 text-white rounded-xl font-black">⬅ BACK</button> </div> </div>
   <div v-if="activeModal === 'dls'" class="fixed inset-0 bg-black/95 flex items-center justify-center z-[1000] p-4">
   <div class="glass-panel p-6 rounded-2xl w-full max-w-sm border-2 border-purple-900/50 animate-pop text-center"> <div class="flex justify-between items-center mb-4 border-b border-slate-700 pb-2">
@@ -599,7 +625,7 @@
   <div class="flex items-center w-full overflow-hidden" :class="match.thisOverHistory.length > 14 ? 'gap-1' : (match.thisOverHistory.length > 9 ? 'gap-1.5' : 'gap-2.5')">
   <span v-if="match.thisOverHistory.length === 0" class="text-pink-300/60 text-[28px] font-black tracking-widest uppercase">THIS OVER -</span> <div v-for="(b, i) in match.thisOverHistory" :key="i"
   class="rounded-[7px] flex items-center justify-center font-black border-[2px] shadow-sm shrink-0 transition-all" :class="[
-  b === 'W' ? 'bg-[#dc2626] border-red-300 text-white' : 'bg-[#d91b81] border-[#f472b6] text-white', match.thisOverHistory.length > 15 ? 'h-[34px] min-w-[30px] px-1 text-[18px]' :
+  (b === 'W' || b.endsWith('W')) ? 'bg-[#dc2626] border-red-300 text-white' : 'bg-[#d91b81] border-[#f472b6] text-white', match.thisOverHistory.length > 15 ? 'h-[34px] min-w-[30px] px-1 text-[18px]' :
   match.thisOverHistory.length > 11 ? 'h-[40px] min-w-[38px] px-1.5 text-[22px]' : match.thisOverHistory.length > 8  ? 'h-[44px] min-w-[44px] px-2 text-[25px]' : 'h-[48px] min-w-[50px] px-2.5 text-[28px]' ]">
   {{ b }} </div> </div> </div> </div>
   <div class="w-[330px] h-full bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[#cbd5e1] rounded-l-[85px] border-l-[14px] border-[#a21caf] flex items-center justify-center gap-3 px-5 shrink-0 shadow-[-10px_0_25px_rgba(0,0,0,0.45)] z-20">
@@ -683,7 +709,7 @@
     }); const app = createApp({ setup() { const urlParams = new URLSearchParams(window.location.search); const isOverlay = urlParams.get('mode') === 'overlay'; const appState = ref(isOverlay ? 'overlay' : 'home');
     const overlayScale = ref(1); const savedMatchExists = ref(false); const match = reactive(defaultMatchState());
     const setupData = reactive({ home: '', away: '', overs: 20, tossWinner: '', decision: '' });
-    const squads = reactive({ home: Array(11).fill(''), away: Array(11).fill(''), homeSub: '', awaySub: '' }); const tempSetup = reactive({ striker: '', nonStriker: '', bowler: '', fielder: '', wType: '' });
+    const squads = reactive({ home: Array(11).fill(''), away: Array(11).fill(''), homeSub: '', awaySub: '' }); const tempSetup = reactive({ striker: '', nonStriker: '', bowler: '', fielder: '', wType: '', extraOutType: '', extraOutBonus: 0 });
     const activeModal = ref(''); const extraType = ref(''); const showChartDrawer = ref(false); const chartType = ref('barChart'); let myChart = null; let myOverlayChart = null;
     let mqttClient = null; let syncTimeout = null; const hostKey = (window.location.hostname || 'sadekrobel').replace(/[^a-zA-Z0-9]/g, '').toLowerCase() || 'sadekrobel';
     const masterTopic = `cric_pro_master_${hostKey}`; const customAlert = reactive({ show: false, message: '' }); const showAlert = (msg) => { customAlert.message = msg; customAlert.show = true; };
@@ -1041,21 +1067,28 @@
     else if (r === 3) announceLiveEvent(`3 Runs by ${batterName}. (${match.runs}/${match.wickets})`);
     else if (r === 4) { match.striker.fours += 1; updatePlayerStat(batterName, 'batting'); announceLiveEvent(`FOUR! Boundary by ${batterName}! (${match.runs}/${match.wickets})`, false, true); }
     else if (r === 6) { match.striker.sixes += 1; updatePlayerStat(batterName, 'batting'); announceLiveEvent(`SIX! Maximum by ${batterName}! (${match.runs}/${match.wickets})`, false, true); } if (r % 2 !== 0) swapStrike(); if (match.innings === 2 && match.runs >= match.target) { completeSecondInningsMatch(match.battingTeam); return; } checkOverComplete(); syncDataToOverlay(true); };
-    const openExtraModal = (type) => { if(type === 'out') { tempSetup.wType = ''; activeModal.value = 'out'; } else { extraType.value = type; activeModal.value = 'extras'; } }; const handleExtra = (r) => {
-    saveStateForUndo(); const type = extraType.value; match.runs += r; match.thisOverRuns += r; const bowlerName = match.bowler.name || 'Bowler'; const batterName = match.striker.name || 'Batter';
-    if(type === 'wd' || type === 'nb') { match.bowler.runs += r; if(type==='wd') match.bowler.wd += 1; if(type==='nb') { match.bowler.nb += 1; match.striker.balls+=1; updatePlayerStat(batterName, 'batting'); }
-    match.thisOverHistory.push(r > 1 ? `${r}${type.toUpperCase()}` : type.toUpperCase()); updatePlayerStat(bowlerName, 'bowling'); activeModal.value = ''; announceLiveEvent(`${type === 'wd' ? 'WIDE BALL' : 'NO BALL'} (+${r}R) by ${bowlerName}. (${match.runs}/${match.wickets})`); if (match.innings === 2 && match.runs >= match.target) { completeSecondInningsMatch(match.battingTeam); return; } syncDataToOverlay(true); } else if (type === 'lb' || type === 'b') {
-    match.balls += 1; match.striker.balls += 1; match.bowler.balls += 1;
+    const openExtraModal = (type) => { tempSetup.extraOutType = ''; tempSetup.extraOutBonus = 0; if(type === 'out') { tempSetup.wType = ''; activeModal.value = 'out'; } else { extraType.value = type; activeModal.value = 'extras'; } };
+    const handleExtra = (r) => { saveStateForUndo(); const type = extraType.value; const bowlerName = match.bowler.name || 'Bowler'; const batterName = match.striker.name || 'Batter';
+    if (type === 'wd' || type === 'nb') { const bonus = Number(r) || 0; const totalRuns = 1 + bonus; match.runs += totalRuns; match.thisOverRuns += totalRuns; match.bowler.runs += totalRuns;
+    if (type === 'wd') { match.bowler.wd += 1; } else { match.bowler.nb += 1; match.striker.balls += 1; match.striker.runs += bonus; if (bonus === 4) match.striker.fours += 1; if (bonus === 6) match.striker.sixes += 1; updatePlayerStat(batterName, 'batting'); }
+    const badge = bonus > 0 ? `${type.toUpperCase()}+${bonus}` : type.toUpperCase(); match.thisOverHistory.push(badge); updatePlayerStat(bowlerName, 'bowling'); activeModal.value = '';
+    if (bonus % 2 !== 0) swapStrike(); announceLiveEvent(`${type === 'wd' ? 'WIDE BALL' : 'NO BALL'} (${badge}, +${totalRuns}R) by ${bowlerName}. (${match.runs}/${match.wickets})`, false, type === 'nb' && (bonus === 4 || bonus === 6));
+    if (match.innings === 2 && match.runs >= match.target) { completeSecondInningsMatch(match.battingTeam); return; } syncDataToOverlay(true); } else if (type === 'lb' || type === 'b') {
+    match.runs += r; match.thisOverRuns += r; match.balls += 1; match.striker.balls += 1; match.bowler.balls += 1;
     match.thisOverHistory.push(r > 1 ? `${r}${type.toUpperCase()}` : type.toUpperCase()); updatePlayerStat(batterName, 'batting'); updatePlayerStat(bowlerName, 'bowling'); activeModal.value = '';
     announceLiveEvent(`${type === 'lb' ? 'LEG BYE' : 'BYE'} (+${r}R). (${match.runs}/${match.wickets})`); if (r % 2 !== 0) swapStrike(); if (match.innings === 2 && match.runs >= match.target) { completeSecondInningsMatch(match.battingTeam); return; } checkOverComplete(); syncDataToOverlay(true); } };
-    const handleWicket = (wType) => { if (wType === 'Caught' || wType === 'Run Out' || wType === 'Stumped') { tempSetup.wType = wType; tempSetup.fielder = ''; activeModal.value = 'fielderSelect'; return; } processWicket(wType, ''); };
+    const handleExtraRunOut = (bonus) => { tempSetup.wType = 'Run Out'; tempSetup.fielder = ''; tempSetup.extraOutType = extraType.value; tempSetup.extraOutBonus = Number(bonus) || 0; activeModal.value = 'fielderSelect'; };
+    const handleWicket = (wType) => { tempSetup.extraOutType = ''; tempSetup.extraOutBonus = 0; if (wType === 'Caught' || wType === 'Run Out' || wType === 'Stumped') { tempSetup.wType = wType; tempSetup.fielder = ''; activeModal.value = 'fielderSelect'; return; } processWicket(wType, ''); };
     const confirmWicketWithFielder = () => { processWicket(tempSetup.wType, tempSetup.fielder); }; const processWicket = (wType, fielder) => { saveStateForUndo();
-    const outBatterName = match.striker.name || 'Batter'; const outBatterRuns = match.striker.runs; const outBatterBalls = match.striker.balls + 1; const bowlerName = match.bowler.name || 'Bowler';
-    match.wickets += 1; match.balls += 1; match.striker.balls += 1; match.bowler.balls += 1; match.thisOverWickets += 1; if (wType !== 'Run Out') match.bowler.wickets += 1;
+    const eType = tempSetup.extraOutType; const eBonus = Number(tempSetup.extraOutBonus) || 0; tempSetup.extraOutType = ''; tempSetup.extraOutBonus = 0;
+    const outBatterName = match.striker.name || 'Batter'; const bowlerName = match.bowler.name || 'Bowler'; let outBatterRuns = match.striker.runs; let outBatterBalls = match.striker.balls;
+    if (eType === 'wd' || eType === 'nb') { const totalRuns = 1 + eBonus; match.runs += totalRuns; match.thisOverRuns += totalRuns; match.bowler.runs += totalRuns;
+    if (eType === 'wd') { match.bowler.wd += 1; } else { match.bowler.nb += 1; match.striker.balls += 1; match.striker.runs += eBonus; if (eBonus === 4) match.striker.fours += 1; outBatterRuns = match.striker.runs; outBatterBalls = match.striker.balls; }
+    match.wickets += 1; match.thisOverWickets += 1; match.thisOverHistory.push(`${eType.toUpperCase()}+${eBonus > 0 ? eBonus + 'W' : 'W'}`);
+    } else { outBatterBalls = match.striker.balls + 1; match.wickets += 1; match.balls += 1; match.striker.balls += 1; match.bowler.balls += 1; match.thisOverWickets += 1; if (wType !== 'Run Out') match.bowler.wickets += 1; match.thisOverHistory.push('W'); }
     let dStr = wType === 'Bowled' ? `b ${bowlerName}` : (wType === 'Caught' ? `c ${fielder} b ${bowlerName}` : (wType === 'Stumped' ? `st ${fielder} b ${bowlerName}` : (wType === 'Run Out' && fielder ? `run out (${fielder})` : `${wType}`)));
-    updatePlayerStat(outBatterName, 'batting'); match.battingStats[outBatterName].out = true; match.battingStats[outBatterName].dismissal = dStr;
-    match.thisOverHistory.push('W'); updatePlayerStat(bowlerName, 'bowling');
-    outSummaryPopup.name = outBatterName; outSummaryPopup.dismissal = dStr; outSummaryPopup.runs = outBatterRuns; outSummaryPopup.balls = outBatterBalls; outSummaryPopup.show = true; announceLiveEvent(`WICKET! ${outBatterName} ${outBatterRuns}(${outBatterBalls}) ${dStr}. (${match.runs}/${match.wickets})`, true, false); syncDataToOverlay(true); setTimeout(() => { outSummaryPopup.show = false; syncDataToOverlay(true); }, 8000); const squadCount = currentBattingSquad.value.map(p => (p || '').trim()).filter(Boolean).length;
+    updatePlayerStat(outBatterName, 'batting'); match.battingStats[outBatterName].out = true; match.battingStats[outBatterName].dismissal = dStr; updatePlayerStat(bowlerName, 'bowling');
+    outSummaryPopup.name = outBatterName; outSummaryPopup.dismissal = dStr; outSummaryPopup.runs = outBatterRuns; outSummaryPopup.balls = outBatterBalls; outSummaryPopup.show = true; announceLiveEvent(`WICKET! ${outBatterName} ${outBatterRuns}(${outBatterBalls}) ${dStr}. (${match.runs}/${match.wickets})`, true, false); syncDataToOverlay(true); setTimeout(() => { outSummaryPopup.show = false; syncDataToOverlay(true); }, 8000); if (match.innings === 2 && match.runs >= match.target) { activeModal.value = ''; completeSecondInningsMatch(match.battingTeam); return; } const squadCount = currentBattingSquad.value.map(p => (p || '').trim()).filter(Boolean).length;
     const maxWickets = squadCount > 1 ? squadCount - 1 : 10; const remainingBatters = availableBatsmen.value; if (match.wickets >= maxWickets || (squadCount > 1 && remainingBatters.length === 0)) {
     activeModal.value = ''; if (match.innings === 1 && !match.innings1Data) { outSummaryPopup.show = false; playerProfilePopup.show = false; match.activeOverlayGraphic = 'scorecard_inn1';
     activeModal.value = 'innings1End'; announceLiveEvent(`ALL OUT! 1st Innings Ended: ${match.battingTeam} ${match.runs}/${match.wickets}. Target: ${match.runs + 1}`, true, false); syncDataToOverlay(true); setTimeout(() => { if (activeModal.value === 'innings1End') { match.activeOverlayGraphic = 'scorecard_inn1'; syncDataToOverlay(true); } }, 120); } else { match.innings = 2;
@@ -1114,7 +1147,7 @@
     const curr = safeStorage.getJSON('cricketCurrentMatch', null); if (curr && curr.match && curr.match.id === deletedId) { safeStorage.removeItem('cricketCurrentMatch'); savedMatchExists.value = false; } } else {
     let playerObj = safeStorage.getJSON('cricketPlayerHistory', {}); delete playerObj[historyList.value[idx].playerKey]; safeStorage.setItem('cricketPlayerHistory', JSON.stringify(playerObj)); historyList.value.splice(idx, 1);
     } }); }; return {
-    appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, customConfirm, executeConfirmAction, outSummaryPopup, playerProfilePopup, overlayInn1Data, overlayInn2Data, activeOverlayScoreData, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, addRuns, openExtraModal, handleExtra, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, exitMatch, confirmExit, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard, viewPlayerStats, selectedPlayerStats,
+    appState, overlayScale, savedMatchExists, match, setupData, squads, tempSetup, activeModal, extraType, showChartDrawer, chartType, customAlert, customConfirm, executeConfirmAction, outSummaryPopup, playerProfilePopup, overlayInn1Data, overlayInn2Data, activeOverlayScoreData, currentBattingSquad, currentBowlingSquad, availableBatsmen, availableBowlersXI, fieldingSquadList, isDuplicate, loadTeamMemory, goToSquads, validateAndGoToOpening, resumeMatch, startMatch, startNewMatchInit, copyOverlayUrl, showGraphicOnLive, pushChartToLive, stopLiveGraphic, calculateCRR, calculateEconomy, handleUndo, rotateStrike, startNewOver, addRuns, openExtraModal, handleExtra, handleExtraRunOut, handleWicket, confirmWicketWithFielder, startNewBatter, openChartDrawer, closeChartDrawer, exitMatch, confirmExit, abandonMatch, getDLSParScore, historyType, openHistory, historyList, deleteHistoryItem, resumeHistoryMatch, viewHistoryScorecard, viewPlayerStats, selectedPlayerStats,
     koData, grpData, grpTab, activeTourneyMatch, tourneyWinnerSelect, setKoTeamCount, generateKoFixtures, resetKoTournament, saveKoState, initGroupSetupTeams, groupPlayoffPathText, getSortedGroupTeams, syncGroupPlayoffBracket, startGroupTournamentNow, resetGroupTournamentNow, saveGrpState, launchTournamentMatch,
     previousModal, goBackFromOpening, goBackFromAdmin, undoFromPostMatch, executeSwitchToSecondInnings, handleTieBreaker, postMatchTab, scorecardTab, commTab, getTopPerformers, finalMatchResultText, finalizePostMatch,
     allKnownPlayersList, getSquadArrayForTeam, getSquadSubForTeam, renamePlayerModal, openRenameActivePlayer, confirmRenameActivePlayer, updateSquadMemberLive, updateSquadSubLive
